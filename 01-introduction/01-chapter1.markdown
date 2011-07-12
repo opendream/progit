@@ -1,18 +1,14 @@
-# Getting Started #
+## เริ่มต้นปฐมบทแห่ง Git ##
+บทนี้เป็นบทแห่งการเริ่มต้นที่จะบอกเล่าเรื่องราวที่มาที่ไปของสิ่งที่เรียกว่า version contol tools จากนั้นเราก็จะถูกดึง มาเข้าเรื่อง Git ว่าเราจะไปทำยังไงให้ Git มาอยู่ในเครื่องเราได้ ทำไงให้มันทำงานได้และเมื่อจบบทนี้เราจะได้รู้ว่า ทำไมต้อง Git นั่นสิทำไม?
 
-This chapter will be about getting started with Git.  We will begin at the beginning by explaining some background on version control tools, then move on to how to get Git running on your system and finally how to get it setup to start working with.  At the end of this chapter you should understand why Git is around, why you should use it and you should be all setup to do so.
+## เกี่ยวกับ Version Control ##
+อะไรคือ version control แล้วทำไมต้องใช้ด้วย บางคนอาจบอกว่า “ก็จำได้ว่าทำอะไรไปมีไรป่ะ” แต่สุดท้ายผ่านไปสอง เดือนก็ลืมหมด version control คือระบบที่บันทึกการเปลี่ยนแปลงทั้งหมดที่เกิดขึ้นกับไฟล์หรือชุดของไฟล์ที่เรากำลัง ทำงานกับมันอยูและเมื่อมีการบันทึกการเปลี่ยนแปลง ทุกครั้งที่เกิดปัญหาแก้ไฟล์มั่วจำไม่ได้ เราก็สามารถย้อนกลับ ไปหาเวอร์ชั่นใดๆก่อนหน้าได้เสมอ โดยที่ตัวอย่างที่จะใช้ในหนังสือเล่มนี้จะเป็นไฟล์ที่ทรัพย์สินอันสำคัญเช่น source  code จะถูกควบคุมโดย version control แต่อย่างไรก็ตามสำหรับการนำไปใช้งานจริงนั้นเราสามารถประยุกต์ใช้กับ ไฟล์ประเภทไหนก็ได้
+เช่นถ้าคุณเป็น graphic designer  และอยากจะเก็บเวอร์ชั่นของภาพที่เราทำไปให้หมดทุกอัน สิ่งที่ช่วยเรื่องเหล่านี้ ได้คือ Version Control System (VCS) มันคือสิ่งที่คุณ “ต้อง” ใช้เพราะมันจะช่วยให้เราถอยไปถอยมาได้ไม่ว่าจะเป็น ระดับไฟล์หรือระดับโปรเจค ถ้ามันเละมากแก้มั่วไปหมดก็สามารถถอยกลับไปได้ วื๊บๆ ดังนั้นไอ้พวกข้ออ้างไฟล์หาย ไฟล์พังเพื่อขอเลื่อนโปรเจคไรือส่งงานข้าจะใช้ไม่ได้อีกต่อไป -/\-
 
-## About Version Control ##
-
-What is version control, and why should you care? Version control is a system that records changes to a file or set of files over time so that you can recall specific versions later. For the examples in this book you will use software source code as the files being version controlled, though in reality you can do this with nearly any type of file on a computer.
-
-If you are a graphic or web designer and want to keep every version of an image or layout (which you would most certainly want to), a Version Control System (VCS) is a very wise thing to use. It allows you to revert files back to a previous state, revert the entire project back to a previous state, compare changes over time, see who last modified something that might be causing a problem, who introduced an issue and when, and more. Using a VCS also generally means that if you screw things up or lose files, you can easily recover. In addition, you get all this for very little overhead.
 
 ### Local Version Control Systems ###
 
-Many people’s version-control method of choice is to copy files into another directory (perhaps a time-stamped directory, if they’re clever). This approach is very common because it is so simple, but it is also incredibly error prone. It is easy to forget which directory you’re in and accidentally write to the wrong file or copy over files you don’t mean to.
-
-To deal with this issue, programmers long ago developed local VCSs that had a simple database that kept all the changes to files under revision control (see Figure 1-1).
+ย่อหน้าที่แล้วมีคำว่า VCS  เยอะมากเอ๊ะแล้วจริงๆเขาทำด้วยอะไรกัน? คำตอบเริ่มจากทำกันบ้านๆก็ได้ไม่ต้องคิดมาก copy file ที่ต้องการไว้บ่อยๆจะแก้ก็ copy ทิ้งไว้ก่อนแล้วตั้งชื่อ directory ให้สอดคล้องกัน ทำไปเรือยๆนี่ไง VCS กราบส์ OTL ทำแบบนี้ก็ไม่ผิดแต่มันเยอะส์บางทีลืมบ้างอะไรบ้างก็บ้าบอกันได้เลยทีเดียวเพราะไม่รู้อันไหนแน่ที่ต้อง เอากลับมาใช้และเพื่อแก้ไขปัญหาเรื่องนี้โปรแกรมเมอร์ (อีกแล้วไม่ใช่ tester) ได้สร้าง VCS ที่มี database แปะมาด้วยสำหรับการเก็บประวัติการเปลี่ยนแปลงทั้งหลายทั้งปวง ดังรูป(see Figure 1-1).
 
 Insert 18333fig0101.png 
 Figure 1-1. Local version control diagram.
