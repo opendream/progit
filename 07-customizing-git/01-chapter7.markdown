@@ -176,7 +176,7 @@ You'll rarely want `color.ui = always`. In most scenarios, if you want color cod
 	$ git config --global mergetool.trustExitCode false
 	$ git config --global diff.external extDiff
 
-or you can edit your `~/.gitconfig` file to add these lines:
+หรือจะใช้วิธีแก้ไขไฟล์ `~/.gitconfig` แล้วเพิ่มบรรทัดนี้ลงไป
 
 	[merge]
 	  tool = extMerge
@@ -186,30 +186,30 @@ or you can edit your `~/.gitconfig` file to add these lines:
 	[diff]
 	  external = extDiff
 
-After all this is set, if you run diff commands such as this:
+หลังจากกำหนดค่าเสร็จแล้ว ถ้าเราลองสั่ง diff ตามนี้
 	
 	$ git diff 32d1776b1^ 32d1776b1
 
-Instead of getting the diff output on the command line, Git fires up P4Merge, which looks something like Figure 7-1.
+แทนที่จะได้ผลลัพทธ์เป็น diff จาก command line โปรแกรม Git จะไปเปิดโปรแกรม P4Merge ขึ้นมาแทนซึ่งได้ผลดังรูป 7-1
 
 Insert 18333fig0701.png 
-Figure 7-1. P4Merge.
+รูป 7-1. P4Merge.
 
-If you try to merge two branches and subsequently have merge conflicts, you can run the command `git mergetool`; it starts P4Merge to let you resolve the conflicts through that GUI tool.
+ถ้าเราลอง merge สอง branches แล้วพบว่าเกิด conflic ขึ้น เราสามารถทดลองสั่ง `git mergetool` ดู โปรแกรม Git จะสั่ง P4Merge ให้ทำงานเพื่อให้เราแก้ไข conflic ผ่าน GUI
 
-The nice thing about this wrapper setup is that you can change your diff and merge tools easily. For example, to change your `extDiff` and `extMerge` tools to run the KDiff3 tool instead, all you have to do is edit your `extMerge` file:
+การทำ wrapper มีข้อดีตรงที่เราสามารถปรับเปลี่ยนเครื่องมือในการ diff และ merge ได้ง่ายขึ้น ตัวอย่างเช่น เมื่อต้องการเปลี่ยนเครื่องมือ `extDiff` และ `extMerge` ไปใช้ KDiff3 สิ่งที่เราต้องทำก็แค่แก้ไขไฟล์ `extMerge` เท่านั้น
 
 	$ cat /usr/local/bin/extMerge
 	#!/bin/sh	
 	/Applications/kdiff3.app/Contents/MacOS/kdiff3 $*
 
-Now, Git will use the KDiff3 tool for diff viewing and merge conflict resolution.
+เท่านี้ Git ก็จะไปใช้โปรแกรม KDiff3 ในการแสดงผล diff และ merge conflict แทน
 
-Git comes preset to use a number of other merge-resolution tools without your having to set up the cmd configuration. You can set your merge tool to kdiff3, opendiff, tkdiff, meld, xxdiff, emerge, vimdiff, or gvimdiff. If you're not interested in using KDiff3 for diff but rather want to use it just for merge resolution, and the kdiff3 command is in your path, then you can run
+Git ได้เตรียมวิธีง่ายๆ ให้เราสามารถเปลี่ยนไปใช้โปรแกรม merge-resolution บางตัวได้โดยไม่ต้องตั้งคำสั่งสำหรับเรียกใช้เลย เราสามารถตั้ง merge ให้ไปเรียกใช้ kdiff3 opendiff tkdiff meld xxdiff emerge vimdiff หรือ gvimdiff ได้ในบรรทัดเดียว และในกรณีที่เราไม่ต้องการใช้ kdiff3 ในการทำ diff แต่ต้องการใช้สำหรับการ merge-resolution เราสามารถสั่งได้ตามนี้
 
 	$ git config --global merge.tool kdiff3
 
-If you run this instead of setting up the `extMerge` and `extDiff` files, Git will use KDiff3 for merge resolution and the normal Git diff tool for diffs.
+ถ้าเราใช้คำสั่งข้างต้นแทนการสร้างไฟล์ `extMerge` และ `extDiff` โปรแกรม Git จะใช้โปรแกรม kDiff3 สำหรับการ merge-resolution และใช้โปรแกรม diff ที่มาพร้อมกับ Git สำหรับการทำ diff
 
 ### Formatting and Whitespace ###
 
