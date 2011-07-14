@@ -106,69 +106,69 @@
 
 ถ้าเรากำหนด `help.autocorrect` เป็น 1 โปรแกรม Git จะแก้ไขข้อความแล้วสั่งให้โปรแกรมทำงานทันที ในกรณีที่ระบบเดาออกมาได้แค่ 1 รูปแบบ
 
-### Colors in Git ###
+### ใส่สีให้ Git ###
 
-Git can color its output to your terminal, which can help you visually parse the output quickly and easily. A number of options can help you set the coloring to your preference.
+Git สามารถแสดงสีบน terminal ได้ ซึ่งจะช่วยให้เราดูค่าต่างๆ ได้ง่ายและเร็วขึ้น โดยคำสั่งสำหรับกำหนดค่าสีมีดังนี้
 
 #### color.ui ####
 
-Git automatically colors most of its output if you ask it to. You can get very specific about what you want colored and how; but to turn on all the default terminal coloring, set `color.ui` to true:
+Git จะพยายามใส่สีให้เราในทุกๆ ค่าที่ออกมาถ้าเราต้องการ เราสามารถกำหนดไปในรายละเอียดเกี่ยวกับสีและรูปแบบที่จะออกมาได้ แต่ก่อนอื่นต้องเราต้องเปิดให้ Git รู้ว่าเราต้องการให้มีสีก่อน โดยใช้คำสั่ง `color.ui` ดังนี้
 
 	$ git config --global color.ui true
 
-When that value is set, Git colors its output if the output goes to a terminal. Other possible settings are false, which never colors the output, and always, which sets colors all the time, even if you're redirecting Git commands to a file or piping them to another command. This setting was added in Git version 1.5.5; if you have an older version, you'll have to specify all the color settings individually.
+เมื่อค่าถูกกำหนด โปรแกรม Git จะใส่สีให้กับทุกค่าที่ออกมาใน terminal ทันที คำสั่งนี้ถูกใส่เข้ามาใน Git version 1.5.5 ถ้าเราใช้เวอร์ชั่นก่อนหน้านี้ เราจะต้องกำหนดค่าสีทีละค่าด้วยตัวเอง
 
 You'll rarely want `color.ui = always`. In most scenarios, if you want color codes in your redirected output, you can instead pass a `--color` flag to the Git command to force it to use color codes. The `color.ui = true` setting is almost always what you'll want to use.
 
 #### `color.*` ####
 
-If you want to be more specific about which commands are colored and how, or you have an older version, Git provides verb-specific coloring settings. Each of these can be set to `true`, `false`, or `always`:
+ถ้าเราต้องการกำหนดลึกลงไปว่าคำสั่งใดบ้างที่ต้องการให้มีสี และมีสีอย่างไร เราสามารถกำหนดสีโดยใช้ verb-specific coloring setting ได้ โดยสามารถใช้ `true` `false` หรือ `always` กับคำสั่งเหล่านี้
 
 	color.branch
 	color.diff
 	color.interactive
 	color.status
 
-In addition, each of these has subsettings you can use to set specific colors for parts of the output, if you want to override each color. For example, to set the meta information in your diff output to blue foreground, black background, and bold text, you can run
+ถ้ายังไม่สะใจ แต่ละคำสั่งสามารถกำหนดย่อยลงไปได้อีก โดยเราสามารถกำหนดสีให้กับแต่ละส่วนที่ออกมา เช่น ถ้าเราต้องการกำหนดให้ meta information ที่อยู่ใน diff มีสีตัวอักษรเป็นสีฟ้า มีสีพื้นหลังเป็นสีดำ และเป็นตัวหนา เราสามารถสั่งได้ดังนี้
 
-	$ git config --global color.diff.meta ‚Äúblue black bold‚Äù
+	$ git config --global color.diff.meta "blue black bold"
 
-You can set the color to any of the following values: normal, black, red, green, yellow, blue, magenta, cyan, or white. If you want an attribute like bold in the previous example, you can choose from bold, dim, ul, blink, and reverse.
+เราสามารถกำหนดสีด้วยคำว่า normal black red green yellow blue magenta cyan หรือ white ถ้าเราต้องการกำหนดค่าอย่าง ตัวหนา แบบในตัวอย่างก่อนหน้านี้ เราสามารถใช้คำว่า bold dim ul blink และ reverse ได้
 
-See the `git config` manpage for all the subsettings you can configure, if you want to do that.
+ดูเพิ่มเติมได้ใน `git config` manpage สำหรับค่าอื่นๆ ถ้าต้องการจะทำ
 
-### External Merge and Diff Tools ###
+### ทำการ Merge และ Diff จากโปรแกรมภายนอก ###
 
-Although Git has an internal implementation of diff, which is what you've been using, you can set up an external tool instead. You can also set up a graphical merge conflict-resolution tool instead of having to resolve conflicts manually. I'll demonstrate setting up the Perforce Visual Merge Tool (P4Merge) to do your diffs and merge resolutions, because it's a nice graphical tool and it's free.
+แม้ว่า Git จะมีระบบ diff (ที่เราใช้กันในบทก่อนๆ) เอาไว้แล้วก็ตาม แต่ถ้าเราต้องการใช้โปรแกรมอื่นในการตรวจสอบ diff ก็สามารถทำได้ เช่นเดียวกันเราสามารถใช้เครื่องมือที่มี GUI สำหรับการ merge และแก้ไข conflict แทนการใช้ merge ที่มีมากับ Git ก็ได้ ผมจะยกตัวอย่างการตั้งค่าเพื่อใช้ Perforce Visual Merge Tools (P4Merge) สำหรับ diffs และ merge เพราะมันมีหน้าตาที่ดูดี ที่สำคัญคือมันฟรี
 
-If you want to try this out, P4Merge works on all major platforms, so you should be able to do so. I'll use path names in the examples that work on Mac and Linux systems; for Windows, you'll have to change `/usr/local/bin` to an executable path in your environment.
+ถ้าต้องการทดลอง (P4Merge รองรับระบบปฏิบัติการหลักๆ) ก็สามารถทำตามได้เลย ผมจะใช้ path และ names โดยอ้างอิงจาก Mac และ Linux ส่วนใครที่ใช้ Windows ก็ให้เปลี่ยน `/usr/local/bin` ไปตาม path ของระบบที่ใช้อยู่นะครับ
 
-You can download P4Merge here:
+ขั้นแรกให้ Download P4Merge จากที่นี่
 
 	http://www.perforce.com/perforce/downloads/component.html
 
-To begin, you'll set up external wrapper scripts to run your commands. I'll use the Mac path for the executable; in other systems, it will be where your `p4merge` binary is installed. Set up a merge wrapper script named `extMerge` that calls your binary with all the arguments provided:
+เริ่มต้น เราจะกำหนดให้ external wrapper script ไปยังคำสั่งที่ต้องการ (ตัวอย่างจะเป็น path ของ Mac แต่ถ้าเป็นระบบอื่นก็ให้ลองหาคำสั่ง p4merge ในเครื่องดู) สร้าง merge wrapper ในชื่อ extMerge ให้มันไปเรียกคำสั่งที่เราต้องการดังนี้
 
 	$ cat /usr/local/bin/extMerge
 	#!/bin/sh
 	/Applications/p4merge.app/Contents/MacOS/p4merge $*
 
-The diff wrapper checks to make sure seven arguments are provided and passes two of them to your merge script. By default, Git passes the following arguments to the diff program:
+สำหรับตัว diff wrapper เราจะได้รับ arguments ทั้งหมด 7 ตัว โดยเราจะส่ง 2 ตัวต่อไปยัง diff script ทั้งนี้ค่าปริยาย Git จะส่ง argument ไปยังโปรแกรม diff เป็นดังนี้
 
 	path old-file old-hex old-mode new-file new-hex new-mode
 
-Because you only want the `old-file` and `new-file` arguments, you use the wrapper script to pass the ones you need.
+เนื่องจากเราต้องการแค่ argument `old-file` และ `new-file` ดังนั้นเราจะให้ wrapper ส่งต่อไปเฉพาะที่เราต้องการดังนี้ 
 
 	$ cat /usr/local/bin/extDiff 
 	#!/bin/sh
 	[ $# -eq 7 ] && /usr/local/bin/extMerge "$2" "$5"
 
-You also need to make sure these tools are executable:
+จากนั้นเราต้องเปลี่ยนให้ไฟล์ wrapper ทั้งสองตัวของเราเป็นไฟล์ที่สามารถ execute ได้
 
 	$ sudo chmod +x /usr/local/bin/extMerge 
 	$ sudo chmod +x /usr/local/bin/extDiff
 
-Now you can set up your config file to use your custom merge resolution and diff tools. This takes a number of custom settings: `merge.tool` to tell Git what strategy to use, `mergetool.*.cmd` to specify how to run the command, `mergetool.trustExitCode` to tell Git if the exit code of that program indicates a successful merge resolution or not, and `diff.external` to tell Git what command to run for diffs. So, you can either run four config commands
+เมื่อทุกอย่างพร้อม เราจะสามารถกำหนดให้ Git ไปใช้ mearge resolution และ diff tools ของเราได้แล้ว เริ่มต้นเราบอก Git ก่อนว่าเราใช้ `merge.too` ตัวไหน จากนั้นก็บอกวิธีการเรียกใช้โดย `mergetool.extMerge.cmd` จากนั้นก็บอก Git ว่าเมื่อโปรแกรมทำงานเสร็จแล้วให้สนใจความสำเร็จหรือล้มเหลวของการ merge หรือไม่ โดยใช้คำสั่ง `mergetool.trustExitCode` เมื่อทำ merge เสร็จแล้วก็มากำหนดค่าให้ diff บ้างโดยใช้คำสั่ง `diff.external` ดังนี้
 
 	$ git config --global merge.tool extMerge
 	$ git config --global mergetool.extMerge.cmd \
@@ -395,10 +395,10 @@ However, that result is of limited use. If you've used keyword substitution in C
 It turns out that you can write your own filters for doing substitutions in files on commit/checkout. These are the "clean" and "smudge" filters. In the `.gitattributes` file, you can set a filter for particular paths and then set up scripts that will process files just before they're checked out ("smudge", see Figure 7-2) and just before they're committed ("clean", see Figure 7-3). These filters can be set to do all sorts of fun things.
 
 Insert 18333fig0702.png 
-Figure 7-2. The ‚Äúsmudge‚Äù filter is run on checkout.
+Figure 7-2. The "smudge" filter is run on checkout.
 
 Insert 18333fig0703.png 
-Figure 7-3. The ‚Äúclean‚Äù filter is run when files are staged.
+Figure 7-3. The "clean" filter is run when files are staged.
 
 The original commit message for this functionality gives a simple example of running all your C source code through the `indent` program before committing. You can set it up by setting the filter attribute in your `.gitattributes` file to filter `*.c` files with the "indent" filter:
 
@@ -858,7 +858,7 @@ Here is an example pre-rebase script that checks for that. It gets a list of all
 	target_shas.each do |sha|
 	  remote_refs.each do |remote_ref|
 	    shas_pushed = `git rev-list ^#{sha}^@ refs/remotes/#{remote_ref}`
-	    if shas_pushed.split(‚Äú\n‚Äù).include?(sha)
+	    if shas_pushed.split("\n").include?(sha)
 	      puts "[POLICY] Commit #{sha} has already been pushed to #{remote_ref}"
 	      exit 1
 	    end
