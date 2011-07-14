@@ -82,11 +82,11 @@
 
 #### user.signingkey ####
 
-If you're making signed annotated tags (as discussed in Chapter 2), setting your GPG signing key as a configuration setting makes things easier. Set your key ID like so:
+ถ้าเราสร้าง signed annotated tag ขึ้นมา (อย่างที่คุยไว้ในบทที่ 2) การกำหนด GPG signing key สามารถทำได้เหมือนการกำหนดค่าอื่นๆ ตามนี้
 
 	$ git config --global user.signingkey <gpg-key-id>
 
-Now, you can sign tags without having to specify your key every time with the `git tag` command:
+ตอนนี้ เราสามารถใส่ tags โดยไม่ต้องมีกำหนด key ทุกครั้งที่เราใส่ tag ด้วยคำสั่ง `git tag`
 
 	$ git tag -s <tag-name>
 
