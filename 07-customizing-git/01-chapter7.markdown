@@ -205,7 +205,7 @@ Insert 18333fig0701.png
 
 เท่านี้ Git ก็จะไปใช้โปรแกรม KDiff3 ในการแสดงผล diff และ merge conflict แทน
 
-Git ได้เตรียมวิธีง่ายๆ ให้เราสามารถเปลี่ยนไปใช้โปรแกรม merge-resolution บางตัวได้โดยไม่ต้องตั้งคำสั่งสำหรับเรียกใช้เลย เราสามารถตั้ง merge ให้ไปเรียกใช้ kdiff3 opendiff tkdiff meld xxdiff emerge vimdiff หรือ gvimdiff ได้ในบรรทัดเดียว และในกรณีที่เราไม่ต้องการใช้ kdiff3 ในการทำ diff แต่ต้องการใช้สำหรับการ merge-resolution เราสามารถสั่งได้ตามนี้
+Git ได้เตรียมวิธีง่ายๆ ให้เราสามารถเปลี่ยนไปใช้โปรแกรม merge-resolution บางตัวได้โดยไม่ต้องตั้งคำสั่งสำหรับเรียกใช้เลย เราสามารถตั้ง merge ให้ไปเรียกใช้ kDiff3 opendiff tkdiff meld xxdiff emerge vimdiff หรือ gvimdiff ได้ในบรรทัดเดียว และในกรณีที่เราไม่ต้องการใช้ kDiff3 ในการทำ diff แต่ต้องการใช้สำหรับการ merge-resolution เราสามารถสั่งได้ตามนี้
 
 	$ git config --global merge.tool kdiff3
 
