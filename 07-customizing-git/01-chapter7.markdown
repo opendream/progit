@@ -22,19 +22,19 @@
 
 ### พื้นฐานการปรับแต่งบนเครื่องตัวเอง ###
 
-The configuration options recognized by Git fall into two categories: client side and server side. The majority of the options are client side‚Äîconfiguring your personal working preferences. Although tons of options are available, I'll only cover the few that either are commonly used or can significantly affect your workflow. Many options are useful only in edge cases that I won't go over here. If you want to see a list of all the options your version of Git recognizes, you can run
+การปรับแต่งใน Git มีอยู่สองประเภทคือ ปรับแต่งบนเครื่องตัวเอง (cliend side) และ ปรับแต่งที่ฝั่งเซิฟเวอร์ (server side) โดยส่วนมาแล้วจะเน้นการปรับแต่งบนเครื่องตัวเองมากกว่า เพราะมักจะเอาไว้ใช้เองไม่มีผลกับคนอื่น อย่างไรก็ตามค่าที่สามารถปรับแต่งได้มีอยู่มหาศาล แต่ที่จะพูดในบทนี้จะเป็นค่าที่ใช้กันบ่อยๆ หรือค่าที่จำเป็นสำหรับ workflow เป็นหลัก แม้ว่าในหลายๆ ค่าจะมีประโยชน์ในกรณีที่เราใช้ตัวล่าสุดแต่คงไม่ได้เอามาใส่ในเล่มนี้ ถ้าต้องการรู้ว่า Git ของคุณมีอะไรให้ปรับแต่งได้บ้าง ให้ลองสั่ง
 
 	$ git config --help
 
-The manual page for `git config` lists all the available options in quite a bit of detail.
+คู่มือการใช้งานที่ได้จาก `git config` จะแสดงรายการของค่าสำหรับปรับแต่พร้อมกับรายละเอียดอีกเล็กน้อย
 
 #### core.editor ####
 
-By default, Git uses whatever you've set as your default text editor or else falls back to the Vi editor to create and edit your commit and tag messages. To change that default to something else, you can use the `core.editor` setting:
+ถ้าไม่ได้ตั้งค่าอะไร Git จะเปิด text editor ที่กำหนดเป็นค่าบริยายในเครื่อง หรือไม่ก็ใช้ Vi เป็นตัวแก้ไขข้อความที่จะ commit หรือ tag ถ้าต้องการจะแก้ไขไปใช้ text editor ตัวอื่นให้ใช้คำสั่ง `core.editor` ในการตั้งค่า
 
 	$ git config --global core.editor emacs
 
-Now, no matter what is set as your default shell editor variable, Git will fire up Emacs to edit messages.
+หลังจากนี้ ไม่ว่า shell ของเราจะจะตั้งค่าปริยายสำหรับแก้ไขไฟล์เป็นอะไร โปรแกรม Git จะไปเปิด Emacs สำหรับแก้ไขข้อความเสมอ 
 
 #### commit.template ####
 
