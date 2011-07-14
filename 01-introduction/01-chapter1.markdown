@@ -8,23 +8,24 @@
 
 ### Local Version Control Systems ###
 
-ย่อหน้าที่แล้วมีคำว่า VCS  เยอะมากเอ๊ะแล้วจริงๆเขาทำด้วยอะไรกัน? คำตอบเริ่มจากทำกันบ้านๆก็ได้ไม่ต้องคิดมาก copy file ที่ต้องการไว้บ่อยๆจะแก้ก็ copy ทิ้งไว้ก่อนแล้วตั้งชื่อ directory ให้สอดคล้องกัน ทำไปเรือยๆนี่ไง VCS กราบส์ OTL ทำแบบนี้ก็ไม่ผิดแต่มันเยอะส์บางทีลืมบ้างอะไรบ้างก็บ้าบอกันได้เลยทีเดียวเพราะไม่รู้อันไหนแน่ที่ต้อง เอากลับมาใช้และเพื่อแก้ไขปัญหาเรื่องนี้โปรแกรมเมอร์ (อีกแล้วไม่ใช่ tester) ได้สร้าง VCS ที่มี database แปะมาด้วยสำหรับการเก็บประวัติการเปลี่ยนแปลงทั้งหลายทั้งปวง ดังรูป(see Figure 1-1).
+ย่อหน้าที่แล้วมีคำว่า VCS  เยอะมากเอ๊ะแล้วจริงๆเขาทำด้วยอะไรกัน? คำตอบเริ่มจากทำกันบ้านๆก็ได้ไม่ต้องคิดมาก copy file ที่ต้องการไว้บ่อยๆจะแก้ก็ copy ทิ้งไว้ก่อนแล้วตั้งชื่อ directory ให้สอดคล้องกัน ทำไปเรือยๆนี่ไง VCS กราบส์ OTL ทำแบบนี้ก็ไม่ผิดแต่มันเยอะส์บางทีลืมบ้างอะไรบ้างก็บ้าบอกันได้เลยทีเดียวเพราะไม่รู้อันไหนแน่ที่ต้อง เอากลับมาใช้และเพื่อแก้ไขปัญหาเรื่องนี้โปรแกรมเมอร์ (อีกแล้วไม่ใช่ tester) ได้สร้าง VCS ที่มี database แปะมาด้วยสำหรับการเก็บประวัติการเปลี่ยนแปลงทั้งหลายทั้งปวง ดังรูป(ดู Figure 1-1).
 
 Insert 18333fig0101.png 
 Figure 1-1. Local version control diagram.
 
-One of the more popular VCS tools was a system called rcs, which is still distributed with many computers today. Even the popular Mac OS X operating system includes the  rcs command when you install the Developer Tools. This tool basically works by keeping patch sets (that is, the differences between files) from one change to another in a special format on disk; it can then re-create what any file looked like at any point in time by adding up all the patches.
+หนึ่งใน VCS ในตำนานที่ยังคงอยู่ค้ำฟ้ามาจนถึงปัจจุบันคือ rcs ยกตัวอย่างเช่นใน Mac OS X เองก็ยังคงมีคำสั่ง rcs ให้เราใช้งานได้หลังจากที่เราติดตั้ง Developer Tools ลงในเครื่องโดยที่เจ้า rcs นี้จะทำหน้าที่เก็บความแตกต่างของไฟล์หรือที่เรียกว่า patch sets เพื่อใช้สำหรับการสร้างไฟล์ขึ้นมาใหม่ในกรณีที่เกิด file lock หลังจากที่เราลง pacth ใหม่ลงไปในเครื่องดังนั้น rcs ก็จะเป็นตัวอย่างที่ดีของการทำ local repository แต่ของแบบนี้ก็ดีถ้าเราทำอะไรคนเดียว
 
 ### Centralized Version Control Systems ###
+ในกรณีที่เราต้องการทำงานร่วมกับคนอื่นๆแล้วเราจะแบ่งปันโค้ดเทพของกันและกันได้อย่างไรนี่ไอ้ของแบบ Local Repo คงไม่เหมาะเท่าไหร่ ดังนั้นของใหม่ที่เกิดถัดมาคือ Centralized Version Control System (CVCSs) และตัวอย่างของระบบแบบนี้คือ CVS, Subversion และ Perforce นั่นเองซึ่งหัวใจหลักของการทำงานแบบนี้คือจะต้องมี server หนึ่งตัวที่รับหน้าที่เก็บของให้ทั้งหมด ทั้งไฟล์ที่เกิดการเปลี่ยนแปลงและจำนวน user ที่ check out ไฟล์จาก server และอย่างที่เรารู้ว่า Centralize Repo เป็นมาตรฐานของ VCS มานานหลายปี (ดู Figure 1-2).
 
-The next major issue that people encounter is that they need to collaborate with developers on other systems. To deal with this problem, Centralized Version Control Systems (CVCSs) were developed. These systems, such as CVS, Subversion, and Perforce, have a single server that contains all the versioned files, and a number of clients that check out files from that central place. For many years, this has been the standard for version control (see Figure 1-2).
 
 Insert 18333fig0102.png 
 Figure 1-2. Centralized version control diagram.
 
-This setup offers many advantages, especially over local VCSs. For example, everyone knows to a certain degree what everyone else on the project is doing. Administrators have fine-grained control over who can do what; and it’s far easier to administer a CVCS than it is to deal with local databases on every client.
+สำหรับการ setup ระบบแบบ Centralize เองก็มีข้อดีหลายอย่างมากที่ดีกว่า local VCSs ยกตัวอย่างเช่นทุกๆคนในทีมจะรู้ว่าคนอื่นๆมชในทีมที่เหลือกำลังทำอะไรอยู่ ส่วนผู้ที่ดูแลระบบก็สามารถจัดการกับสิทธิ์การทำงานของ user ทุกคนได้ซึ่งนี้ก็เป็นข้อดีที่เหนือกว่าการมานั่งกำหนดอะไรอะไรที่ local database ทีละเครื่องมากมายนัก
 
-However, this setup also has some serious downsides. The most obvious is the single point of failure that the centralized server represents. If that server goes down for an hour, then during that hour nobody can collaborate at all or save versioned changes to anything they’re working on. If the hard disk the central database is on becomes corrupted, and proper backups haven’t been kept, you lose absolutely everything—the entire history of the project except whatever single snapshots people happen to have on their local machines. Local VCS systems suffer from this same problem—whenever you have the entire history of the project in a single place, you risk losing everything.
+
+แต่อย่างไรก็ตามการทำงานในลักษณะนี้เองมรข้อเสียที่น่าสนใจอยู่หนึ่งอย่างและดูเหมือนว่าจะร้ายแรงมากคือในกรณีที่ server พังไปสักชั่วโมงจะทำให้คนที่ทำงานอยู่ไม่สามารถส่งอะไรเข้ามา update ได้เลยและถ้าเอาให้หนักหน่อยในกรณีที่ไม่มีการสำรองข้อมูลไว้เราจะพบกับฝันร้ายขั้นร้ายแรงคือ เราจะเสีย history ทั้งหมดของระบบไปหมดเลย (แรงดีเนอะ) ดังนั้นนี่คือด้วนมืดของ Centrlaized Repo
 
 ### Distributed Version Control Systems ###
 
