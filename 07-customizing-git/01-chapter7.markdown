@@ -74,11 +74,11 @@
 
 #### core.pager ####
 
-The core.pager setting determines what pager is used when Git pages output such as `log` and `diff`. You can set it to `more` or to your favorite pager (by default, it's `less`), or you can turn it off by setting it to a blank string:
+คำสั่ง core.pager ใช้สำหรับบอก Git ให้แสดงผลเป็นหน้าๆ สำหรับข้อมูลยาวๆ เช่น `log` และ `diff` เป็นต้น เราสามารถตั้งค่าเป็น `more` หรืออื่นๆ ตามที่ชอบ (ค่าบริยายคือ `less`) หรือเราจะปิดการแสดงผลเป็นหน้าไปเลยก็ได้ โดยการกำหนดค่าว่างให้มัน
 
 	$ git config --global core.pager ''
 
-If you run that, Git will page the entire output of all commands, no matter how long they are.
+ถ้าเราสั่งคำสั่งข้างต้น ต่อไป Git จะแสดงข้อมูลทั้งหมดแบบไม่มีการแบ่งหน้า โดยไม่สนใจว่าข้อมูลจะยาวแค่ไหน
 
 #### user.signingkey ####
 
