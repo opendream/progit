@@ -92,7 +92,7 @@
 
 #### core.excludesfile ####
 
-You can put patterns in your project's `.gitignore` file to have Git not see them as untracked files or try to stage them when you run `git add` on them, as discussed in Chapter 2. However, if you want another file outside of your project to hold those values or have extra values, you can tell Git where that file is with the `core.excludesfile` setting. Simply set it to the path of a file that has content similar to what a `.gitignore` file would have.
+เราสามารถกำหนดรูปแบบของไฟล์ไว้ใน `.gitignore` เพื่อให้ Git ไม่สนใจไฟล์เหล่านั้นตอนที่เราสั่ง `git add` หรือตอนที่ตรวจสอบสถานะของโครงการ อย่างที่เคยคุยไว้ในบทที่สอง อย่างไรก็ตามถ้าเราต้องการให้มีไฟล์นอกโครงการของเรา ทำหน้าที่เก็บค่าเหล่านี้ หรือค่าอื่นๆ เราสามารถใช้คำสั่ง `core.excludesfile` ได้ โดยชี้คำสั่งนี้ไปที่ path ของไฟล์ที่มีเนื้อหาแบบเดียวกับ `.gitignore` ไฟล์
 
 #### help.autocorrect ####
 
