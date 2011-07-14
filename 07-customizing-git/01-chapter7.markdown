@@ -96,7 +96,7 @@
 
 #### help.autocorrect ####
 
-This option is available only in Git 1.6.1 and later. If you mistype a command in Git 1.6, it shows you something like this:
+คำสั่งนี้ใช้ได้เฉพาะใน Git 1.6.1 หรือเวอร์ชั่นที่สูงกว่า ถ้าเราพิมพ์คำสั่งผิดโปรแกรม Git 1.6 จะแสดงข้อความประมาณนี้
 
 	$ git com
 	git: 'com' is not a git-command. See 'git --help'.
@@ -104,7 +104,7 @@ This option is available only in Git 1.6.1 and later. If you mistype a command i
 	Did you mean this?
 	     commit
 
-If you set `help.autocorrect` to 1, Git will automatically run the command if it has only one match under this scenario.
+ถ้าเรากำหนด `help.autocorrect` เป็น 1 โปรแกรม Git จะแก้ไขข้อความแล้วสั่งให้โปรแกรมทำงานทันที ในกรณีที่ระบบเดาออกมาได้แค่ 1 รูปแบบ
 
 ### Colors in Git ###
 
