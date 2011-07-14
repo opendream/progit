@@ -38,7 +38,7 @@
 
 #### commit.template ####
 
-If you set this to the path of a file on your system, Git will use that file as the default message when you commit. For instance, suppose you create a template file at `$HOME/.gitmessage.txt` that looks like this:
+เราเรากำหนดค่านี้ไปที่ไฟล์บนเครื่อง Git จะใช้ไฟล์นี้เป็นข้อความตั้งต้นสำหรับการ commit ตัวอย่างเช่น เราสร้างไฟล์ `$HOME/.gitmessage.txt` ที่ออกมาหน้าตาแบบนี้
 
 	subject line
 
@@ -46,12 +46,12 @@ If you set this to the path of a file on your system, Git will use that file as 
 
 	[ticket: X]
 
-To tell Git to use it as the default message that appears in your editor when you run `git commit`, set the `commit.template` configuration value:
+วิธีการบอก Git ให้รู้ว่าเราต้องการให้ข้อความในไฟล์นี้มาแสดงใน text editor ตอนที่สั่ง `git commit` ให้สั่ง `commit.template` ดังนี้
 
 	$ git config --global commit.template $HOME/.gitmessage.txt
 	$ git commit
 
-Then, your editor will open to something like this for your placeholder commit message when you commit:
+แล้วโปรแกรม text editor จะเปิดข้อความดังนี้ ทุกครั้งที่เราสั่ง commit
 
 	subject line
 
@@ -70,7 +70,7 @@ Then, your editor will open to something like this for your placeholder commit m
 	~
 	".git/COMMIT_EDITMSG" 14L, 297C
 
-If you have a commit-message policy in place, then putting a template for that policy on your system and configuring Git to use it by default can help increase the chance of that policy being followed regularly.
+ต่อไปถ้าเราต้องการกำหนดนโยบายสำหรับข้อความที่จะ commit ให้เราใส่ไฟล์ต้นแบบไว้ในเครื่องแล้วกำหนดให้ Git ใช้เป็นค่าบริยาย จะช่วยให้การเปลี่ยนแปลงรูปแบบข้อความ commit ในทีมได้ง่ายขึ้น
 
 #### core.pager ####
 
