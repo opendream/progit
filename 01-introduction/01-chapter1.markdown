@@ -34,7 +34,6 @@ Figure 1-2. Centralized version control diagram.
 Insert 18333fig0103.png 
 Figure 1-3. Distributed version control diagram.
 
-Furthermore, many of these systems deal pretty well with having several remote repositories they can work with, so you can collaborate with different groups of people in different ways simultaneously within the same project. This allows you to set up several types of workflows that aren’t possible in centralized systems, such as hierarchical models.
 นอกจากนี้แล้วระบบแบบนี้ยังถูกออกแบบให้มีความสามารถในการทำงานกับ remote repository ได้มากกว่าหนึ่งที่ด้วยนั่นหมายความว่าเราสามารถทำงานแจมกับพรรคพวกได้มากกว่าหนึงที่ในโปรเจคเดียวกัน ดังนั้นเราจะสามารถ setup workflow ได้หลายประเภทเพื่อให้รองรับการทำงานของเราและสิ่งนี้ทำไม่ได้ใน Centralize Repository นะจ๊ะย้ำ
 
 ## A Short History of Git ##
