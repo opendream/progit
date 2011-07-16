@@ -68,62 +68,64 @@ Figure 1-5. Git stores data as snapshots of the project over time.
 
 นี่ความความแตกต่างที่สำคัญระหว่าง Git และ VCSs อื่นๆเกือบทั่วโลก มันทำให้ Git ต้องคิดใหม่ ทำใหม่เกือบทุกๆอย่าง ขณะที่ระบบอื่นๆแค่ copy มาจากรุ่นก่อนๆ มันทำให้ Git เหมือนเป็น filesystem ขนาดจิ๋วที่มากับ tools อันทรงพลังที่สร้างขึ้นมาครอบมันมากกว่าที่จะเป็นแค่ VCS ธรรมดา เด๋วเราค่อยมาโชว์ของดีที่ได้จากการมองข้อมูลในลักษณะนี้ในหัวข้อ branching ใน Chapter 3
 
-### Nearly Every Operation Is Local ###
+### เกือบทุก operation นั้นทำบนเครื่องตัวเอง ###
 
-Most operations in Git only need local files and resources to operate — generally no information is needed from another computer on your network.  If you’re used to a CVCS where most operations have that network latency overhead, this aspect of Git will make you think that the gods of speed have blessed Git with unworldly powers. Because you have the entire history of the project right there on your local disk, most operations seem almost instantaneous.
+ส่วนใหญ่แล้ว operation ใน Git ต้องการแค่ file และทรัพยากรบนเครื่องในการทำงาน ไม่จำเป็นต้องมีข้อมูลอื่นใดจากเครื่องอื่นๆใน network ถ้าคุณคุ้นเคยกับ CVCS ที่ operation ส่วนใหญ่ต้องทนกับความช้าของ network แล้วละก็ คุณจะรู้สึกราวกับว่าเทพแห่งความเร็วนั้นอวยพร Git ด้วยความเร็วส์ที่ไม่อายบรรยาย เพราะว่าคุณมี history ทั้งหมดของ project เก็บอยู่ที่นี่ในเครื่องของตัวเอง operation ทั้งหลายแหล่จึงรวดเร็วทันใจ
 
-For example, to browse the history of the project, Git doesn’t need to go out to the server to get the history and display it for you—it simply reads it directly from your local database. This means you see the project history almost instantly. If you want to see the changes introduced between the current version of a file and the file a month ago, Git can look up the file a month ago and do a local difference calculation, instead of having to either ask a remote server to do it or pull an older version of the file from the remote server to do it locally.
+ยกตัวอย่างเช่นการค้นหา history ของ project Git ไม่จำเป็นต้องวิ่งไป server เพื่อดึง history แล้วหิ้วกลับมาแสดงผลให้คุณ มันแค่อ่านจาก database บนเครื่องก็ได้แล้ว นั่นหมายความว่าคุณสามารถเห็น project history ได้ในอึดใจเดียว ถ้าอยากดูความเปลี่ยนแปลงที่เกิดขึ้นบน file ซักอันระหว่าง version ปัจจุบันกับเมื่อเดือนที่แล้ว Git สามารถค้นหา file เมื่อเดือนที่แล้วบนเครื่องแล้วคำนวนหาสิ่งที่เปลี่ยนแปลงไปให้ได้ทันที แทนที่จะต้องไปอ้อน server ที่อยู่ไกลๆให้คำนวนให้หรือไปขอ file เดือนก่อนจาก server แล้วค่อยเอามาคำนวน
 
-This also means that there is very little you can’t do if you’re offline or off VPN. If you get on an airplane or a train and want to do a little work, you can commit happily until you get to a network connection to upload. If you go home and can’t get your VPN client working properly, you can still work. In many other systems, doing so is either impossible or painful. In Perforce, for example, you can’t do much when you aren’t connected to the server; and in Subversion and CVS, you can edit files, but you can’t commit changes to your database (because your database is offline). This may not seem like a huge deal, but you may be surprised what a big difference it can make.
+นั่นหมายความว่าคุณแทบจะไม่มีอะไรที่ทำไม่ได้ในกรณีที่ไม่ได้ต่อเนตหรือต่อ VPN ไม่ว่าจะกำลังนั่งรถ นั่งเรือ นั่งเครื่องบินอยู่ ถ้ามีอะไรกระจุ๊กกระจิ๊กอยากทำก็สามารถทำแล้ว commit เก็บไว้ได้อย่างสบายอารมณ์ ไว้ต่อเนตได้เมื่อไหร่ก็ค่อย upload ถ้าสมมติอยู่บ้านแล้วไม่สามารถ set VPN ได้ ก็ยังจะทำงานได้อยู่ ถ้าเป็นระบบอื่นๆ จะทำให้ได้แบบนี้แทบจะเป็นไปไม่ได้ ถึงได้ก็เลือดตาแทบกระเด็นหล่ะ เช่นสมมติใช้ Perforce คุณแทบจะทำอะไรไม่ได้เลยถ้าไม่ต่ออยู่กับ server หรือกรณี Subversion และ CVS ถึงจะแก้ file ได้ ก็ commit ใส่ database ไม่ได้ (เพราะไม่ได้ต่อกับ database) ถึงเรื่องแค่นี้จะดูเป็นเรื่องเล็ก แต่ถ้าลองได้ใช้จริงจะรู้ว่าชีวิตมันรู้สึกแตกต่างกันขนาดไหน
 
-### Git Has Integrity ###
+### Git นั้นเที่ยงธรรม ###
 
-Everything in Git is check-summed before it is stored and is then referred to by that checksum. This means it’s impossible to change the contents of any file or directory without Git knowing about it. This functionality is built into Git at the lowest levels and is integral to its philosophy. You can’t lose information in transit or get file corruption without Git being able to detect it.
+ทุกอย่างใน Git ถูก checksum ก่อนจะถูก save และจะถูกอ้างอิงถึงด้วย checksum นั้นๆ นั่นหมายความว่าไม่มีทางที่จะมีข้อมูลใน file หรือ directory เปลี่ยนไปโดยที่ Git จะไม่รู้เรื่อง ความสามารถนี้ถูกฝังไว้ในแก่นลึกสุดใจของ Git และหล่อหลอมเข้ากับจิตวิญญาณของมัน คุณไม่มีวันเจอ file เสียหรือพังไประหว่างถ่ายโอนข้อมูลโดยที่ Git ตรวจจับไม่เจอแน่นอน
 
-The mechanism that Git uses for this checksumming is called a SHA-1 hash. This is a 40-character string composed of hexadecimal characters (0–9 and a–f) and calculated based on the contents of a file or directory structure in Git. A SHA-1 hash looks something like this:
+กลไกที่ Git ใช้ในการทำ checksum เรียกว่า SHA-1 hash ซึ่งเป็นเลขฐาน 16 ยาว 40 ตัวอักษรที่ถูกคำนวนมาจากเนื้อหาภายใน file หรือโครงสร้าง directory ภายใน Git SHA-1 hash มีหน้าตาประมาณนี้:
 
 	24b9da6552252987aa493b52f8696cd6d3b00373
 
-You will see these hash values all over the place in Git because it uses them so much. In fact, Git stores everything not by file name but in the Git database addressable by the hash value of its contents.
+คุณจะเห็นค่า hash เหล่านี้กระจายตัวอยู่ทั่ว Git มันถูกใช้เยอะมว้ากก เอาจริงๆแล้ว Git ไม่ได้เก็บข้อมูลเป็น file แต่เก็บลง database ซึ่งสามารถเข้าถึงข้อมูลได้ด้วยค่า hash ของเนื้อหาใน file
 
-### Git Generally Only Adds Data ###
+### โดยรวมแล้ว Git มีแต่เพิ่มข้อมูล ###
 
-When you do actions in Git, nearly all of them only add data to the Git database. It is very difficult to get the system to do anything that is not undoable or to make it erase data in any way. As in any VCS, you can lose or mess up changes you haven’t committed yet; but after you commit a snapshot into Git, it is very difficult to lose, especially if you regularly push your database to another repository.
+เมื่อคุณทำ action ใดๆใน Git เกือบทุกอย่างจะเป็นการเพิ่มข้อมูลลงไปใน Git database มันยากมากที่จะทำอะไรลงไปแล้ว undo ไม่ได้ คล้ายกับ VCS อื่นๆคือคุณยังสามรถทำ file หาย หรือว่าทำของเละเทะได้ ถ้าคุณยังไม่ได้ commit แต่เมื่อไหร่ที่คุณ commit ไปใน Git ซัก snapshot นึงแล้ว มันแทบจะไม่มีวันหายเลย โดยเฉพาะอย่างยิ่งเวลาคุณคอย push database ของคุณไปใส่ repository อื่นอย่างสม่ำเสมอ
 
-This makes using Git a joy because we know we can experiment without the danger of severely screwing things up. For a more in-depth look at how Git stores its data and how you can recover data that seems lost, see “Under the Covers” in Chapter 9.
+การใช้ Git จึงกลายเป็นความบันเทิงเพราะเรารู้ว่าเราสามารถทำการทดลองอะไรก็ได้โดยไม่กลัวว่าจะทำอะไรพัง ไว้ค่อยมาเจาะลึกว่า Git เก็บข้อมูลยังไง และเวลาทำอะไรเละเทะไปแล้วจะกู้กลับมายังไงในบท “Under the Covers” ใน Chapter 9.
 
-### The Three States ###
+### State ทั้งสาม ###
 
-Now, pay attention. This is the main thing to remember about Git if you want the rest of your learning process to go smoothly. Git has three main states that your files can reside in: committed, modified, and staged. Committed means that the data is safely stored in your local database. Modified means that you have changed the file but have not committed it to your database yet. Staged means that you have marked a modified file in its current version to go into your next commit snapshot.
+เอาล่ะ! ตั้งสมาธิให้ดี นี่คือแก่นของวรยุทธ์ที่จะต้องจำให้ขึ้นใจถ้าอยากให้การศึกษา Git เป็นไปอย่างราบรื่น Git มีสาม state หลักสำหรับ file ทุก file: committed, modified และ staged 
 
-This leads us to the three main sections of a Git project: the Git directory, the working directory, and the staging area.
+Committed แปลว่าข้อมูลถูกจัดเก็บอย่างปลอดภัยใน database บนเครื่อง, Modified แปลว่าคุณได้แก้ file ไปแต่ยังไม่ได้ commit มันใส่ database, Staged แปลว่าคุณได้ mark file ที่ถูก modify ใน version นี้ให้มันถูก commit ใน snapshot หน้า
+
+3 state นี้ชักนำให้เกิด 3 ก๊กใน Git project นั่นคือ Git directory, working directory, และ staging area
 
 Insert 18333fig0106.png 
 Figure 1-6. Working directory, staging area, and git directory.
 
-The Git directory is where Git stores the metadata and object database for your project. This is the most important part of Git, and it is what is copied when you clone a repository from another computer.
+Git directory คือที่ที่ Git เก็บ metadata และ object database สำหรับ project ของคุณ นี่คือส่วนที่สำคัญที่สุดของ Git และมันคือสิ่งที่ถูก copy มาเวลาที่คุณ clone repository มาจาก computer เครื่องอื่น
 
-The working directory is a single checkout of one version of the project. These files are pulled out of the compressed database in the Git directory and placed on disk for you to use or modify.
+working directory คือ checkout อันหนึ่งๆของซัก version นึงของ project ซึ่ง file เหล่านี้จะถูกดึงออกมาจาก compressed database ใน Git directory และเอามาวางบน disk ให้คุณใช้หรือว่าแก้ไขมัน
 
-The staging area is a simple file, generally contained in your Git directory, that stores information about what will go into your next commit. It’s sometimes referred to as the index, but it’s becoming standard to refer to it as the staging area.
+staging area คือ file ธรรมดาไม่ซับซ้อน ซึ่งจะอยู่ใน Git directory ของคุณ มันจะเก็บข้อมูลว่าอะไรบ้างที่จะถูกรวมไปใน commit ถัดไป บางคนก็เรียกมันว่า index แต่คนส่วนใหญ่จะเรียกมันว่า staging area
 
-The basic Git workflow goes something like this:
+โดยเบสิคแล้ว flow ของ Git จะดำเนินไปดังนี้:
 
-1.	You modify files in your working directory.
-2.	You stage the files, adding snapshots of them to your staging area.
-3.	You do a commit, which takes the files as they are in the staging area and stores that snapshot permanently to your Git directory.
+1.	คุณแก้ไข file ใน working directory
+2.	คุณ stage file เหล่านั้น (เพิ่ม snapshot ของ file เหล่านั้นใน staging area ของคุณ)
+3.	คุณ commit ซึ่งเป็นการเอา snapshot ของ file นั้นๆใน staging area มา save เก็บไว้ Git directory ตลอดกาล
 
-If a particular version of a file is in the git directory, it’s considered committed. If it’s modified but has been added to the staging area, it is staged. And if it was changed since it was checked out but has not been staged, it is modified. In Chapter 2, you’ll learn more about these states and how you can either take advantage of them or skip the staged part entirely.
+ถ้า file ซัก version นึงถูกเก็บลง git directory แล้ว file นั้นจะมีสถานะ committed ถ้ามันโดนแก้และถูก add เข้าไปใน staging area มันจะมีสถานะ staged ถ้ามันถูกแก้ไขเฉยๆไปจากตอนที่ถูก check out แต่ยังไม่เคยถูก stage มันจะมีสถานะ modified ใน Chapter 2 คุณจะเข้าใจ state ทั้ง 3 นี้เพิ่มขึ้น และได้เรียนรู้วิธีที่จะใช้ประโยชน์จากพวกมันและวิธีการลัดข้ามส่วน staged ไปเลย
 
-## Installing Git ##
+## ติดตั้ง Git ##
 
-Let’s get into using some Git. First things first—you have to install it. You can get it a number of ways; the two major ones are to install it from source or to install an existing package for your platform.
+มาเริ่มใช้ Git กันเหอะ อันดับแรกเลยคือต้องติดตั้งมันก่อนซึ่งสามารถทำได้หลายหลาย แต่สองทางหลักๆคือ ติดตั้งจาก source เลยหรือไม่ก็ติดตั้ง package ที่เตรียมไว้สำหรับ platform ของคุณ
 
-### Installing from Source ###
+### ติดตั้งจาก Source ###
 
-If you can, it’s generally useful to install Git from source, because you’ll get the most recent version. Each version of Git tends to include useful UI enhancements, so getting the latest version is often the best route if you feel comfortable compiling software from source. It is also the case that many Linux distributions contain very old packages; so unless you’re on a very up-to-date distro or are using backports, installing from source may be the best bet.
+ถ้าทำได้ ติดตั้งจาก source เลยก็ดี เพราะจะได้ version ล่าสุดซิงๆ แต่ละ version ที่ใหม่ขึ้นของ Git ชอบมี UI ใหม่ๆ เจ๋งๆมาให้ใช้ ฉะนั้นการใช้ version ล่าสุดมักจะเป็นหาทางที่แหล่มที่สุดถ้าสะดวกใจที่จะ compile จาก source อีกเหตุผลนึงคือ Linux distribution หลายๆอันมักจะมี package ที่ดึกดำบรรพ์ ฉะนั้น ถ้าคุณไม่ได้ใช้ distro ที่มันซิงมากๆหรือใช้ backports การ install จาก source น่าจะเป็นการเดิมพันที่คุ้มสุด
 
-To install Git, you need to have the following libraries that Git depends on: curl, zlib, openssl, expat, and libiconv. For example, if you’re on a system that has yum (such as Fedora) or apt-get (such as a Debian based system), you can use one of these commands to install all of the dependencies:
+จะ install Git ได้ คุณต้องมี library ต่างเหล่านี้ที่ Git depends on: curl, zlib, openssl, expat และ libiconv ยกตัวอย่างเช่น ถ้าคุณใช้ OS ที่มี yum (เช่น Fedora) หรือ apt-get (เช่นพวกตระกูล Debian ทั้งหลาย) คุณสามารถใช้ command ข้างล่างนี้เพื่อ install พวก dependencies ทั้งหลายได้:
 
 	$ yum install curl-devel expat-devel gettext-devel \
 	  openssl-devel zlib-devel
@@ -131,92 +133,92 @@ To install Git, you need to have the following libraries that Git depends on: cu
 	$ apt-get install libcurl4-gnutls-dev libexpat1-dev gettext \
 	  libz-dev libssl-dev
 	
-When you have all the necessary dependencies, you can go ahead and grab the latest snapshot from the Git web site:
+เมื่อคุณมี dependencies ที่จำเป็นครบแล้ว ก็เดินหน้าลุยไปเอา snapshot ล่าสุดจาก Git web site ได้เลย:
 
 	http://git-scm.com/download
 	
-Then, compile and install:
+หลังจากนั้นก็ compile และ install:
 
 	$ tar -zxf git-1.7.2.2.tar.gz
 	$ cd git-1.7.2.2
 	$ make prefix=/usr/local all
 	$ sudo make prefix=/usr/local install
 
-After this is done, you can also get Git via Git itself for updates:
+หลังจากขั้นนี้ คุณสามารถ download Git ผ่าน Git เองได้ด้วยเวลาอยาก update:
 
 	$ git clone git://git.kernel.org/pub/scm/git/git.git
 	
-### Installing on Linux ###
+### ติดตั้งบน Linux ###
 
-If you want to install Git on Linux via a binary installer, you can generally do so through the basic package-management tool that comes with your distribution. If you’re on Fedora, you can use yum:
+ถ้าอยากติดตั้ง Git บน Linux ผ่าน installer คุณก็ทำได้ง่ายๆผ่าน package-management tool ที่มากับ distribution ของคุณ เช่นถ้าใช้ Fedora ก็ yum เอาตามนี้:
 
 	$ yum install git-core
 
-Or if you’re on a Debian-based distribution like Ubuntu, try apt-get:
+หรือถ้าใช้ตระกูล Debian อย่าง Ubuntu ก็ apt-get เอา:
 
 	$ apt-get install git-core
 
-### Installing on Mac ###
+### ติดตั้งบน Mac ###
 
-There are two easy ways to install Git on a Mac. The easiest is to use the graphical Git installer, which you can download from the Google Code page (see Figure 1-7):
+มีทางง่ายๆ 2 ทางที่จะติดตั้ง Git บน Mac ที่ง่ายสุดคือใช้ graphical Git installer ซึ่งสามารถ download ได้จาก Google Code page (ตามรูป Figure 1-7):
 
 	http://code.google.com/p/git-osx-installer
 
 Insert 18333fig0107.png 
 Figure 1-7. Git OS X installer.
 
-The other major way is to install Git via MacPorts (`http://www.macports.org`). If you have MacPorts installed, install Git via
+อีกทางคือติดตั้ง Git ผ่าน MacPorts (`http://www.macports.org`) ถ้าลง MacPorts ไว้อยู่แล้ว ก็ติดตั้ง Git ตามนี้
 
 	$ sudo port install git-core +svn +doc +bash_completion +gitweb
 
-You don’t have to add all the extras, but you’ll probably want to include +svn in case you ever have to use Git with Subversion repositories (see Chapter 8).
+ไม่จำเป็นต้องลง extras ทั้งหมดก็ได้ แต่อย่างน้อยน่าจะลง +svn ไว้ในกรณีที่ต้องใช้ Git ร่วมกับ Subversion repository (ดูได้ใน Chapter 8).
 
-### Installing on Windows ###
+### ติดตั้งบน Windows ###
 
-Installing Git on Windows is very easy. The msysGit project has one of the easier installation procedures. Simply download the installer exe file from the Google Code page, and run it:
+ติดตั้ง Git บน Windows นี่โคตรง่าย msysGit project ทำวิธีติดตั้งง่ายๆไว้ แค่ download file installer (exe) จาก Google Code page แล้วก็ run มัน:
 
 	http://code.google.com/p/msysgit
 
-After it’s installed, you have both a command-line version (including an SSH client that will come in handy later) and the standard GUI.
+หลังจากติดตั้งแล้ว คุณจะมีทั้ง version command-line (รวมทั้ง SSH client ที่จะได้ใช้ภายหลัง) และ GUI
 
-## First-Time Git Setup ##
+## ครั้งแรกของ Git (setup) ##
 
-Now that you have Git on your system, you’ll want to do a few things to customize your Git environment. You should have to do these things only once; they’ll stick around between upgrades. You can also change them at any time by running through the commands again.
+หลังจากมี Git บนเครื่องแล้ว ต้อง customize Git environment ซักนิดก่อน ขั้นตอนนี้ทำแค่ครั้งเดียวพอ ถึง upgrade version ก็ไม่ต้องมานั่ง set ใหม่ ถ้าวันหลังอยากจะเปลี่ยนมันก็เปลี่ยนได้ตลอดเวลา แค่ run command ซ้ำแค่นั้นเอง
 
-Git comes with a tool called git config that lets you get and set configuration variables that control all aspects of how Git looks and operates. These variables can be stored in three different places:
+Git มากับ tool ที่เรียกว่า git config เปิดช่องให้ get หรือ set ตัวแปร configuration ที่ควบคุมการหน้าตา, คำสั่ง และทำงานของ Git ได้ ตัวแปรเหล่านี้ถูกแบ่งเก็บใน 3 ที่ดังนี้:
 
-*	`/etc/gitconfig` file: Contains values for every user on the system and all their repositories. If you pass the option` --system` to `git config`, it reads and writes from this file specifically. 
-*	`~/.gitconfig` file: Specific to your user. You can make Git read and write to this file specifically by passing the `--global` option. 
-*	config file in the git directory (that is, `.git/config`) of whatever repository you’re currently using: Specific to that single repository. Each level overrides values in the previous level, so values in `.git/config` trump those in `/etc/gitconfig`.
+*	file `/etc/gitconfig`: เก็บข้อมูล user ทุกคนในระบบรวมถึง repository ทั้งหลาย ถ้าคุณส่ง option `--system` ให้ `git config` มันจะอ่านหรือเขียนใน file นี้ตรงๆ 
+*	file `~/.gitconfig`: เป็น file เฉพาะของ user คุณเท่านั้น สามารถเจาะจงให้ Git เขียนหรืออ่าน file นี้ได้โดยการส่ง `--global` option ให้มัน 
+*	config file ใน git directory (ซึ่งอยู่ที่ `.git/config`) ของ repository ใดๆที่คุณใช้งาน: เฉพาะเจาะจงกับ repository นั้นๆ แต่ละ level คอยบังค่าที่ set ใน level ก่อนๆ ฉะนั้น ค่าที่ set ไว้ใน `.git/config` ก็จะบังค่าใน `/etc/gitconfig`
 
-On Windows systems, Git looks for the `.gitconfig` file in the `$HOME` directory (`C:\Documents and Settings\$USER` for most people). It also still looks for /etc/gitconfig, although it’s relative to the MSys root, which is wherever you decide to install Git on your Windows system when you run the installer.
+บน Windows นั้น Git อ่านค่าใน file `.gitconfig` ใน `$HOME` directory (ส่วนใหญ่จะอยู่ที่ `C:\Documents and Settings\$USER`) มันดูค่าใน /etc/gitconfig ด้วยเหมือนกัน แต่ต้องอ้างอิงกับ MSys root ซึ่งจะอยู่ที่ที่คุณ ลง Git ไว้ตอนที่ run installer
 
-### Your Identity ###
+### Identity ของคุณ ###
 
-The first thing you should do when you install Git is to set your user name and e-mail address. This is important because every Git commit uses this information, and it’s immutably baked into the commits you pass around:
+อย่างแรกที่ควรทำหลังจากลง Git คือการ set user name และ e-mail address ของคุณ ที่มันจำเป็นเพราะทุกๆ commit ใน Git จะใช้ข้อมูลนี้และมันจะถูกสลักลงไปในแต่ละ commit ที่คุณส่ง:
 
 	$ git config --global user.name "John Doe"
 	$ git config --global user.email johndoe@example.com
 
-Again, you need to do this only once if you pass the `--global` option, because then Git will always use that information for anything you do on that system. If you want to override this with a different name or e-mail address for specific projects, you can run the command without the `--global` option when you’re in that project.
+ย้ำอีกครั้ง คุณจำเป็นต้อง set ค่าเหล่านี้แค่ครั้งเดียวถ้าคุณใช้ option `--global` เพราะ Git จะใช้ข้อมูลนั้นสำหรับทุกๆ action ที่คุณใช้บน system นั้น ถ้าอยากทับค่านั้นด้วชื่อหรือ e-mail address อื่น สำหรับบาง project คุณก็ทำได้โดยการ run command แล้วไม่ต้องส่ง option `--global` เข้าไปเวลาคนทำ project นั้น
 
-### Your Editor ###
+### Editor ของคุณ ###
 
-Now that your identity is set up, you can configure the default text editor that will be used when Git needs you to type in a message. By default, Git uses your system’s default editor, which is generally Vi or Vim. If you want to use a different text editor, such as Emacs, you can do the following:
+หลังจาก setup Identity ของคุณแล้ว คุณก็สามารถเลือก default text editor ที่จะถูกเลือกใช้เวลา Git ต้องการให้คุณพิมพ์ message ได้ โดยปรกติแล้ว Git จะใช้ default editor ของระบบคุณ ซึ่งส่วนใหญ่จะเป็น Vi หรือ Vim ถ้าคุณอยากใช้ตัวอื่นเช่น Emacs ก็ทำได้ตังนี้:
 
 	$ git config --global core.editor emacs
 	
-### Your Diff Tool ###
+### Diff Tool ของคุณ ###
 
-Another useful option you may want to configure is the default diff tool to use to resolve merge conflicts. Say you want to use vimdiff:
+อีก option นึงที่คุณน่าจะอยาก config คือ default diff tool เพื่อใช้ในการแก้ conflict ตอน merge สมมติว่าคุณอยากใช้ vimdiff:
 
 	$ git config --global merge.tool vimdiff
 
-Git accepts kdiff3, tkdiff, meld, xxdiff, emerge, vimdiff, gvimdiff, ecmerge, and opendiff as valid merge tools. You can also set up a custom tool; see Chapter 7 for more information about doing that.
+Git รองรับ kdiff3, tkdiff, meld, xxdiff, emerge, vimdiff, gvimdiff, ecmerge และ opendiff คุณสามารถ setup custom tool อื่นๆได้ด้วย ไปตามอ่านใน Chapter 7 ละกันว่าทำยังไง 
 
-### Checking Your Settings ###
+### Check Settings ของคุณ ###
 
-If you want to check your settings, you can use the `git config --list` command to list all the settings Git can find at that point:
+ถ้าอยาก check settings ของคุณ คุณสามารถใช้คำสั่ง `git config --list` เพื่อจะ list settings ทั้งหลายแหล่ที่ Git มี ณ ตอนนั้นมาให้ดูได้:
 
 	$ git config --list
 	user.name=Scott Chacon
@@ -227,28 +229,28 @@ If you want to check your settings, you can use the `git config --list` command 
 	color.diff=auto
 	...
 
-You may see keys more than once, because Git reads the same key from different files (`/etc/gitconfig` and `~/.gitconfig`, for example). In this case, Git uses the last value for each unique key it sees.
+บาง key อาจจะซ้ำเพราะ Git อ่านค่า key เดียวกันจาก file ต่างๆ (เช่นจาก `/etc/gitconfig` และ `~/.gitconfig` เป็นต้น) ในกรณีนั้น Git จะใช้ค่าสุดท้ายที่มันเห็น
 
-You can also check what Git thinks a specific key’s value is by typing `git config {key}`:
+คุณตรวจสอบได้ด้วยว่า Git มันกำลังคิดว่าค่าของ key นั้นๆเป็นอะไรโดยพิมพ์ว่า `git config {key}`:
 
 	$ git config user.name
 	Scott Chacon
 
-## Getting Help ##
+## ขอความช่วยเหลือ ##
 
-If you ever need help while using Git, there are three ways to get the manual page (manpage) help for any of the Git commands:
+ถ้าต้องการความช่วยเหลือขณะใช้ Git มี 3 ทางที่จะดู help สำหรับ command ใดๆของ Git ใน manual page (manpage):
 
 	$ git help <verb>
 	$ git <verb> --help
 	$ man git-<verb>
 
-For example, you can get the manpage help for the config command by running
+เช่นถ้าอยากดู help สำหรับคำสั่ง config ใน manpage ก็แค่
 
 	$ git help config
 
-These commands are nice because you can access them anywhere, even offline.
-If the manpages and this book aren’t enough and you need in-person help, you can try the `#git` or `#github` channel on the Freenode IRC server (irc.freenode.net). These channels are regularly filled with hundreds of people who are all very knowledgeable about Git and are often willing to help.
+command แบบนี้มันเจ๋งตรงที่เรียกจากตรงไหนก็ได้แม้ว่าจะไม่ได้ต่อเนตก็ตาม
+ถ้า manpage ทั้งหลายและหนังสือเล่มนี้ยังเอาไม่อยู่และคุณต้องการคนช่วย ให้ลองไปที่ Freenode IRC (irc.freenode.net) ที่ห้อง `#git` หรือ `#github` ดู ห้องเหล่านี้โดยปรกติจะมีคนเป็นร้อยๆที่มีความรู้เรื่อง Git และชอบช่วยเหลือ
 
-## Summary ##
+## สรุป ##
 
-You should have a basic understanding of what Git is and how it’s different from the CVCS you may have been using. You should also now have a working version of Git on your system that’s set up with your personal identity. It’s now time to learn some Git basics.
+น่าจะพอเห็นภาพคร่าวๆว่า Git คืออะไรและมันต่างกับ CVCS ที่คุณเคยใช้ๆมายังไง และตอนนี้คุณน่าจะมี Git version ที่พร้อมใช้งานและมีข้อมูลส่วนตัว setup เรียบร้อยอยู่บนเครื่องแล้ว ถึงเวลาตะลุย basic ของ Git ซะที!
