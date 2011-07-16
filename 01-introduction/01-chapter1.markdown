@@ -2,8 +2,8 @@
 บทนี้เป็นบทแห่งการเริ่มต้นที่จะบอกเล่าเรื่องราวที่มาที่ไปของสิ่งที่เรียกว่า version contol tools จากนั้นเราก็จะถูกดึง มาเข้าเรื่อง Git ว่าเราจะไปทำยังไงให้ Git มาอยู่ในเครื่องเราได้ ทำไงให้มันทำงานได้และเมื่อจบบทนี้เราจะได้รู้ว่า ทำไมต้อง Git นั่นสิทำไม?
 
 ## เกี่ยวกับ Version Control ##
-อะไรคือ version control แล้วทำไมต้องใช้ด้วย บางคนอาจบอกว่า “ก็จำได้ว่าทำอะไรไปมีไรป่ะ” แต่สุดท้ายผ่านไปสอง เดือนก็ลืมหมด version control คือระบบที่บันทึกการเปลี่ยนแปลงทั้งหมดที่เกิดขึ้นกับไฟล์หรือชุดของไฟล์ที่เรากำลัง ทำงานกับมันอยูและเมื่อมีการบันทึกการเปลี่ยนแปลง ทุกครั้งที่เกิดปัญหาแก้ไฟล์มั่วจำไม่ได้ เราก็สามารถย้อนกลับ ไปหาเวอร์ชั่นใดๆก่อนหน้าได้เสมอ โดยที่ตัวอย่างที่จะใช้ในหนังสือเล่มนี้จะเป็นไฟล์ที่ทรัพย์สินอันสำคัญเช่น source  code จะถูกควบคุมโดย version control แต่อย่างไรก็ตามสำหรับการนำไปใช้งานจริงนั้นเราสามารถประยุกต์ใช้กับ ไฟล์ประเภทไหนก็ได้
-เช่นถ้าคุณเป็น graphic designer  และอยากจะเก็บเวอร์ชั่นของภาพที่เราทำไปให้หมดทุกอัน สิ่งที่ช่วยเรื่องเหล่านี้ ได้คือ Version Control System (VCS) มันคือสิ่งที่คุณ “ต้อง” ใช้เพราะมันจะช่วยให้เราถอยไปถอยมาได้ไม่ว่าจะเป็น ระดับไฟล์หรือระดับโปรเจค ถ้ามันเละมากแก้มั่วไปหมดก็สามารถถอยกลับไปได้ วื๊บๆ ดังนั้นไอ้พวกข้ออ้างไฟล์หาย ไฟล์พังเพื่อขอเลื่อนโปรเจคไรือส่งงานข้าจะใช้ไม่ได้อีกต่อไป -/\-
+อะไรคือ version control แล้วทำไมต้องใช้ด้วย บางคนอาจบอกว่า “ก็จำได้ว่าทำอะไรไปมีไรป่ะ” แต่สุดท้ายผ่านไปสองเดือนก็ลืมหมด version control คือระบบที่บันทึกการเปลี่ยนแปลงทั้งหมดที่เกิดขึ้นกับไฟล์หรือชุดของไฟล์ที่เรากำลัง ทำงานกับมันอยูและเมื่อมีการบันทึกการเปลี่ยนแปลง ทุกครั้งที่เกิดปัญหาแก้ไฟล์มั่วจำไม่ได้ เราก็สามารถย้อนกลับ ไปหาเวอร์ชั่นใดๆก่อนหน้าได้เสมอ โดยที่ตัวอย่างที่จะใช้ในหนังสือเล่มนี้จะเป็นไฟล์ที่ทรัพย์สินอันสำคัญเช่น source  code จะถูกควบคุมโดย version control แต่อย่างไรก็ตามสำหรับการนำไปใช้งานจริงนั้นเราสามารถประยุกต์ใช้กับ ไฟล์ประเภทไหนก็ได้
+เช่นถ้าคุณเป็น graphic designer  และอยากจะเก็บเวอร์ชั่นของภาพที่เราทำไปให้หมดทุกอัน สิ่งที่ช่วยเรื่องเหล่านี้ ได้คือ Version Control System (VCS) มันคือสิ่งที่คุณ “ต้อง” ใช้เพราะมันจะช่วยให้เราถอยไปถอยมาได้ไม่ว่าจะเป็น ระดับไฟล์หรือระดับโปรเจค ถ้ามันเละมากแก้มั่วไปหมดก็สามารถถอยกลับไปได้ วื๊บๆ ดังนั้นไอ้พวกข้ออ้างไฟล์หาย ไฟล์พังเพื่อขอเลื่อนโปรเจคหรือส่งงานข้าจะใช้ไม่ได้อีกต่อไป -/\-
 
 
 ### Local Version Control Systems ###
@@ -36,37 +36,37 @@ Figure 1-3. Distributed version control diagram.
 
 นอกจากนี้แล้วระบบแบบนี้ยังถูกออกแบบให้มีความสามารถในการทำงานกับ remote repository ได้มากกว่าหนึ่งที่ด้วยนั่นหมายความว่าเราสามารถทำงานแจมกับพรรคพวกได้มากกว่าหนึงที่ในโปรเจคเดียวกัน ดังนั้นเราจะสามารถ setup workflow ได้หลายประเภทเพื่อให้รองรับการทำงานของเราและสิ่งนี้ทำไม่ได้ใน Centralize Repository นะจ๊ะย้ำ
 
-## A Short History of Git ##
+## ตำนานของ Git ##
 
-As with many great things in life, Git began with a bit of creative destruction and fiery controversy. The Linux kernel is an open source software project of fairly large scope. For most of the lifetime of the Linux kernel maintenance (1991–2002), changes to the software were passed around as patches and archived files. In 2002, the Linux kernel project began using a proprietary DVCS system called BitKeeper.
+เฉกเช่นสิ่งมหัศจรรย์ทั้งหลายแหล่ในโลก, Git เริ่มต้นมาจากดราม่าส์เล็กๆ ณ ชุมชนหนึ่งในดาวนี้ Linux kernel เป็น open source โปรเจคอันนึงที่มีขนาดใหญ่พอสมควร เกือบทั้งชีวิตของการ maintenance kernel ของ Linux นี้ (ช่วงปี 1991–2002) การเปลี่ยนแปลงต่างๆถูกส่งไปส่งมาในรูปแบบ patch และ zip files จนกระทั่งปี 2002 Linux kernel project ก็เริ่มใช้ DVCS ที่เรียกว่า BitKeeper
 
-In 2005, the relationship between the community that developed the Linux kernel and the commercial company that developed BitKeeper broke down, and the tool’s free-of-charge status was revoked. This prompted the Linux development community (and in particular Linus Torvalds, the creator of Linux) to develop their own tool based on some of the lessons they learned while using BitKeeper. Some of the goals of the new system were as follows:
+ในปี 2005 ความสัมพันธ์ระหว่าง community ที่พัฒนา Linux kernel กับบริษัท commercial ที่พัฒนา BitKeeper ก็สะบั้นลง ไอ้ tool ที่เคยใช้ได้ฟรีมาตลอดก็จุ๊งไป ทำให้ community ที่พัฒนา Linux (โดยเฉพาะท่านเทพ Linus Torvalds ที่เป็นบิดาแห่ง Linux) ต้องพัฒนา tool ขึ้นมาใช้เอง โดยอิงจากประสบการณ์ที่ได้เรียนรู้ระหว่างใช้งาน BitKeeper ระบบใหม่มีเป้าหมายบางประการ ดังนี้:
 
-*	Speed
-*	Simple design
-*	Strong support for non-linear development (thousands of parallel branches)
-*	Fully distributed
-*	Able to handle large projects like the Linux kernel efficiently (speed and data size)
+*	ความเร็วส์
+*	design ที่ simple
+*	ต้องพัฒนาไปพร้อมๆกันที่ละหลายๆคนได้ (ประมาณ 1000 branches)
+*	distributed สุดๆ
+*	ใช้กับโปรเจคใหญ่ๆอย่าง Linux kernel ได้ดี (ทั้งเรื่องความเร็วส์และขนาดของข้อมูล)
 
-Since its birth in 2005, Git has evolved and matured to be easy to use and yet retain these initial qualities. It’s incredibly fast, it’s very efficient with large projects, and it has an incredible branching system for non-linear development (See Chapter 3).
+ตั้งแต่ถูกคลอดมาในปี 2005, Git ก็พัฒนาและเติบโตจนเป็นของที่ใช้ง่าย แต่ก็ยังคงไว้ซึ่งข้อดีข้างต้นนี้ นั่นเร็วส์สุดยิด, เหมาะกับโปรเจคขนาดยักษ์ และพัฒนาไปพร้อมๆกันทีละหลายๆ branch อย่างน่าอัศจรรย์ (ดูได้ใน Chapter 3).
 
-## Git Basics ##
+## เบสิคของ Git ##
 
-So, what is Git in a nutshell? This is an important section to absorb, because if you understand what Git is and the fundamentals of how it works, then using Git effectively will probably be much easier for you. As you learn Git, try to clear your mind of the things you may know about other VCSs, such as Subversion and Perforce; doing so will help you avoid subtle confusion when using the tool. Git stores and thinks about information much differently than these other systems, even though the user interface is fairly similar; understanding those differences will help prevent you from becoming confused while using it.
+เอาล่ะ มาดูกันว่า Git in a nutshell เป็นยังไง? ส่วนนี้เป็นส่วนสำคัญที่ท่านจะต้องดูดไป เพราะเมื่อไหร่ที่ท่านเข้าใจแก่นแท้ของ Git และเข้าใจว่ามันทำงานยังไง เมื่อนั้น การใช้ Git อย่างมีประสิทธิภาพสูงสุดก็ไม่ยากละ ขณะที่เรียนรู้ Git พยายามลืม VCSs ตัวที่ผ่านๆมาให้หมด (เช่น Subversion และพวกพ้อง) เพราะมันจะป้องกันความงงที่จะเกิดขึ้นระหว่างใช้ Git ได้ Git มองและจำข้อมูลต่างกับระบบอื่นๆค่อนข้างเยอะ แม้ว่า UI มันจะดูคล้ายๆตัวอื่นก็ตาม ทำความเข้าใจความแตกต่าง แล้วเวลาใช้จะไม่งง
 
-### Snapshots, Not Differences ###
+### Snapshots, ไม่ใช่ความเปลี่ยนแปลง ###
 
-The major difference between Git and any other VCS (Subversion and friends included) is the way Git thinks about its data. Conceptually, most other systems store information as a list of file-based changes. These systems (CVS, Subversion, Perforce, Bazaar, and so on) think of the information they keep as a set of files and the changes made to each file over time, as illustrated in Figure 1-4.
+หลักๆเลย Git ต่างกับ VCS อื่นๆ (Subversion และเพื่อนๆ) ตรงที่วิธีที่ Git มองข้อมูลที่มันเก็บ โดยคอนเซปแล้ว ระบบอื่นๆจะเก็บข้อมูลในรูปของ listของความเปลี่ยนแปลง ระบบเหล่านี้ (CVS, Subversion, Perforce, Bazaar ฯลฯ) คิดว่าข้อมูลที่มันเก็บคือ set ของ files และความเปลี่ยนแปลงที่เกิดขึ้นกับแต่ละ file ในเวลาที่ดำเนินไป ดังเช่นตัวอย่างในรูป Figure 1-4.
 
 Insert 18333fig0104.png 
 Figure 1-4. Other systems tend to store data as changes to a base version of each file.
 
-Git doesn’t think of or store its data this way. Instead, Git thinks of its data more like a set of snapshots of a mini filesystem. Every time you commit, or save the state of your project in Git, it basically takes a picture of what all your files look like at that moment and stores a reference to that snapshot. To be efficient, if files have not changed, Git doesn’t store the file again—just a link to the previous identical file it has already stored. Git thinks about its data more like Figure 1-5. 
+Git ไม่ได้มองหรือจำข้อมูลที่มันเก็บอย่างนั้น ในทางกลับกัน Git มองข้อมูลมันเหมือนกับเป็น set ของ snapshots ของ filesystem ขนาดจิ๋ว ทุกๆครั้งที่คุณ commit หรือ save project ใน Git มันจะถ่ายรูปว่า files ของเราหน้าตาเป็นไง ณ บัดนั้น และเก็บ reference ไปยัง snapshot (รูปถ่าย) นั้น และเพื่อให้มีประสิทธิภาพ ถ้า file ไม่ถูกแก้ไข Git จะไม่จำ file นั้นๆซ้ำ แค่เก็บ link ไปยัง file เก่าที่เหมือนกันเป๊ะๆ ที่มันเคยจำไว้แล้วเฉยๆ Git มองข้อมูลท่มันเก็บเหมือนดังภาพ Figure 1-5. 
 
 Insert 18333fig0105.png 
 Figure 1-5. Git stores data as snapshots of the project over time.
 
-This is an important distinction between Git and nearly all other VCSs. It makes Git reconsider almost every aspect of version control that most other systems copied from the previous generation. This makes Git more like a mini filesystem with some incredibly powerful tools built on top of it, rather than simply a VCS. We’ll explore some of the benefits you gain by thinking of your data this way when we cover Git branching in Chapter 3.
+นี่ความความแตกต่างที่สำคัญระหว่าง Git และ VCSs อื่นๆเกือบทั่วโลก มันทำให้ Git ต้องคิดใหม่ ทำใหม่เกือบทุกๆอย่าง ขณะที่ระบบอื่นๆแค่ copy มาจากรุ่นก่อนๆ มันทำให้ Git เหมือนเป็น filesystem ขนาดจิ๋วที่มากับ tools อันทรงพลังที่สร้างขึ้นมาครอบมันมากกว่าที่จะเป็นแค่ VCS ธรรมดา เด๋วเราค่อยมาโชว์ของดีที่ได้จากการมองข้อมูลในลักษณะนี้ในหัวข้อ branching ใน Chapter 3
 
 ### Nearly Every Operation Is Local ###
 
