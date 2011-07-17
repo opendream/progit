@@ -211,52 +211,54 @@ Git ได้เตรียมวิธีง่ายๆ ให้เราส
 
 ถ้าเราใช้คำสั่งข้างต้นแทนการสร้างไฟล์ `extMerge` และ `extDiff` โปรแกรม Git จะใช้โปรแกรม kDiff3 สำหรับการ merge-resolution และใช้โปรแกรม diff ที่มาพร้อมกับ Git สำหรับการทำ diff
 
-### Formatting and Whitespace ###
+### การจัดการตัวอักษรและช่องว่าง ###
 
-Formatting and whitespace issues are some of the more frustrating and subtle problems that many developers encounter when collaborating, especially cross-platform. It's very easy for patches or other collaborated work to introduce subtle whitespace changes because editors silently introduce them or Windows programmers add carriage returns at the end of lines they touch in cross-platform projects. Git has a few configuration options to help with these issues.
+เป็นเรื่องที่น่ารำคัญมากๆ เมื่อเราไล่ดูการแก้ไข code แล้วปรากฏว่าแทนที่เราจะเห็นเฉพาะส่วนเปลี่นแปลงที่มีผลกับโปรแกรม เรากลับเห็นจุดบรรทัดที่เปลี่ยนแปลงแค่ช่องว่างหลังบรรทัด โดยเฉพาะตอนที่เราไม่ได้ทำงานคนเดียว หรือทำงานข้ามระบบปฏิบัติการ มันมีโอกาสมากที่จะทำผิดพลาดเพราะ text editor ไม่ได้แสดงให้เราเห็นว่ามีช่องว่างอยู่ท้ายบรรทัดนั้นๆ หรือบางทีอาจจะแก้รหัส end-of-line ไปตามแต่ละระบบปฏิบัติการ โปรแกรม Git มีค่าที่เราตั้งได้หลายตัวเพื่อจัดการปัญหานี้ 
 
 #### core.autocrlf ####
 
-If you're programming on Windows or using another system but working with people who are programming on Windows, you'll probably run into line-ending issues at some point. This is because Windows uses both a carriage-return character and a linefeed character for newlines in its files, whereas Mac and Linux systems use only the linefeed character. This is a subtle but incredibly annoying fact of cross-platform work. 
+ถ้าคุณทำงานบนระบบ Windows หรือทำงานบนระบบอื่นๆ แต่ทำงานร่วมกับคนที่เขียนโปรแกรมบน Windows คุณน่าจะเคยเจอปัญหา ระหัส end-of-line มาบ้าง นั่นเป็นเพราะ Windows ใช้ทั้ง carriage-return และใช้ linefeed สำหรับขึ้นบรรทัดใหม่ในไฟล์ แต่ใน Mac และ Linux ใช้เฉพาะ linefeed เท่านั้น ดูเหมือนจะเป็นเรื่องเล็กน้อยนะครับ แต่มันน่ารำคาญสุดๆ
 
-Git can handle this by auto-converting CRLF line endings into LF when you commit, and vice versa when it checks out code onto your filesystem. You can turn on this functionality with the `core.autocrlf` setting. If you're on a Windows machine, set it to `true` ‚Äî this converts LF endings into CRLF when you check out code:
+Git สามารถจัดการมันได้ ด้วยการเปลี่ยน carriage-return เป็น linefeed ให้อัตโนมัติตอนที่เราสั่ง commit และเปลี่ยนกลับให้เมื่อ checks out กลับมา เราสามารถเปิดใช้ความสามารถนี้ด้วยคำสั่ง `core.autocrlf` ถ้าอยู่บนระบบ Windows กำหนดให้ค่าเป็น `true` โปรแกรม Git จะแปลง linefeed เป็น carriage-return ให้ตอนที่เรา check out 
+
 
 	$ git config --global core.autocrlf true
 
-If you're on a Linux or Mac system that uses LF line endings, then you don't want Git to automatically convert them when you check out files; however, if a file with CRLF endings accidentally gets introduced, then you may want Git to fix it. You can tell Git to convert CRLF to LF on commit but not the other way around by setting `core.autocrlf` to input:
+แต่ถ้าเราอยู่บน Linux หรือ Mac ที่ต้องการใช้ linefeed สำหรับจบบรรทัด เราไม่ต้องการให้ Git มา convert ให้แล้ว แต่อย่างไรก็ตามถ้าเราทำงานกับ Windows เราอาจจะบังเอิญไปเอาไฟล์ที่จบด้วย carriage-return มาใส่ในโครงการของเราเข้า วิธีการแก้ไขก็คือเราต้องบอกให้ Git เปลี่ยน carriage-return ไปเป็น linefeed ให้ตอนที่ commit แต่ไม่ต้องเปลี่ยนตอนที่ checkout ด้วยคำสั่ง `core.autocrlf`
 
 	$ git config --global core.autocrlf input
 
-This setup should leave you with CRLF endings in Windows checkouts but LF endings on Mac and Linux systems and in the repository.
+พอทำแบบนี้เราจะได้ carriage-return ลงท้ายบรรทัดสำหรับ Windows และได้ linefeed ลงท้ายสำหรับ Mac Linux และใน repository ครับ
 
-If you're a Windows programmer doing a Windows-only project, then you can turn off this functionality, recording the carriage returns in the repository by setting the config value to `false`:
+แต่ถ้าเราเป็นนักพัฒนาบน Windows และโปรเจคของเราเป็น Windows เท่านั้น เราสามารถปิดความสามารถนี้ทิ้งไปได้เลย โดยใช้คำสั่ง
 
 	$ git config --global core.autocrlf false
 
 #### core.whitespace ####
 
-Git comes preset to detect and fix some whitespace issues. It can look for four primary whitespace issues ‚Äî two are enabled by default and can be turned off, and two aren't enabled by default but can be activated.
+Git มาพร้อมกับความสามารถในการจัดการปัญหาช่องว่างทั้ง 4 ประการ โดยสองประการแรกจะถูกเปิดโดยอัตโนมัติ แต่จะปิดไปก็ได้ ส่วนอีกสองอันถ้าต้องการเปิดก็สามารถทำได้เช่นกัน
 
-The two that are turned on by default are `trailing-space`, which looks for spaces at the end of a line, and `space-before-tab`, which looks for spaces before tabs at the beginning of a line.
+สองคำสั่งแรกที่เปิดโดยอัตโนมัติคือ `trailing-space` กับหลับจัดการปัญหาช่องว่างหลังบรรทัด และอีกคำสั่งคือ `space-before-tab` สำหรับจากการช่องว่างก่อน tab ในตอนต้นของบรรทัด
 
-The two that are disabled by default but can be turned on are `indent-with-non-tab`, which looks for lines that begin with eight or more spaces instead of tabs, and `cr-at-eol`, which tells Git that carriage returns at the end of lines are OK.
+อีกสองคำสั่งที่ปิดเอาไว้แต่สามารถเปิดได้ คือ `indent-with-non-tab` สำหรับจัดการการใช้ช่องว่างขนาดเท่ากับแปดตัวอักษรหรือมากกว่า แทนที่จะใช้ tab และคำสั่งสุดท้ายคือ `cr-at-eol` ใช้สำหรับบอก Git ว่าไม่ต้องไปยุ่งกับ carriage-return ที่ท้ายบรรทัด 
 
-You can tell Git which of these you want enabled by setting `core.whitespace` to the values you want on or off, separated by commas. You can disable settings by either leaving them out of the setting string or prepending a `-` in front of the value. For example, if you want all but `cr-at-eol` to be set, you can do this:
+เราสามารถบอก Git ให้ปิดหรือเปิดความสามารถเหล่านี้ได้ โดยการกำหนดค่าให้กับ `core.whitespace` โดยใส่คำสั่งที่ต้องการให้เปิด แล้วคั่นด้วย comma ถ้าตัวไหนที่ไม่ได้ใส่ไว้ Git จะเข้าใจว่าให้ปิดความสามารถนั่นๆ ไป หรืออีกทางหนึ่งคือให้ใส่เครื่องหมายลบ `-` เอาไว้หน้าคำสั่งนั้นๆ ตัวอย่างเช่นถ้าตอ้งการเปิดความสามารถทั้งหมด ยกเว้น `cr-at-eol` ให้สั่งตามนี้
 
 	$ git config --global core.whitespace \
 	    trailing-space,space-before-tab,indent-with-non-tab
 
-Git will detect these issues when you run a `git diff` command and try to color them so you can possibly fix them before you commit. It will also use these values to help you when you apply patches with `git apply`. When you're applying patches, you can ask Git to warn you if it's applying patches with the specified whitespace issues:
+Git จะช่วยจัดการปัญหาเหล่านี้ให้ตอนที่เราสั่ง `git diff` และจะใส่สีไว้ให้เห็นชัดๆ เพื่อเราจะได้แก้ไขก่อนที่จะ commit เข้าไป นอกจากนี้มันยังช่วยจัดการเรื่อง apple patches ตอนสั่ง `git apply` ด้วย เมื่อเราสั่ง apply patches เราสามารถให้ Git ช่วยเตื่อนได้ถ้าพบปัญหาเรื่องช่องว่าง เช่น
 
 	$ git apply --whitespace=warn <patch>
 
-Or you can have Git try to automatically fix the issue before applying the patch:
+หรือเราสามารถบอกให้ Git แก้ข้อมูลให้เลย ก่อนที่จะทำการ patch ก็ได้
 
 	$ git apply --whitespace=fix <patch>
 
-These options apply to the git rebase option as well. If you've committed whitespace issues but haven't yet pushed upstream, you can run a `rebase` with the `--whitespace=fix` option to have Git automatically fix whitespace issues as it's rewriting the patches.
+ความสามารถนี้สามารถนำปประยุกต์ใช้กับ git rebase ได้เช่นเดียวกัน ตัวอย่างเช่น ถ้าเราเผลอ commit ช่องว่างที่ไม่เหมาะสมเข้าไป จึงไม่อยาก push ขึ้นไปที่ server เราสามารถสั่ง `rebase` ด้วยคำสั่ง `--whitespace=fix` แล้ว Git จะไปจัดการกับปัญหาช่องว่างให้เราเอง
 
-### Server Configuration ###
+
+### การปรับแต่งบนเครื่องแม่ข่าย ###
 
 Not nearly as many configuration options are available for the server side of Git, but there are a few interesting ones you may want to take note of.
 
