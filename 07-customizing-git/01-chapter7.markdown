@@ -290,50 +290,48 @@ Git บนฝั่ง Server ไม่ค่อยมีอะไรให้�
 
 ## Git Attributes ##
 
+Git สามารถใช้ความสามารถนี้ได้เฉพาะกับ directory หรือ กับไฟล์ เท่านั้น เราเรียกการกำหนด path-specific ว่า Git attributes ซึ่งสามาถกำหนดไว้ในไฟล์ `.gitattributes` ที่อยู่ใน repository ของเรา (ปกติแล้วจะใส่ไว้ใน root ของ project) หรือใส่ไว้ในไฟล์ `.git/info/attributes` ถ้าไม่ต้องการให้ไฟล์ attributes ถูกส่งขึ้นไปบน server ด้วย
 
-
-Some of these settings can also be specified for a path, so that Git applies those settings only for a subdirectory or subset of files. These path-specific settings are called Git attributes and are set either in a `.gitattributes` file in one of your directories (normally the root of your project) or in the `.git/info/attributes` file if you don't want the attributes file committed with your project.
-
-Using attributes, you can do things like specify separate merge strategies for individual files or directories in your project, tell Git how to diff non-text files, or have Git filter content before you check it into or out of Git. In this section, you'll learn about some of the attributes you can set on your paths in your Git project and see a few examples of using this feature in practice.
+การใช้ attributes จะทำให้เราเหมือนว่าสามารถกำหนดวิธีในการ merge สำหรับไฟล์แต่ละแบบได้ หรือสำหรับแต่ละ directory ใน project ของเราได้ เราสามารถสอน Git ได้ว่าไฟล์แต่ละแบบจะต้อง diff กันอย่างไร หรือจะต้องนำไฟล์นั้นๆ ไปทำอะไรก่อนแล้วค่อยนำค่ามา diff สำหรับในส่วนนี้เราจะใช้ตัวอย่างเพื่อแสดงให้เห็นวิธีการใช้งานคำสั่งบางส่วนของ attributes
 
 ### Binary Files ###
 
-One cool trick for which you can use Git attributes is telling Git which files are binary (in cases it otherwise may not be able to figure out) and giving Git special instructions about how to handle those files. For instance, some text files may be machine generated and not diffable, whereas some binary files can be diffed ‚Äî you'll see how to tell Git which is which.
+เทคนิคเท่ๆ ที่ได้จากการใช้งาน Git attribute คือเราสามารถบอก Git ได้ว่าไฟล์ไหนคือ binary (ในหลายกรณีระบบอื่นๆ จะไม่สามารถแยกได้) และสามารถบอกได้ด้วยว่าจะจัดการกับไฟล์รูปแบบนั้นได้อย่างไร ตัวอย่างเช่น text file ที่คอมพิวเตอร์เป็นคนสร้างขึ้นมา ถึง diff ออกมาก็อ่านหรือแก้ไขไม่ได้ ไฟล์พวกนี้ก็ควรถูกจัดการแบบไฟล์ binary ในขณะที่ไฟล์ binary บางไฟล์เราสามารถบอกความแตกต่างของแต่ละไฟล์ได้ เราก็ควรจะบอกให้ Git ช่วยจัดการให้
 
-#### Identifying Binary Files ####
+#### ระบุไฟล์ประเภท Binary Files ####
 
-Some files look like text files but for all intents and purposes are to be treated as binary data. For instance, Xcode projects on the Mac contain a file that ends in `.pbxproj`, which is basically a JSON (plain text javascript data format) dataset written out to disk by the IDE that records your build settings and so on. Although it's technically a text file, because it's all ASCII, you don't want to treat it as such because it's really a lightweight database ‚Äî you can't merge the contents if two people changed it, and diffs generally aren't helpful. The file is meant to be consumed by a machine. In essence, you want to treat it like a binary file.
+ไฟล์บางไฟล์อาจจะดูเหมือน text files แต่จริงๆ แล้วมันถูกสร้างขึ้นมาเพื่อให้จัดการมันแบบข้อมูล ิbinary ตัวอย่างเช่น project ที่ถูกสร้างด้วย XCode บน Mac จะมีไฟล์ที่ชื่อ `.pbxproj` ซึ่งด้านในเก็บข้อมูลแบบ JSON (plain text javascript data format) ซึ่งคนที่สร้างคือตัว IDE เอง สำหรับกำหนดค่า setting ในโปรแกรม ในทางเทคนิคแล้วนี่ถือว่าเป็น text file เพราะข้อมูลถูกเก็บด้วย ASCII และสามารถอ่านได้ แต่เราไม่จัดการไฟล์นี้แบบ text file เรามองไฟล์นี้เป็นเหมือน database ขนาดเล็ก เราไม่สามารถ merge ไฟล์นี้ได้ถ้ามีคนสองคนแก้มัน และการใช้ diff ก็ไม่ได้ช่วยอะไรมากนัก หมายวามว่าไฟล์นี้ควรถูกจัดการด้วยคอมพิวเตอร์ หรือเรียกว่าเราควรจัดการไฟล์นี้แบบ binary file
 
-To tell Git to treat all `pbxproj` files as binary data, add the following line to your `.gitattributes` file:
+การบอก Git ให้จัดการไฟล์ `pbxproj` แบบไฟล์ที่มีข้อมูลเป็น binary สามารถทำได้โด้ยการเพิ่มบรรทัดนี้ลงใน `.gitattributes`
 
 	*.pbxproj -crlf -diff
 
-Now, Git won't try to convert or fix CRLF issues; nor will it try to compute or print a diff for changes in this file when you run git show or git diff on your project. In the 1.6 series of Git, you can also use a macro that is provided that means `-crlf -diff`:
+หลังจากนี้ Git จะไม่พยายามแก้ปัญหา carriage-return ให้เรา หรือไม่พยายามดูความแตกต่างในไฟล์ เมื่อเราสั่ง git diff แต่ใน Git เวอร์ชัน 1.6 เราสามารถใช้คำสั่งสั้นๆ แทนการใช้ `-crlf -diff` ได้ ด้วยคำสั่งนี้
 
 	*.pbxproj binary
 
 #### Diffing Binary Files ####
 
-In the 1.6 series of Git, you can use the Git attributes functionality to effectively diff binary files. You do this by telling Git how to convert your binary data to a text format that can be compared via the normal diff.
+ใน Git เวอร์ชัน 1.6 เราสามารถใช้ Git attributes ในการจัดการเปรียบเทียบ binary ไฟล์ได้ วิธีการคือเราต้องบอก Git ว่าจะแปลง binary data ให้เป็น text แบบไหน ก่อนที่จะใช้เปรียบเทียบโดยใช้ diff
 
-Because this is a pretty cool and not widely known feature, I'll go over a few examples. First, you'll use this technique to solve one of the most annoying problems known to humanity: version-controlling Word documents. Everyone knows that Word is the most horrific editor around; but, oddly, everyone uses it. If you want to version-control Word documents, you can stick them in a Git repository and commit every once in a while; but what good does that do? If you run `git diff` normally, you only see something like this:
+เพราะว่านี้เรื่องที่เท่มากๆ แต่คนทั่วไปกลับไม่ค่อยรู้จักกัน ดังนั้นผมจะลงไปในรายละเอียดให้มากหน่อย เริ่มต้นจากเราจะลองใช้เทคนิคนี้แก้ปัญหาในการทำ version-controlling ให้ Word document กัน แม้ว่าเราจะรู้กันว่าใช้ Word เป็น text editer นั้นสยองเอามากๆ แต่ทุกคนก็ใช้กัน แล้วถ้าเราต้องการทำ version-control กับเอกสาร Word ล่ะ แน่นอนว่าเราสามารถส่งไฟล์ Word ขึ้น Git ได้ แต่มันจะดีหรือถ้าเราสั่ง `git diff` แล้วมันแสดงแบบนี้
 
 	$ git diff 
 	diff --git a/chapter1.doc b/chapter1.doc
 	index 88839c4..4afcb7c 100644
 	Binary files a/chapter1.doc and b/chapter1.doc differ
 
-You can't directly compare two versions unless you check them out and scan them manually, right? It turns out you can do this fairly well using Git attributes. Put the following line in your `.gitattributes` file:
+เราไม่สามารถเปรียบเทียบไฟล์สองเวอร์ชั้นได้ตรงๆ ยกเว้นจะ download มาทั้งสองตัวแล้วเปิดเทียบกันด้วยตัวเอง ทีนี้ลองมาดูว่า Git attribute จะช่วยเราได้อย่างไร เริ่มจากทดลองใส่บรรทัดต่อไปนี้ลงในไฟล์ `.gitattributes` 
 
 	*.doc diff=word
 
-This tells Git that any file that matches this pattern (.doc) should use the "word" filter when you try to view a diff that contains changes. What is the "word" filter? You have to set it up. Here you'll configure Git to use the `strings` program to convert Word documents into readable text files, which it will then diff properly:
+บรรทัดนี้จะบอก Git ว่าไฟล์ที่ตรงกับรูปแบบ (.doc) ให้ใช้ "word" เป็นตัวกรองตอนที่ต้องการใช้ diff ในการดูความเปลี่ยนแปลง ไม่ต้องสงสัยว่า Git ทำ "word" ให้ เราต้องทำมันขึ้นมาเองครับ สิ่งที่ต้องทำคือใช้โปรแกรม `string` ในการแปลงเอกสาร Word ให้เป็น text file ที่อ่านได้ ซึ่งช่วยให้ diff สามารถทำการเปรียบเทียบได้ไปด้วย
 
 	$ git config diff.word.textconv strings
 
-Now Git knows that if it tries to do a diff between two snapshots, and any of the files end in `.doc`, it should run those files through the "word" filter, which is defined as the `strings` program. This effectively makes nice text-based versions of your Word files before attempting to diff them.
+ตอนนี้ Git รู้แล้วว่าถ้าเราพยายาจะเปรียบเทียบไฟล์ที่ลงท้ายด้วย `.doc` สองเวอร์ชัน จะต้องเปรียบเทียบโดยใช้ "word" ในการกรอง โดยมันจะไปใช้โปรแกรม `strings` อีกที วิธีการนี้จะทำให้เราได้ text file อย่างดี สำหรับให้ Git เอาไปใช้ในการเปรียบเทียบ
 
-Here's an example. I put Chapter 1 of this book into Git, added some text to a paragraph, and saved the document. Then, I ran `git diff` to see what changed:
+ตัวอย่างต่อไปนี้ ผมจะใส่บทแรกฉบับภาษาอังกฤษของหนังสือบทนี้ลงใน Git จากนั้นจะใส่ข้อความเล็กน้อยลงแทรกลงไป หลังจากบันทึก ผมจะสั่ง `git diff` เพื่อดูความเปลี่ยนแปลง
 
 	$ git diff
 	diff --git a/chapter1.doc b/chapter1.doc
@@ -347,6 +345,8 @@ Here's an example. I put Chapter 1 of this book into Git, added some text to a p
 	-s going on, modify stuff and contribute changes. If the book spontaneously 
 	+s going on, modify stuff and contribute changes. If the book spontaneously 
 	+Let's see if this works.
+
+Git สามารถตรวจสอบความเปลี่ยนแปลงได้อย่างชัดเจน ประโยคที่ผมใส่ลงไปคือ "Let's see if this works" ซึ่งผลออกมาถูกต้อง 
 
 Git successfully and succinctly tells me that I added the string "Let's see if this works", which is correct. It's not perfect ‚Äî it adds a bunch of random stuff at the end ‚Äî but it certainly works. If you can find or write a Word-to-plain-text converter that works well enough, that solution will likely be incredibly effective. However, `strings` is available on most Mac and Linux systems, so it may be a good first try to do this with many binary formats.
 
