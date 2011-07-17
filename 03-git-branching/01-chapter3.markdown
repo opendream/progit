@@ -1,135 +1,135 @@
-# Git Branching #
+# การแตก branch ใน Git #
 
-Nearly every VCS has some form of branching support. Branching means you diverge from the main line of development and continue to do work without messing with that main line. In many VCS tools, this is a somewhat expensive process, often requiring you to create a new copy of your source code directory, which can take a long time for large projects.
+เกือบทุก VCS support การแตก branch ทางใดซักทางหนึ่ง การแตก Branch หมายถึงคุณแยกตัวออกมาจาก main line ของการพัฒนาและทำงานต่อไปบนบนนั้นโดยไม่ไปยุ่งเกี่ยวกับ main line ในหลายๆ VCS การทำแบบนี้ค่อนข้างจะเปลือง ส่วนใหญ่จะเป็นการ copy ทั้ง directory ของ source code ซึ่งจะกินเวลานานมว๊ากกบน project ใหญ่ๆ
 
-Some people refer to the branching model in Git as its “killer feature,” and it certainly sets Git apart in the VCS community. Why is it so special? The way Git branches is incredibly lightweight, making branching operations nearly instantaneous and switching back and forth between branches generally just as fast. Unlike many other VCSs, Git encourages a workflow that branches and merges often, even multiple times in a day. Understanding and mastering this feature gives you a powerful and unique tool and can literally change the way that you develop.
+หลายคนเรียกการแตก branch ใน Git เป็น “killer feature” และมันทำให้ Git โดดเด่นออกมาจาก VCS อื่นๆ ทำไมน่ะเหรอ? เพราะวิธีที่ Git แตก branch มันถูกโคตร การแตก branch ทำได้ในชั่วพริบตาและการ switch ไปๆมาๆระหว่าง branch ก็เร็วพอๆกัน ไม่เหมือน VCS ดาษๆทั่วไป Git ผลักดันกระบวนการทำงาน workflow ให้แตก branch และ merge บ่อยๆแบบที่ทำได้วันละหลายๆครั้ง การทำความเข้าใจและบรรลุ feature นี้จะทำให้ Git กลายเป็นเครื่องมือที่ทรงพลังและมีเอกลักษณ์และทำให้วิถีการทำงานของคุณเปลี่ยนไปเลย
 
-## What a Branch Is ##
+## Branch คืออะไร ##
 
-To really understand the way Git does branching, we need to take a step back and examine how Git stores its data. As you may remember from Chapter 1, Git doesn’t store data as a series of changesets or deltas, but instead as a series of snapshots.
+เพื่อทำความเข้าใจวิธีที่ Git แตก branch เราต้องย้อนกลับมาดูว่า Git เก็บข้อมูลยังไง ตามที่คุณอาจจะจำได้จาก Chapter 1 ว่า Git ไม่ได้เก็บข้อมูลเป็นลำดับของความเปลี่ยนแปลงต่อเวลาแต่เก็บเป็นลำดับของ snapshot ต่อเวลา
 
-When you commit in Git, Git stores a commit object that contains a pointer to the snapshot of the content you staged, the author and message metadata, and zero or more pointers to the commit or commits that were the direct parents of this commit: zero parents for the first commit, one parent for a normal commit, and multiple parents for a commit that results from a merge of two or more branches.
+เวลาคุณ commit ใน Git นั้น Git จะเก็บเป็น object ของการ commit ซึ่งประกอบด้วย pointer ชี้ไปยัง snapshot ของ content ที่คุณ stage ไว้, metadata ของชื่อผู้แก้ไขและ message ที่บันทึกไว้ และ pointer ที่ชี้ไปยัง parent ลำดับถัดไปของ commit นั้นๆ (ซึ่งอาจจะไม่มีก็ได้ถ้าเป็น commit ครั้งแรก, อาจจะมีอันเดียวชี้ไปยัง parent ของ commit ปรกติทั่วไปหรืออาจจะมี parent หลายอันสำหรับ commit ที่เป็นผลจากการ merge หลายๆ branch เข้าด้วยกัน)
 
-To visualize this, let’s assume that you have a directory containing three files, and you stage them all and commit. Staging the files checksums each one (the SHA-1 hash we mentioned in Chapter 1), stores that version of the file in the Git repository (Git refers to them as blobs), and adds that checksum to the staging area:
+ลองจินตนาการว่าคุณมี directory อันนึงที่มี file อยู่ข้างใน 3 files แล้วคุณก็ stage ทั้งหมดและ commit การ stage file จะสร้าง checksum ของแต่ละ file (ไอ้ SHA-1 hash ที่บอกไว้ใน Chapter 1 นั่นแหละ), แล้วบันทึก version ของ file นั้นๆใน Git repository (Git อ้างอิงพวกมันแบบ blobs) และเพิ่ม checksum นั้นลงไปใน staging area:
 
 	$ git add README test.rb LICENSE
 	$ git commit -m 'initial commit of my project'
 
-When you create the commit by running `git commit`, Git checksums each subdirectory (in this case, just the root project directory) and stores those tree objects in the Git repository. Git then creates a commit object that has the metadata and a pointer to the root project tree so it can re-create that snapshot when needed.
+เมื่อคุณทำการ commit ด้วยคำสั่ง `git commit` Git จะคำนวน checksum ของแต่ละ subdirectory (ในกรณีนี้ก็มีแค่ root project directory) และบันทึกโครงสร้างของ directory ใน Git repository หลังจากนั้น Git ก็จะสร้าง commit object ที่มี metadata และ pointer ชี้ไปยังโครงสร้างของ root project เพื่อที่มันจะได้สร้าง snapshot นั้นขึ้นมาใหม่ได้เมื่อต้องการ
 
-Your Git repository now contains five objects: one blob for the contents of each of your three files, one tree that lists the contents of the directory and specifies which file names are stored as which blobs, and one commit with the pointer to that root tree and all the commit metadata. Conceptually, the data in your Git repository looks something like Figure 3-1.
+Git repository ของคุณตอนนี้จะมี 5 objects: blob แต่ละ blob สำหรับ content ของแต่ละ file ใน 3 files นั้น, โครงสร้าง root directory ที่เก็บ list ของสิ่งของในนั้นและบันทึกว่า file ไหนถูกเก็บใส่ blob ไหน และ 1 commit ที่มี pointer อันนึงชี้ไปยังโครงสร้างของ root directory กับพวก metadata ของ commit นั้น ซึ่งหน้าตาของข้อมูลใน Git repository ของคุณก็มีคอนเซปประมาณรูป Figure 3-1.
 
 Insert 18333fig0301.png 
 Figure 3-1. Single commit repository data.
 
-If you make some changes and commit again, the next commit stores a pointer to the commit that came immediately before it. After two more commits, your history might look something like Figure 3-2.
+ถ้าคุณทำการแก้ไขใดๆ แล้ว commit ซ้ำอีกครั้ง commit อันถัดไปจะเก็บในรูป pointer ชี้ไปยัง commit ก่อนหน้า ทำไปอีก 2 commits history ของคุณน่าจะมีหน้าตาประมาณรูป Figure 3-2.
 
 Insert 18333fig0302.png 
 Figure 3-2. Git object data for multiple commits.
 
-A branch in Git is simply a lightweight movable pointer to one of these commits. The default branch name in Git is master. As you initially make commits, you’re given a master branch that points to the last commit you made. Every time you commit, it moves forward automatically.
+branch อันนึงใน Git เป็นแค่ pointer ฉบับกระเป๋าของ commits เหล่านี้ ชื่อโดย default ของ branch ใน Git คือ master ขณะที่คุณ commit ครั้งแรกส่งกำลังส่ง master branch อันนึงที่ points กลับไปยัง commit ก่อนหน้า ทุกครั้งที่คุณ commit มันก็ค่อยๆขยับไปๆโดยอัตโนมัติ
 
 Insert 18333fig0303.png 
 Figure 3-3. Branch pointing into the commit data’s history.
 
-What happens if you create a new branch? Well, doing so creates a new pointer for you to move around. Let’s say you create a new branch called testing. You do this with the `git branch` command:
+แล้วจะเกิดอะไรขึ้นถ้าคุณสร้าง branch ใหม่? ก็แค่สร้าง pointer อันใหม่เพื่อที่จะโยกย้ายไปมาตามใจ ยกตัวอย่างว่าคุณสร้าง branch ใหม่ชื่อว่า testing ซึ่งสามารถทำได้ด้วยคำสั่ง `git branch`:
 
 	$ git branch testing
 
-This creates a new pointer at the same commit you’re currently on (see Figure 3-4).
+มันจะสร้าง pointer อันใหม่ใน commit ปัจจุบันที่คุณอยู่ (ดูรูป Figure 3-4).
 
 Insert 18333fig0304.png 
 Figure 3-4. Multiple branches pointing into the commit’s data history.
 
-How does Git know what branch you’re currently on? It keeps a special pointer called HEAD. Note that this is a lot different than the concept of HEAD in other VCSs you may be used to, such as Subversion or CVS. In Git, this is a pointer to the local branch you’re currently on. In this case, you’re still on master. The git branch command only created a new branch — it didn’t switch to that branch (see Figure 3-5).
+แล้ว Git มันรู้ได้ไงว่าตอนนี้คุณอยู่ branch ไหน? เพราะมันแอบจำ pointer พิเศษที่ชื่อว่า HEAD จำไว้ว่า HEAD นี้ต่างกันกับ concept ของ HEAD ใน VCS อื่นๆที่คุณอาจจะเคยใช้มาเยอะมาก (ไม่ว่าจะเป็น Subversion หรือ CVS) ใน Git นี่คือ pointer ชี้ไปยัง local branch ที่คุณทำงานอยู่ อย่างในกรณีนี้ คุณยังอยู่บน master คำสั่ง git branch แค่สร้าง branch ใหม่ให้เฉยๆ มันเปล่า switch คุณไปยัง branch ใหม่นั้นแต่อย่างใด (ดูรูป Figure 3-5).
 
 Insert 18333fig0305.png 
 Figure 3-5. HEAD file pointing to the branch you’re on.
 
-To switch to an existing branch, you run the `git checkout` command. Let’s switch to the new testing branch:
+ถ้าจะ switch ไปยัง branch ใดๆที่มีอยู่ คุณก็แค่สั่ง `git checkout` ลอง switch ไปยัง testing branch อันใหม่กัน:
 
 	$ git checkout testing
 
-This moves HEAD to point to the testing branch (see Figure 3-6).
+คำสั่งนี้จะย้าย HEAD ให้ไปชี้ที่ testing branch (ดังรูป Figure 3-6).
 
 Insert 18333fig0306.png
 Figure 3-6. HEAD points to another branch when you switch branches.
 
-What is the significance of that? Well, let’s do another commit:
+แล้วมันสำคัญยังไงอ่ะ? อ่ะ มาดู commit ถัดมากัน:
 
 	$ vim test.rb
 	$ git commit -a -m 'made a change'
 
-Figure 3-7 illustrates the result.
+รูป Figure 3-7 จะโชว์ผลให้ดู
 
 Insert 18333fig0307.png 
 Figure 3-7. The branch that HEAD points to moves forward with each commit.
 
-This is interesting, because now your testing branch has moved forward, but your master branch still points to the commit you were on when you ran `git checkout` to switch branches. Let’s switch back to the master branch:
+น่าสนใจนะเนี่ย เพราะตอนนี้ testing branch ของคุณขยับไปข้างหน้า แต่ master branch ยังคงชี้ไปยัง commit ที่คุณอยู่ก่อนหน้านี้ตอนที่ switch branch ด้วยคำสั่ง `git checkout` อ่ะ ลอง switch กลับไป master branch กัน:
 
 	$ git checkout master
 
-Figure 3-8 shows the result.
+มาดูผลในรูป Figure 3-8
 
 Insert 18333fig0308.png 
 Figure 3-8. HEAD moves to another branch on a checkout.
 
-That command did two things. It moved the HEAD pointer back to point to the master branch, and it reverted the files in your working directory back to the snapshot that master points to. This also means the changes you make from this point forward will diverge from an older version of the project. It essentially rewinds the work you’ve done in your testing branch temporarily so you can go in a different direction.
+คำสั่งนั้นทำสองอย่าง มันขยับ HEAD pointer กลับไปยัง master branch แต่มัน revert file ทั้งหลายใน working directory ของคุณกลับไปยัง snapshot ที่ master ชี้อยู่ ซึ่งหมายความว่าความเปลี่ยนแปลงทั้งหลายที่คุณแก้ไปตั้งแต่จุดนี้ถูกแยกออกไปจาก version เก่าของ project สรุปคือมัน rewind งานที่คุณทำไปบน testing branch กลับมาชั่วคราวเพื่อที่คุณจะได้ลองแก้ไปทางอื่นได้
 
-Let’s make a few changes and commit again:
+มาลองแก้ file ซักนิดแล้ว commit อีกทีดู:
 
 	$ vim test.rb
 	$ git commit -a -m 'made other changes'
 
-Now your project history has diverged (see Figure 3-9). You created and switched to a branch, did some work on it, and then switched back to your main branch and did other work. Both of those changes are isolated in separate branches: you can switch back and forth between the branches and merge them together when you’re ready. And you did all that with simple `branch` and `checkout` commands.
+ตอนนี้ project history ของคุณถูกแยกออก (ดู Figure 3-9) คุณสร้าง branch ใหม่และ switch ไป, ทำงานไปบนนั้น, แล้ว switch กลับมาที่ branch หลัก แล้วทำงานอื่นลงไป ความเปลี่ยนแปลงทั้งสองสายถูกตัดขาดจากกันใน branch ทั้งสอง คุณสามารถโดดกลับไปกลับมาระหว่างสอง branches ได้แล้วค่อย merge มันเข้าด้วยกันเมื่อคุณพร้อม ซึ่งทั้งหมดนั่นทำได้ด้วยคำสั่งง่ายอย่าง `branch` และ `checkout`
 
 Insert 18333fig0309.png 
 Figure 3-9. The branch histories have diverged.
 
-Because a branch in Git is in actuality a simple file that contains the 40 character SHA-1 checksum of the commit it points to, branches are cheap to create and destroy. Creating a new branch is as quick and simple as writing 41 bytes to a file (40 characters and a newline).
+เนื่องจาก branch ใน Git จริงๆแล้วเป็นแค่ file ธรรมดาๆที่เก็บตัวหนังสือ 40 อักษรที่เป็น SHA-1 checksum ของ commit ที่มันชี้ไปหา การสร้างหรือทำลาย branch เลยถูกอย่างกะขี้ สร้าง branch ใหม่ทั้งง่ายและเร็วส์ปานการเขียน 41 bytes ลงไปใน file (40 อักษรกะ newline อีกตัว)
 
-This is in sharp contrast to the way most VCS tools branch, which involves copying all of the project’s files into a second directory. This can take several seconds or even minutes, depending on the size of the project, whereas in Git the process is always instantaneous. Also, because we’re recording the parents when we commit, finding a proper merge base for merging is automatically done for us and is generally very easy to do. These features help encourage developers to create and use branches often.
+มันเลยแตกต่างกับการแตก branch ใน VCS tool ทั่วไปราวฟ้ากะเหว เพราะปรกติต้องนั่ง copy ทุก file ใน project ใส่ใน directory ใหม่ซึ่งกินเวลาหลายวิ หรืออาจจะเป็นนาทีขึ้นอยู่กับความอ้วนของ project ขณะที่ Git ตดไม่ทันหายเหม็นก็ทำเสร็จละ นอกจากนี้ เนื่องจากเราจำ parent ไว้ในทุกๆ commit เวลาต้องหาต้นตอ version เวลาจะ merge ก็ทำได้โดยอัตโนมัติและง่ายด้วย features เหล่านี้เติมความกล้าให้ developer สร้างและใช้ branches ทั้งหลายเยอะขึ้น
 
-Let’s see why you should do so.
+มาดูกันว่าทำไมคุณก็ควรจะทำ
 
-## Basic Branching and Merging ##
+## เบสิคการแตก Branch และการ Merge ##
 
-Let’s go through a simple example of branching and merging with a workflow that you might use in the real world. You’ll follow these steps:
+มาดูตัวอย่างง่ายๆของการแตก branch และการ merge ด้วย workflow ที่คุณน่าจะใช้ในชีวิตประจำวัน คุณจะทำตามนี้:
 
-1.	Do work on a web site.
-2.	Create a branch for a new story you’re working on.
-3.	Do some work in that branch.
+1.	ทำงานบน web site.
+2.	แตก branch สำหรับ story ใหม่ที่คุณกำลังทำ
+3.	ทำงานใน branch นั้น
 
-At this stage, you’ll receive a call that another issue is critical and you need a hotfix. You’ll do the following:
+จังหวะนี้เอง มีโทรศัพท์เข้ามาบอกว่ามี issue ร้อนที่ต้องรีบ hotfix ด่วน! คุณก็ทำตามนี้:
 
-1.	Revert back to your production branch.
-2.	Create a branch to add the hotfix.
-3.	After it’s tested, merge the hotfix branch, and push to production.
-4.	Switch back to your original story and continue working.
+1.	กลับไปยัง production branch
+2.	แตก branch สำหรับทำ hotfix.
+3.	หลังจาก test แล้ว ก็ merge hotfix branch แล้ว push ขึ้นไปยัง production
+4.	switch กลับไป story ตอนแรก แล้วทำงานต่ออย่างสบายอารมณ์
 
-### Basic Branching ###
+### เบสิคการแตก Branch ###
 
-First, let’s say you’re working on your project and have a couple of commits already (see Figure 3-10).
+ก่อนอื่น สมมติว่าคุณกำลังทำงานบน project คุณ และ commit เข้าไปหลายทีละ (ตาม Figure 3-10).
 
 Insert 18333fig0310.png 
 Figure 3-10. A short and simple commit history.
 
-You’ve decided that you’re going to work on issue #53 in whatever issue-tracking system your company uses. To be clear, Git isn’t tied into any particular issue-tracking system; but because issue #53 is a focused topic that you want to work on, you’ll create a new branch in which to work. To create a branch and switch to it at the same time, you can run the `git checkout` command with the `-b` switch:
+คุณตัดสินใจว่า เอาล่ะ วันนี้ทำ issue #53 ดีกว่า (ไม่ว่าระบบ issue-tracking ที่บริษัทคุณใช้จะเป็นอะไร) เอาจริงๆแล้ว Git ไม่ได้ผูกติดกับ issue-tracking แต่อย่างใด แต่เนื่องจาก issue #53 มันเป็นเรื่องเป็นราวของมันคุณก็เลยอยากแตก branch แยกออกไปทำ การสร้าง branch ใหม่และ switch ไปในจังหวะเดียวสามารถทำได้ด้วยคำสั่ง `git checkout` แล้วเสริม `-b` เข้าไป:
 
 	$ git checkout -b iss53
 	Switched to a new branch "iss53"
 
-This is shorthand for:
+นี่คือท่าลัดของ:
 
 	$ git branch iss53
 	$ git checkout iss53
 
-Figure 3-11 illustrates the result.
+รูป 3-11 จะโชว์ผลให้ดู
 
 Insert 18333fig0311.png 
 Figure 3-11. Creating a new branch pointer.
 
-You work on your web site and do some commits. Doing so moves the `iss53` branch forward, because you have it checked out (that is, your HEAD is pointing to it; see Figure 3-12):
+คุณทำงานไปบน web site ของคุณและ commit ไปนิดหน่อย ซึ่งระหว่างนั้นก็เป็นการผลัก branch `iss53` ไปข้างหน้า เพราะคุณ checkedout มันออกมา (แปลว่า HEAD ของคุณชี้ไปหามัน ดังรูป Figure 3-12):
 
 	$ vim index.html
 	$ git commit -a -m 'added a new footer [issue 53]'
@@ -137,16 +137,16 @@ You work on your web site and do some commits. Doing so moves the `iss53` branch
 Insert 18333fig0312.png 
 Figure 3-12. The iss53 branch has moved forward with your work.
 
-Now you get the call that there is an issue with the web site, and you need to fix it immediately. With Git, you don’t have to deploy your fix along with the `iss53` changes you’ve made, and you don’t have to put a lot of effort into reverting those changes before you can work on applying your fix to what is in production. All you have to do is switch back to your master branch.
+แล้วโทรศัพท์ก็มาบอกว่า web site มีงานเข้า และคุณต้องซ่อมมันด่วน เพราะ Git คุณไม่จำเป็นต้อง deploy fix ของคุณไปกับความเปลี่ยนแปลงใน `iss53`  และคุณก็ไม่ต้องเปลืองแรงแก้ code กลับมาเป็นเหมือนเดิม ก่อนที่จะเริ่ม fix อะไรที่อยู่บน production ทั้งหมดที่ต้องทำก็แค่ switch กลับไปยัง master branch
 
-However, before you do that, note that if your working directory or staging area has uncommitted changes that conflict with the branch you’re checking out, Git won’t let you switch branches. It’s best to have a clean working state when you switch branches. There are ways to get around this (namely, stashing and commit amending) that we’ll cover later. For now, you’ve committed all your changes, so you can switch back to your master branch:
+อย่างไรก็ตาม ก่อนทำแบบนั้น จำไว้ว่า working directory หรือ staging area ของคุณมีความเปลี่ยนแปลงที่ยังไม่โดน commit ซึ่ง conflict กับ branch branch ที่คุณกำลัง checkout Git ก็เลยไม่ปล่อยให้คุณ switch branches ถ้าจะให้ดี คุณควรจะมีสถานะการทำงาน cleanๆ ก่อนที่จะ switch branches จริงๆมันก็มีท่ายากที่เอาไว้แก้สถานการณ์นี้เหมือนกันนะ (คือการ stash เข้าไปก่อนแล้วค่อย commit amending ตาม) แต่ค่อยมาว่ากันมีหลัง สำหรับตอนนี้ แค่ commit ความเปลี่ยนแปลงทั้งหมดเข้าไปก่อนละกัน จะได้ switch กลับไป master branch ได้:
 
 	$ git checkout master
 	Switched to branch "master"
 
-At this point, your project working directory is exactly the way it was before you started working on issue #53, and you can concentrate on your hotfix. This is an important point to remember: Git resets your working directory to look like the snapshot of the commit that the branch you check out points to. It adds, removes, and modifies files automatically to make sure your working copy is what the branch looked like on your last commit to it.
+ณ จุดนี้ working directory ของ project คุณจะเหมือนกับก่อนหน้าที่คุณเริ่มทำงานบน issue #53 เป๊ะๆ และคุณก็สามารถรวมสมาธิไปที่ hotfix ได้ ตรงนี้คือตรงที่ต้องจำให้ขึ้นใจ: Git จะ reset working directory ของคุณให้เหมือนกับ snapshot ของ commit ที่ branch ที่คุณ check out ชี้ไป มันจะเพิ่ม ลบ หรือแก้ file โดยอัตโนมัติจนมั่นใจว่า working copy ของคุณเหมือนกับ commit สุดท้ายบน branch นั้น
 
-Next, you have a hotfix to make. Let’s create a hotfix branch on which to work until it’s completed (see Figure 3-13):
+หลังจากนั้น คุณมี hotfix ที่รอให้ทำ มาสร้าง branch เพื่อทำ hotfix จนกว่ามันจะเสร็จกัน(ดู Figure 3-13):
 
 	$ git checkout -b 'hotfix'
 	Switched to a new branch "hotfix"
@@ -158,7 +158,7 @@ Next, you have a hotfix to make. Let’s create a hotfix branch on which to work
 Insert 18333fig0313.png 
 Figure 3-13. hotfix branch based back at your master branch point.
 
-You can run your tests, make sure the hotfix is what you want, and merge it back into your master branch to deploy to production. You do this with the `git merge` command:
+คุณสามารถ run tests เพื่อให้มั่นใจว่า hotfix มันทำงานได้ดั่งใจและ merge มันกลับเข้า master branch เพื่อ deploy ใส่ production ซึ่งสามารถทำได้ด้วยคำสั่ง `git merge`:
 
 	$ git checkout master
 	$ git merge hotfix
@@ -167,19 +167,19 @@ You can run your tests, make sure the hotfix is what you want, and merge it back
 	 README |    1 -
 	 1 files changed, 0 insertions(+), 1 deletions(-)
 
-You’ll notice the phrase "Fast forward" in that merge. Because the commit pointed to by the branch you merged in was directly upstream of the commit you’re on, Git moves the pointer forward. To phrase that another way, when you try to merge one commit with a commit that can be reached by following the first commit’s history, Git simplifies things by moving the pointer forward because there is no divergent work to merge together — this is called a "fast forward".
+คุณจะเห็นคำว่า "Fast forward" ใน merge นั้น เพราะ commit ที่ถูกชี้โดย branch ที่คุณ merge มันเป็น upstream ของ commit ที่คุณอยู่โดยตรง Git ก็เลยขยับ pointer ไปข้างหน้า พูดอีกนัยหนึ่งก็คือ เวลาที่คุณพยายามจะ merge commit ซักอันเข้ากับ commit ที่สามารถไปถึงได้โดยการตาม history ของ commit อันแรก Git จะทำให้ทุกอย่างง่ายขึ้นโดยการขยับ pointer ไปข้างหน้าเพราะมันไม่มีงานที่ถูกแยกออกไปให้ merge สิ่งนี้เรียกว่า "fast forward".
 
-Your change is now in the snapshot of the commit pointed to by the `master` branch, and you can deploy your change (see Figure 3-14).
+ความเปลี่ยนแปลงของคุณตอนนี้อยู่ใน snapshot ของ commit ที่ `master` branch ชี้ไป และคุณก็สามารถ deploy ความเปลี่ยนแปลงนี้ได้ (ดัง Figure 3-14).
 
 Insert 18333fig0314.png 
 Figure 3-14. Your master branch points to the same place as your hotfix branch after the merge.
 
-After your super-important fix is deployed, you’re ready to switch back to the work you were doing before you were interrupted. However, first you’ll delete the `hotfix` branch, because you no longer need it — the `master` branch points at the same place. You can delete it with the `-d` option to `git branch`:
+หลังจาก fix ที่โคตรสำคัญถูก deployed คุณก็พร้อมที่จะ switch กลับไปยังงานที่คุณทำค้างไว้ก่อนถูกขัดจังหวะ อย่างไรก็ตาม สิ่งที่คุณจะทำก่อนคือการ delete branch `hotfix` เพราะว่าคุณไม่ต้องใช้มันอีกแล้ว เพราะไอ้ `master` branch มันชี้ไปที่จุดเดียวกันแล้ว คุณสามารถ delete มันด้วย option `-d` ของ `git branch`:
 
 	$ git branch -d hotfix
 	Deleted branch hotfix (3a0874c).
 
-Now you can switch back to your work-in-progress branch on issue #53 and continue working on it (see Figure 3-15):
+เอาล่ะ ตอนนี้ switch กลับไป branch issue #53 ที่ทำค้างไว้ได้ละ แล้วก็ทำงานต่อตามสบาย (ดังรูป Figure 3-15):
 
 	$ git checkout iss53
 	Switched to branch "iss53"
@@ -191,9 +191,9 @@ Now you can switch back to your work-in-progress branch on issue #53 and continu
 Insert 18333fig0315.png 
 Figure 3-15. Your iss53 branch can move forward independently.
 
-It’s worth noting here that the work you did in your `hotfix` branch is not contained in the files in your `iss53` branch. If you need to pull it in, you can merge your `master` branch into your `iss53` branch by running `git merge master`, or you can wait to integrate those changes until you decide to pull the `iss53` branch back into `master` later.
+ถึงงานที่ทำไว้ใน `hotfix` branch จะไม่อยู่ใน files ใน `iss53` branch ก็ช่างหัวมัน ถ้าต้องดึงมันเข้ามา คุณก็สามารถ merge `master` branch ของคุณใส่ใน `iss53` branch ได้ด้วยคำสั่ง `git merge master` หรือว่าจะรอ integrate ความเปลี่ยนแปลงพวกนั้นตอนจะรวม `iss53` branch กลับเข้า `master` ทีหลังก็ได้
 
-### Basic Merging ###
+### เบสิคการ Merge ###
 
 Suppose you’ve decided that your issue #53 work is complete and ready to be merged into your `master` branch. In order to do that, you’ll merge in your `iss53` branch, much like you merged in your `hotfix` branch earlier. All you have to do is check out the branch you wish to merge into and then run the `git merge` command:
 
