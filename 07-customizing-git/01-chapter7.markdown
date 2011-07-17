@@ -258,37 +258,39 @@ Git จะช่วยจัดการปัญหาเหล่านี้�
 ความสามารถนี้สามารถนำปประยุกต์ใช้กับ git rebase ได้เช่นเดียวกัน ตัวอย่างเช่น ถ้าเราเผลอ commit ช่องว่างที่ไม่เหมาะสมเข้าไป จึงไม่อยาก push ขึ้นไปที่ server เราสามารถสั่ง `rebase` ด้วยคำสั่ง `--whitespace=fix` แล้ว Git จะไปจัดการกับปัญหาช่องว่างให้เราเอง
 
 
-### การปรับแต่งบนเครื่องแม่ข่าย ###
+### การปรับแต่งบนเครื่อง Server ###
 
-Not nearly as many configuration options are available for the server side of Git, but there are a few interesting ones you may want to take note of.
+Git บนฝั่ง Server ไม่ค่อยมีอะไรให้ทำเท่าไหรครับ แต่มีหลายอย่างที่รู้ไว้ใช่ว่าใส่บ่าแบกหามครับ
 
 #### receive.fsckObjects ####
 
-By default, Git doesn't check for consistency all the objects it receives during a push. Although Git can check to make sure each object still matches its SHA-1 checksum and points to valid objects, it doesn't do that by default on every push. This is a relatively expensive operation and may add a lot of time to each push, depending on the size of the repository or the push. If you want Git to check object consistency on every push, you can force it to do so by setting `receive.fsckObjects` to true:
+ตามปกติ Git จะไม่มีระบบตรวจสอบความเรียบร้อยของแต่ละไฟล์ระหว่างที่ push ขึ้นมาบน Server ถึงแม้ว่า Git จะสามารถตรวจสอบด้วยวิธี SHA-1 checksum ได้ แต่มันทำไม่ได้ทำในทุกๆ การ push เพราะว่ามันจะทำให้เสียเวลามากๆ ถ้าทุกครับที่ push เราต้องตรวจสอบมันทุกไฟล์ ยิ่งถ้า repository หรือ push มีไฟล์จำนวนมาก แต่ถ้าเราต้องการให้ Git มันตรวจสอบทุกๆ ไฟล์ในทุกๆ ครั้งที่ push เราก็สามารถบีบคอให้ Git มันทำให้ได้ ผ่านการกำหนด `receive.fsckObjects` ให้เป็น true
 
 	$ git config --system receive.fsckObjects true
 
-Now, Git will check the integrity of your repository before each push is accepted to make sure faulty clients aren't introducing corrupt data.
+ที่นี่ Git จะทำการตรวจสอบทุกๆ ไฟล์ ก่อนที่จะรับเข้าไป repository เพื่อให้แน่ใจว่าความผิดพลาดที่ client จะไม่สงผลกระทบต่อข้อมูลของเรา
 
 #### receive.denyNonFastForwards ####
 
-If you rebase commits that you've already pushed and then try to push again, or otherwise try to push a commit to a remote branch that doesn't contain the commit that the remote branch currently points to, you'll be denied. This is generally good policy; but in the case of the rebase, you may determine that you know what you're doing and can force-update the remote branch with a `-f` flag to your push command.
+ถ้าเรา rebase commits ที่เรา push ขึ้นไปแล้ว จากนั้นก็ push มันขึ้นไปอีกที หรือไม่เราก็พยายาม push commit ที่ไม่มีจุดเชื่อมต่อกับ commit บน server ตามปกติทั้งสองกรณี Git จะไม่อนุญาติให้เราทำ ซึ่งนี้เป็นสิ่งที่ดี แต่ในบางกรณีถ้าคุณเข้าใจระบบเป็นอย่างดี และแน่ในว่าต้องการทำอย่างนั้นจริงๆ เราก็สามารถใช้ `-f` เพื่อบีบคือให้ Git ยอม push ให้เรา
 
-To disable the ability to force-update remote branches to non-fast-forward references, set `receive.denyNonFastForwards`:
+เพื่อไม่ให้ใครมา force-update ได้ เราสามารถสั่งห้ามเด็จขาดโดยกำหนดให้ `receive.denyNonFastForwards` มีค่าเป็น true
 
 	$ git config --system receive.denyNonFastForwards true
 
-The other way you can do this is via server-side receive hooks, which I'll cover in a bit. That approach lets you do more complex things like deny non-fast-forwards to a certain subset of users.
+อีกวิีธีที่สามารถทำได้บนฝั่ง server คือการใช้ receive hooks ซึ่งจะได้ดูกันต่อไป สำหรับวิธีนั้นจะค่อนข้างซับซ้อนเหมือนการทำ non-fast-forwards ที่เจาะจงกลุ่มผู้ใช้
 
 #### receive.denyDeletes ####
 
-One of the workarounds to the `denyNonFastForwards` policy is for the user to delete the branch and then push it back up with the new reference. In newer versions of Git (beginning with version 1.6.1), you can set `receive.denyDeletes` to true:
+ผู้ใช้บางคนใช้วิธีขี้โกง เมื่อเห็นว่าเรามีข้อกำหนด `denyNonFastForwards` ก็จะใช้วิธีลบ branch ทิ้ง แล้วก็ push ขึ้นมาอีกทีพร้อมจุดเชื่อมต่อใหม่ สำหรับ Git เวอร์ชั่นใหม่ (สูงกว่าเวอร์ชั่น 1.6.1) เราสามารถตั้งค่า `receive.denyDeletes` เป็น true ได้
 
 	$ git config --system receive.denyDeletes true
 
-This denies branch and tag deletion over a push across the board ‚Äî no user can do it. To remove remote branches, you must remove the ref files from the server manually. There are also more interesting ways to do this on a per-user basis via ACLs, as you'll learn at the end of this chapter.
+วิธีการนี้จะทำให้ Git ไม่ยอมให้ลบ branch หรือ tag ผ่านการ push ที่ผั่ง client ถ้าต้องการลบจริงๆ จะต้องลบที่ฝั่ง server ด้วยตัวเอง จริงๆ มีวิธีจัดการกับปัญหานี้อีกแบบด้วย ACLs ่ซึ่งเราจะอธิบายกันตอนท้ายๆ บทนี้
 
 ## Git Attributes ##
+
+
 
 Some of these settings can also be specified for a path, so that Git applies those settings only for a subdirectory or subset of files. These path-specific settings are called Git attributes and are set either in a `.gitattributes` file in one of your directories (normally the root of your project) or in the `.git/info/attributes` file if you don't want the attributes file committed with your project.
 
