@@ -1,44 +1,44 @@
-# Git and Other Systems #
+# Git และระบบอื่นๆ #
 
-The world isn’t perfect. Usually, you can’t immediately switch every project you come in contact with to Git. Sometimes you’re stuck on a project using another VCS, and many times that system is Subversion. You’ll spend the first part of this chapter learning about `git svn`, the bidirectional Subversion gateway tool in Git.
+ทุกอย่างมันยังไม่สมบูรณ์ไปซะหมดหรอก เพราะการที่เราต้องการเปลี่ยนทุกๆ โปรเจคที่มีใช้งานอยู่ส่วนร่วมอยู่ให้เป็น Git ได้ในทันทีคงทำไม่ได้ เพราะบางครั้งเรายังยึดติดกับโปรเจคที่ใช้ VCS (Versions Control System) อื่นๆ ซึ่งหลายครั้งมันคือ Subversion คุณเองจะสามารถใช้ส่วนแรกของบทนี้สำหรับเรียนรู้เกี่ยวกับ `git svn` เป็นเครื่องมื่อที่ช่วยให้เราสามารถใช้งานร่วมกับ Subversion ได้
 
-At some point, you may want to convert your existing project to Git. The second part of this chapter covers how to migrate your project into Git: first from Subversion, then from Perforce, and finally via a custom import script for a nonstandard importing case. 
+บางครั้ง หากต้องการที่จะแปลงโปรเจคของคุณที่มีอยู่แล้วให้มาใช้งานร่วมกับ Git ซึ่งส่วนที่ 2 ของบทนี้จะกพูดถึงการย้ายโปรเจคที่มีอยู่เดิมไปยัง Git ซึ่งก็เลี่ยงไม่ได้ที่จะต้องเริ่มต้นด้วย Subversion และสุดท้ายคือการย้ายโปรเจคด้วยสคริปต์สำหรับนำเข้าโปรเจคที่สร้างขึ้นเอง สำหรับกรณีการนำเข้าโปรเจคที่ไม่เป็นไปตามมาตรฐาน
 
-## Git and Subversion ##
+## Git และ Subversion ##
 
-Currently, the majority of open source development projects and a large number of corporate projects use Subversion to manage their source code. It’s the most popular open source VCS and has been around for nearly a decade. It’s also very similar in many ways to CVS, which was the big boy of the source-control world before that.
+ขณะนี้ การพัฒนาโปรเจคโอเพ่นซอร์ซส่วนใหญ่รวมไปถึงโปรเจคภายในบริษัทจำนวนมากต่างก็ใช้ Subversion เพื่อช่วยจัดการซอร์ซโค้ด โดยที่ Subversion เป็น VCS แบบโอเพ่นซอร์ซและใช้มากันมายาวนานเกือบ 10 ปีแล้ว Subversion นั้นคล้ายกับ CVS ในหลายด้าน โดยที่ CVS เองเคยเป็นพี่ใหญ่ในวงการ source-control มาก่อน Subversion
 
-One of Git’s great features is a bidirectional bridge to Subversion called `git svn`. This tool allows you to use Git as a valid client to a Subversion server, so you can use all the local features of Git and then push to a Subversion server as if you were using Subversion locally. This means you can do local branching and merging, use the staging area, use rebasing and cherry-picking, and so on, while your collaborators continue to work in their dark and ancient ways. It’s a good way to sneak Git into the corporate environment and help your fellow developers become more efficient while you lobby to get the infrastructure changed to support Git fully. The Subversion bridge is the gateway drug to the DVCS world.
+คุณลักษณะเด่นอย่างหนึ่งของ Git ก็คือ Bidirectional Bridge ไปยัง Subversion เรียกว่า git svn ซึ่งเครื่องมือนี้จะทำให้เราใช้ Git แบบไคลเอนต์ (Client) ร่วมกับเซิร์ฟเวอร์ที่เป็น Subversion ได้ ในขณะเดียวกันก็ยังใช้คุณสมบัติต่างๆ แบบโลคอล ของ Git ได้ทั้งหมด และส่งโค้ดกลับไปยังเซิร์ฟเวอร์ Subversion ได้เช่นเดียวกันกับการใช้งานไคลเอนต์ที่เป็น Subversion นั่นย่อมหมายความว่าเราสามารถสร้าง branch และ merge ภายในเครื่องของเราเองได้ ใช้งาน Staging area, rebase และ cherry-picking รวมไปถึงความสามารถอื่นๆ ในขณะที่เพื่อนๆ ร่วมโปรเจคคุณยังคงก้มหน้าก้มตาใช้งานของเก่าคร่ำคร่ากันต่อไป ซึ่งวิธีนี้เป็นวิธีการที่ดีสำหรับ(ลอง/แอบ)ใช้ Git ในสภาพแวดล้อมของหน่วยงาน และยังช่วยให้นักพัฒนาในกลุ่มทำงานได้อย่างมีประสิทธิภาพมากยิ่งขึ้น ระหว่างที่เราโน้มน้าวเพื่อที่จะได้ทรัพยากรที่พร้อมสำหรับการเปลี่ยนไปยัง Git อย่างสมบูรณ์แบบ 
 
 ### git svn ###
 
-The base command in Git for all the Subversion bridging commands is `git svn`. You preface everything with that. It takes quite a few commands, so you’ll learn about the common ones while going through a few small workflows.
+คำสั่งพื้นฐานใน Git สำหรับคำสั่งใช้เชื่อมการทำงานกับ Subversion ทั้งหมดจะเริ่มต้นด้วย `git svn` แล้วต่อท้ายด้วยคำสั่งอีกไม่กี่คำสั่ง ซึ่งจะได้เรียนคำสั่งที่ใช้งานโดยทั่วไปผ่านขั้นตอนการทำงานเล็กน้อย
 
-It’s important to note that when you’re using `git svn`, you’re interacting with Subversion, which is a system that is far less sophisticated than Git. Although you can easily do local branching and merging, it’s generally best to keep your history as linear as possible by rebasing your work and avoiding doing things like simultaneously interacting with a Git remote repository.
+สิ่งสำคัญอย่างหนึ่งที่ต้องจำไว้ว่าเรากำลังใช้ `git svn` เพื่อทำงานร่วมกับ Subversion ซึ่งเป็นระบบที่เก่าคร่ำคร่ากว่า Git อย่างไรก็ตามเรายังสร้าง branch และ merge ภายในเครื่องได้ ซึ่งโดยทั่วไปแล้วเป็นเรื่องดีที่จะเก็บประวัติการทำงานไว้ภายในเครื่องไปเรื่อยๆ ด้วยการ rebase ไปเรื่อยๆ และยังเป็นการเลี่ยงการเกิดผลกระทบต่อ Git repository ที่ใช้งานอยู่ด้วย
 
-Don’t rewrite your history and try to push again, and don’t push to a parallel Git repository to collaborate with fellow Git developers at the same time. Subversion can have only a single linear history, and confusing it is very easy. If you’re working with a team, and some are using SVN and others are using Git, make sure everyone is using the SVN server to collaborate — doing so will make your life easier.
+ไม่ต้องเขียนประวัติการใช้งานใหม่และโยนกลับเข้าไปอีกครั้ง **and don’t push to a parallel Git repository to collaborate with fellow Git developers at the same time** Subversion สร้างประวัติการทำงานต่อเนื่องกันไปเรื่อยๆ นั่นก็ทำให้สับสนได้ง่าย ถ้าทำงานร่วมกันเป็นทีม มีบางส่วนใช้ SVN รวมไปถึง Git ก็มั่นใจได้เลยว่าทุกคนสามารถใช้งานเซิร์ฟเวอร์ Subversion ร่วมกันได้ ทำตามเลยครับ แล้วชีวิตจะง่ายขึ้นเยอะ
 
-### Setting Up ###
+### จงเตรียมพร้อม ###
 
-To demonstrate this functionality, you need a typical SVN repository that you have write access to. If you want to copy these examples, you’ll have to make a writeable copy of my test repository. In order to do that easily, you can use a tool called `svnsync` that comes with more recent versions of Subversion — it should be distributed with at least 1.4. For these tests, I created a new Subversion repository on Google code that was a partial copy of the `protobuf` project, which is a tool that encodes structured data for network transmission. 
+สำหรับการทดลองความสามารถนี้ สิ่งที่ขาดไม่ได้ คือ SVN repository ที่สามารถเข้าไปเขียนข้อมูลได้ เพราะถ้าต้องการจะทำตามตัวอย่างด้านล่าง ก็ต้องทำให้ข้อมูลที่คัดลอกไปจาก repository เขียนเพิ่มเ่ข้าไปได้ก่อน เพื่อให้ชีวิตง่ายขึ้นก็ให้เรียกใช้เครื่องมือชื่อ `svnsync` ที่ติดมากับ Subversion ราวๆ เวอร์ชั่น 1.4 เป็นต้นมา สำหรับตัวอย่างอย่างต่อไปนี้ ได้สร้าง Subversion repository ไว้บน Google code เรียนร้อยแล้ว ซึ่งเป็นส่วนหนึ่งของโปรเจค `protobuf` ซึ่งเป็นเครื่องมือเข้ารหัสโครงสร้างข้อมูลสำหรับส่งผ่านเครือข่าย
 
-To follow along, you first need to create a new local Subversion repository:
+จากนี้เป็นต้นไป สิ่งที่ต้องทำเป็นอันดับแรกคือสร้าง Subversion repository ภายในเครื่องซะก่อน:
 
 	$ mkdir /tmp/test-svn
 	$ svnadmin create /tmp/test-svn
 
-Then, enable all users to change revprops — the easy way is to add a pre-revprop-change script that always exits 0:
+ถัดไปก็เปิดให้ผู้ใช้ทุกคนเปลี่ยน revprops ได้ ซึ่งวิธีการที่ง่ายที่สุดคือเพิ่มสคริปต์ pre-revprop-change ซึ่ง exists 0 เสมอ:
 
 	$ cat /tmp/test-svn/hooks/pre-revprop-change 
 	#!/bin/sh
 	exit 0;
 	$ chmod +x /tmp/test-svn/hooks/pre-revprop-change
 
-You can now sync this project to your local machine by calling `svnsync init` with the to and from repositories.
+เท่านี้ก็ซิงก์โปรเจคที่สร้างขึ้นภายในเครื่องกับ repository (ซึ่งในที่นี้คือ Google code) ได้แล้วด้วยการเรียกใช้คำสั่ง `svnsync init` 
 
 	$ svnsync init file:///tmp/test-svn http://progit-example.googlecode.com/svn/ 
 
-This sets up the properties to run the sync. You can then clone the code by running
+วิธีการกำหนดค่าต่างๆ ด้านบนเพื่อใช้ซิงก์ข้อมูล เมื่อเสร็จเรียบร้อยแล้วก็เริ่ม clone โค้ดออกมาโดยใช้คำสั่ง
 
 	$ svnsync sync file:///tmp/test-svn
 	Committed revision 1.
@@ -48,11 +48,11 @@ This sets up the properties to run the sync. You can then clone the code by runn
 	Committed revision 3.
 	...
 
-Although this operation may take only a few minutes, if you try to copy the original repository to another remote repository instead of a local one, the process will take nearly an hour, even though there are fewer than 100 commits. Subversion has to clone one revision at a time and then push it back into another repository — it’s ridiculously inefficient, but it’s the only easy way to do this.
+แม้ว่าคำสั่งด้านบนจะใช้เวลาไม่กี่นาที แต่หากต้องการคัดลอก repository ต้นฉบับ ไปยัง repository อื่นแทนที่จะเป็น repository ที่อยู่ในเครื่อง กระบวนการนี้จะใช้เวลาอยู่ราวๆ 1 ชั่วโมง ถึงแม้ว่าจะมีรายการ commit ไม่ถึง 100 รายการก็ตาม เพราะในขณะที่ Subversion ดึงแต่ละ revision ออกมาก ก็จะโยนเข้าไปไว้ใน repository อีกอันหนึ่งไปด้วย มันดูเป็นวิธีที่น่าตลกไปหน่อย แต่ว่ามันก็เป็นวิธีการที่ง่ายที่สุดสำหรับการทำงานแบบนี้
 
-### Getting Started ###
+### เริ่มกันสักที ###
 
-Now that you have a Subversion repository to which you have write access, you can go through a typical workflow. You’ll start with the `git svn clone` command, which imports an entire Subversion repository into a local Git repository. Remember that if you’re importing from a real hosted Subversion repository, you should replace the `file:///tmp/test-svn` here with the URL of your Subversion repository:
+จากหัวข้อที่แล้ว เราก็มี repository ของ Subversion ที่สามารถเขียนข้อมูลลงไปได้เรียบร้อยแล้ว ถัดไปก็จะลองทำตามขั้นตอนการทำงานทั่วไปดูก่อน เริ่มต้นด้วยคำสั่ง `git svn clone` ใช้นำรายการต่างๆ จาก repository ที่เป็น Subversion เข้าสู่ repository ของ Git ต้องจำไว้ว่าสำหรับการนำข้อมูลจากเซิร์ฟเวอร์ Subversion จริงๆ ควรเปลี่ยนจาก `file:///tmp/test-svn` ให้เป็น URL ของ repository ที่ทำงานด้วยซะก่อน:
 
 	$ git svn clone file:///tmp/test-svn -T trunk -b branches -t tags
 	Initialized empty Git repository in /Users/schacon/projects/testsvnsync/svn/.git/
@@ -70,13 +70,13 @@ Now that you have a Subversion repository to which you have write access, you ca
 	Checked out HEAD:
 	 file:///tmp/test-svn/branches/my-calc-branch r76
 
-This runs the equivalent of two commands — `git svn init` followed by `git svn fetch` — on the URL you provide. This can take a while. The test project has only about 75 commits and the codebase isn’t that big, so it takes just a few minutes. However, Git has to check out each version, one at a time, and commit it individually. For a project with hundreds or thousands of commits, this can literally take hours or even days to finish.
+คำสั่งด้านบนจะคล้ายกันการทำงานของคำสั่ง `git svn init` ต่อด้วย `git svn fetch` ไปยัง URL ที่ระบุโคยจะใช้เวลาทำงานสักครู่ แต้ด้วยโปรเจคที่สร้างขึ้นมีรายการ commit ไปเพียงแค่ 75 รายการ และขนาดโดยรวมของโค้ดไม่ใหญ่มาก ดังนั้นไม่น่าจะใช้เวลาไม่กี่นาทีเท่านั้น แต่อย่างไรก็ตาม Git จะ check out ออกมาครั้งละรายการ และ commit เข้าไปยัง repository ของ Git ดังนั้นสำหรับโปรเจคที่มีการายการ commit หลายร้อยหรือหลายพันรายการ จะใช้เวลาหลายชั่วโมงหรือหลายวันกว่าจะเสร็จ
 
-The `-T trunk -b branches -t tags` part tells Git that this Subversion repository follows the basic branching and tagging conventions. If you name your trunk, branches, or tags differently, you can change these options. Because this is so common, you can replace this entire part with `-s`, which means standard layout and implies all those options. The following command is equivalent:
+คำสั่ง `-T trunk -b branches -t tags` เป็นส่วนที่บอก Git ว่า repository ของ Subversion นี้เป็นไปตามโครงสร้างการแตก branch และการกำหนด tag แบบทั่วไป แต่ในกรณีที่ตั้งชื่อ trunk, branch หรือ tag ที่ต่างออกไป ก็แค่เปลี่ยนค่าใน option ได้ เนื่องจากมันค่นอข้างจะเป็นเรื่องที่เจอกันได้เรื่อง เพราะฉะนั้นคำสั่งด้านบนจึงสามารถแทนที่ด้วย `-s` เป็นส่วนที่หมายถึง repository นี้ใช้เลย์เอาท์มาตรฐานของ subversion และกำหนดค่าให้กับ option ต่างๆ เช่นเดียวกับคำสั่งด้านบน จะได้คำสั่ง:
 
 	$ git svn clone file:///tmp/test-svn -s
 
-At this point, you should have a valid Git repository that has imported your branches and tags:
+เมื่อถึงขั้นตอนนี้จะได้ repository ของ Git ที่นำข้อมูล branch และ tag เข้ามาเก็บไว้เรียบร้อยแล้ว:
 
 	$ git branch -a
 	* master
@@ -87,7 +87,7 @@ At this point, you should have a valid Git repository that has imported your bra
 	  tags/release-2.0.2rc1
 	  trunk
 
-It’s important to note how this tool namespaces your remote references differently. When you’re cloning a normal Git repository, you get all the branches on that remote server available locally as something like `origin/[branch]` - namespaced by the name of the remote. However, `git svn` assumes that you won’t have multiple remotes and saves all its references to points on the remote server with no namespacing. You can use the Git plumbing command `show-ref` to look at all your full reference names:
+เรื่องหนึ่งที่สำคัญคือเครื่องมือนี้จะกำหนด namesapce สำหรับอ้างถึงต่างกันออกไป เมื่อดึงข้อมูลออกมาจาก repository ของ Git จะได้ข้อมูลของ branch ทั้งหมดของ repository นั้นออกมาเป็นไว้ที่ repository ภายในเครื่อง ซึ่งเหมือนกับ `origin/[branch]` โดยที่ namespace จะถูกกำหนดด้วยชื่อของกลุ่มที่เราสนใจอยู่ (namespaced by the name of the remote) ซึ่ง `git svn` จะทึกทักเอาว่าเราต้องไม่มีกลุ่มข้อมูลที่เราสนใจอยู่หลายกลุ่มและนอกจากนั้นยังจะคิดไปเราบันทึกตำแหน่งที่ใช้อ้างถึง (references to points) ทั้งหมดไว้บนเซิร์ฟเวอร์แบบที่ไม่ได้กำหนด namespace ซึ่งถ้าใช้คำสั่ง `show-ref` ของ Git ก็จะเห็น ตำแหน่งทั้งหมดที่ใช้อ้างถึงได้:
 
 	$ git show-ref
 	1cbd4904d9982f386d87f88fce1c24ad7c0f0471 refs/heads/master
@@ -98,7 +98,7 @@ It’s important to note how this tool namespaces your remote references differe
 	1c4cb508144c513ff1214c3488abe66dcb92916f refs/remotes/tags/release-2.0.2rc1
 	1cbd4904d9982f386d87f88fce1c24ad7c0f0471 refs/remotes/trunk
 
-A normal Git repository looks more like this:
+ซึ่ง repository ของ Git จะเห็นในลักษณะ:
 
 	$ git show-ref
 	83e38c7a0af325a9722f2fdc56b10188806d83a1 refs/heads/master
@@ -106,19 +106,19 @@ A normal Git repository looks more like this:
 	0a30dd3b0c795b80212ae723640d4e5d48cabdff refs/remotes/origin/master
 	25812380387fdd55f916652be4881c6f11600d6f refs/remotes/origin/testing
 
-You have two remote servers: one named `gitserver` with a `master` branch; and another named `origin` with two branches, `master` and `testing`. 
+เรามี 2 เซิร์ฟเวอร์ด้วยกัน เซิร์ฟเวอร์แรกชื่อ `gitserver` ที่มี `master` เป็น branch และอีกเซิร์ฟเวอร์หนึ่งชื่อ `origin` มี `master` และ `testing` เป็น branch แยกกันอยู่ภายใน
 
-Notice how in the example of remote references imported from `git svn`, tags are added as remote branches, not as real Git tags. Your Subversion import looks like it has a remote named tags with branches under it.
+ต้องจำไว้อย่างหนึ่งว่าวิธีการในตัวอย่างของการอ้างไปยังกลุ่มข้อมูลที่เราสนใจอาศัยข้อมูลที่ได้จาก `git svn` ซึ่ง tag ที่เพิ่มเข้ามาเพื่อทำหน้าที่ branch ไม่ใช่ tag ของ Git จริงๆ โดยที่ Subversion จะนำเข้าข้อมูลโดยตั้งชื่อ tag ภายใต้ branch
 
-### Committing Back to Subversion ###
+### กลับสู่ Subversion ###
 
-Now that you have a working repository, you can do some work on the project and push your commits back upstream, using Git effectively as a SVN client. If you edit one of the files and commit it, you have a commit that exists in Git locally that doesn’t exist on the Subversion server:
+ถึงตอนนี้ก็มี repository ที่พร้อมใช้งานแล้ว ตอนนี้ก็สามารถแก้ไขหรือเปลี่ยนแปลงข้อมูลตามที่ต้องการในโปรเจคและ commit กลับไปยัง upstream ซึ่งทั้งหมดใช้ Git ในลักษณะของ SVN Client ซึ่งแน่นอนว่าการทำงานทั้งหมดที่พูดถึงยังไม่ปรากฎบนเซิร์ฟเวอร์ Subversion มีอยู่เพียงแค่ภายในเครื่องเท่านั้น:
 
 	$ git commit -am 'Adding git-svn instructions to the README'
 	[master 97031e5] Adding git-svn instructions to the README
 	 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Next, you need to push your change upstream. Notice how this changes the way you work with Subversion — you can do several commits offline and then push them all at once to the Subversion server. To push to a Subversion server, you run the `git svn dcommit` command:
+ถัดไปก็ต้องโยนข้อมูลการเปลี่ยนกลับไปยัง upstream สังเกตว่าวิธีการต่อไปนี้จะเป็นการเปลี่ยนแปลงวิธีที่เคยใช้งาน Subversion เพราะใน repository ของ Git สามารถ commit โค้ดได้ภายในเครื่องแบบออฟไลน์ จากนั้นจะส่งข้อมูลทั้งหมดกลับไปยังเซอิร์เวอร์ Subversion กลับไปในครั้งเดียว โดยการโยนข้อมูลกลับไปยังเซิร์ฟเวอร์ Subversion ก็ทำได้โดยใช้คำสั่ง `git svn dcommit`:
 
 	$ git svn dcommit
 	Committing to file:///tmp/test-svn/trunk ...
@@ -129,7 +129,7 @@ Next, you need to push your change upstream. Notice how this changes the way you
 	No changes between current HEAD and refs/remotes/trunk
 	Resetting to the latest refs/remotes/trunk
 
-This takes all the commits you’ve made on top of the Subversion server code, does a Subversion commit for each, and then rewrites your local Git commit to include a unique identifier. This is important because it means that all the SHA-1 checksums for your commits change. Partly for this reason, working with Git-based remote versions of your projects concurrently with a Subversion server isn’t a good idea. If you look at the last commit, you can see the new `git-svn-id` that was added:
+คำสั่งด้านบนคือการส่งข้อมูลกลับไปยัง Subversion และนำไปวางไว้เป็นเวอร์ชั่นล่าสุดของ repository (HEAD) พร้อมกับรายการ commit ต่างๆ กลับไปพร้อมกัน จนไปถึงปรับปรุงค่าสำหรับบ่งชี้ (unique identifier) บน Git ภายในเครื่องใหม่ด้วย ขึ้นตอนนี้สำคัญมากเพราะนั้นหมายถึงค่า SHA-1 สำหรับแต่ละการ commit จะเปลี่ยนไป สาเหตุส่วนหนึ่งก็เป็นเพราะการทำงานบน Git ในลักษณะของไคลเอนท์กับโปรเจคมีเซิร์ฟเวอร์เป็น Subversion ไม่ใช่ความคิดที่ดีเท่าไหร่นัก ถ้าดูรายการ commit ล่าสุด จะเห็นว่า `git-svn-id` ได้ถูกเพิ่มเข้ามาแล้ว:
 
 	$ git log -1
 	commit 938b1a547c2cc92033b74d32030e86468294a5c8
@@ -140,11 +140,11 @@ This takes all the commits you’ve made on top of the Subversion server code, d
 
 	    git-svn-id: file:///tmp/test-svn/trunk@79 4c93b258-373f-11de-be05-5f7a86268029
 
-Notice that the SHA checksum that originally started with `97031e5` when you committed now begins with `938b1a5`. If you want to push to both a Git server and a Subversion server, you have to push (`dcommit`) to the Subversion server first, because that action changes your commit data.
+สังเกตว่าค่า checksum ของ SHA จะเริ่มต้นด้วย `97031e5` เป็นลำดับแรก เมื่อ commit ไปแล้ว ตอนนี้ก็กลายเป็น `938b1a5` และในกรณีที่ต้องการ push ไปทั้งเซิร์ฟเวอร์ Git และเซิร์ฟเวอร์ Subversion เราต้อง push (`dcommit`) ไปยังเซิร์ฟเวอร์ Subversion ก่อนเป็นลำดับแรก เพราะนั่นจะเป็นการเปลี่ยนข้อมูลที่ commits ของเรา
 
-### Pulling in New Changes ###
+### การดึงข้อมูลเปลี่ยนแปลงใหม่ ###
 
-If you’re working with other developers, then at some point one of you will push, and then the other one will try to push a change that conflicts. That change will be rejected until you merge in their work. In `git svn`, it looks like this:
+ในกรณีที่กำลังทำงานร่วมกันกับเพื่อนหลายคน ซึ่งในบางครั้งเพื่อนในกลุ่มเรา push ข้อมูลใหม่ขึ้นมา และอีกคนหนึ่งก็พยายามที่จะ push ข้อมูลของเขาขึ้นมาเพื่อแก้ conflict ที่เกิดขึ้น (conflict ทีเกิดขึ้นคือข้อมูลที่ต่างกันระหว่างคนแรกและคนที่สอง) การเปลี่ยนแปลงของคนที่ 2 นั้นจะถูกปฏิเสธ (reject) จนกว่าจะ merge ข้อมูลในส่วนที่เกิด conflict ซะก่อน ซึ่งใน `git svn` จะหน้าตาเป็นแบบนี้:
 
 	$ git svn dcommit
 	Committing to file:///tmp/test-svn/trunk ...
@@ -152,7 +152,7 @@ If you’re working with other developers, then at some point one of you will pu
 	out-of-date: resource out of date; try updating at /Users/schacon/libexec/git-\
 	core/git-svn line 482
 
-To resolve this situation, you can run `git svn rebase`, which pulls down any changes on the server that you don’t have yet and rebases any work you have on top of what is on the server:
+เพื่อแก้ไขปัญหาในลักษณะนี้ ทำได้โดยการใช้คำสั่ง `git svn rebase` ซึ่งจะดึงข้อมูลการเปลี่ยนแปลงทั้งหมดบนเซิร์ฟเวอร์ที่เราไม่มีข้อมูลอยู่และ rebase งานของเราให้เป็นเวอร์ชั่นล่าสุดล่าสุดเช่นเดียวกันกับบนเซิร์ฟเวอร์:
 
 	$ git svn rebase
 	       M      README.txt
@@ -160,7 +160,7 @@ To resolve this situation, you can run `git svn rebase`, which pulls down any ch
 	First, rewinding head to replay your work on top of it...
 	Applying: first user change
 
-Now, all your work is on top of what is on the Subversion server, so you can successfully `dcommit`:
+ตอนนี้งานทั้งหมดที่มีอยู่ภายในเครื่องก็เช่นเดียวกันกับไฟล์เวอร์ชั่นล่าสุดที่อยู่บนเซิร์ฟเวอร์แล้ว ดังนั้นก็ปิดงานด้วยคำสั่ง `dcommit`:
 
 	$ git svn dcommit
 	Committing to file:///tmp/test-svn/trunk ...
@@ -171,7 +171,7 @@ Now, all your work is on top of what is on the Subversion server, so you can suc
 	No changes between current HEAD and refs/remotes/trunk
 	Resetting to the latest refs/remotes/trunk
 
-It’s important to remember that unlike Git, which requires you to merge upstream work you don’t yet have locally before you can push, `git svn` makes you do that only if the changes conflict. If someone else pushes a change to one file and then you push a change to another file, your `dcommit` will work fine:
+จำไว้ให้ว่าไม่เหมือน Git ที่จะบังคับให้ merge งานกับ upstream ก่อนที่จะ push กลับเข้าไป ซึ่ง `git svn` ช่วยเราได้ในกรณีที่เกิด conflict ถ้ามีใครสักคนโยนข้อมูลการเปลี่ยนแปลงของไฟล์สักไฟล์ และต่อมาเราก็โยนข้อมูลการเปลี่ยนแปลงของไฟล์อีกไฟล์หนึ่งกลับไป `dcommit` ก็ยังทำงานได้ไม่มีปัญหา:
 
 	$ git svn dcommit
 	Committing to file:///tmp/test-svn/trunk ...
@@ -188,9 +188,9 @@ It’s important to remember that unlike Git, which requires you to merge upstre
 	First, rewinding head to replay your work on top of it...
 	Nothing to do.
 
-This is important to remember, because the outcome is a project state that didn’t exist on either of your computers when you pushed. If the changes are incompatible but don’t conflict, you may get issues that are difficult to diagnose. This is different than using a Git server — in Git, you can fully test the state on your client system before publishing it, whereas in SVN, you can’t ever be certain that the states immediately before commit and after commit are identical.
+อีกอย่างหนึ่งที่ต้องจำคือ ด้วยเหตุที่ว่าผลลัพธ์คือสถานะของโปรเจคที่ไม่ได้เกิดขึ้นเช่นเดียวกันกับเครื่องคอมพิวเตอร์ทุกเครื่องเมื่อเรา push ไปแล้ว ถ้าการเปลี่ยนแปลงดังกล่าวขัดแย้งกันแต่ไม่เกิด conflict ปัญหาที่แก้ยากก็จะตามมาภายหลัง ซึ่งนี่จะต่างจากเซิร์ฟเวอร์ที่เป็น Git เพราะ Git เราสามารถทดสอบสถานะต่างๆ บนไคลเอนต์ได้อย่างเต็มที่ก่อนที่จะโยนข้อมูลกลับไปยังเซิร์ฟเวอร์ ในทางตรงกันข้ามสำหรับ SVN แล้ว เราไม่สามารถมั่นใจได้เลยว่าสถานะก่อนและหลังการ commit จะเหมือนกันทุกอย่าง
 
-You should also run this command to pull in changes from the Subversion server, even if you’re not ready to commit yourself. You can run `git svn fetch` to grab the new data, but `git svn rebase` does the fetch and then updates your local commits.
+เราสามารถใช้คำสั่งเพื่อดึงรายการเปลี่ยนแปลงจากเซิร์ฟเวอร์ Subversion ถึงแม้จะยังไม่ต้องการจะ commit ก็ตาม โดยใช้คำสั่ง `git svn fetch` เพื่อดึงเอาข้อมูลใหม่บนเซิร์ฟเวอร์ลงมา แต่สำหรับ `git svn rebase` จะไม่มีดึงข้อมูลใหม่ลงมาหรืออัพเดตข้อมูลของรายการ commit ที่อยู่ภายในเครื่องเลย:
 
 	$ git svn rebase
 	       M      generate_descriptor_proto.sh
@@ -198,13 +198,13 @@ You should also run this command to pull in changes from the Subversion server, 
 	First, rewinding head to replay your work on top of it...
 	Fast-forwarded master to refs/remotes/trunk.
 
-Running `git svn rebase` every once in a while makes sure your code is always up to date. You need to be sure your working directory is clean when you run this, though. If you have local changes, you must either stash your work or temporarily commit it before running `git svn rebase` — otherwise, the command will stop if it sees that the rebase will result in a merge conflict.
+เมื่อสั่ง `git svn rebase` ให้ทำงานในแต่ละครั้งต้องแน่ใจว่าโค้ดของเราเป็นโค้ดเวอร์ชั่นล่าสุดเสมอ แต่ถ้ามีการเปลี่ยนแปลงเกิดขึ้นภายในเครื่อง ก็ให้ commit การเปลี่ยนแปลงนั้นไปก่อนชั่วคราวหรือ stash ส่วนนั้นออกไปก่อนที่จะใช้คำสั่ง `git svn rebase` เพราะไม่เช่นนั้นแล้วคำสั่งนี้ก็จะหยุดทำงานเมื่อเห็นว่าเกิดข้อผิดพลาดของการ merge เกิดขึ้นอยู่ดี:
 
-### Git Branching Issues ###
+### ปัญหาการสร้าง Branch ของ Git ###
 
-When you’ve become comfortable with a Git workflow, you’ll likely create topic branches, do work on them, and then merge them in. If you’re pushing to a Subversion server via git svn, you may want to rebase your work onto a single branch each time instead of merging branches together. The reason to prefer rebasing is that Subversion has a linear history and doesn’t deal with merges like Git does, so git svn follows only the first parent when converting the snapshots into Subversion commits.
+พอเราเริ่มคุ้นเคยกับขั้นตอนการทำงานของ Git แล้ว เรื่องถัดไปก็น่าจะลองทำ branch เป็นเรื่องต่อไป แก้ไขข้อมูลที่แตก branch ออกไป และ merge เข้าหากัน ในกรณีที่ push ข้อมูลเข้าไปยังเซิร์ฟเวอร์ที่เป็น Subversion ผ่าน git svn ก็น่าจะเคยอยาก rebase งานให้อยู่บน branch เดียวกันไปแทนที่จะ merge ข้อมูลใน branch เข้าหากัน ด้วยเหตุผลที่ให้ความสำคัญกับการ rebase นั่นก็เพราะว่า Subversion จะเก็บประวัติการทำงานต่อกันไปเรื่อยๆ และยังไม่ได้เกี่ยวข้องเรื่อง merge เหมือนกับที่ Git ทำ ดังนั้น git svn ก็เลยทำตัวในลักษณะเดียวกันกับต้นฉบับ เมื่อมีการแปลง snapshots ให้กลายเป็นรายการ commit ของ Subversion
 
-Suppose your history looks like the following: you created an `experiment` branch, did two commits, and then merged them back into `master`. When you `dcommit`, you see output like this:
+สมมติว่าประวัติการทำงานของเราหน้าตาเป็นแบบนี้ คือ เราสร้าง branch ชื่อ `experiment` และ commit ไป 2 รายการ จากนั้นก็ merge กลับไปยัง `master` เมื่อสั่ง `dcommit` ก็จะได้ผลลัพธ์ดังนี้:
 
 	$ git svn dcommit
 	Committing to file:///tmp/test-svn/trunk ...
@@ -225,17 +225,17 @@ Suppose your history looks like the following: you created an `experiment` branc
 	No changes between current HEAD and refs/remotes/trunk
 	Resetting to the latest refs/remotes/trunk
 
-Running `dcommit` on a branch with merged history works fine, except that when you look at your Git project history, it hasn’t rewritten either of the commits you made on the `experiment` branch — instead, all those changes appear in the SVN version of the single merge commit.
+เมื่อ `dcommit` ทำงานบน branch พร้อมกับ merge รายการต่างๆ เรียบร้อย เว้นแต่ว่าถ้าลองดูในรายการประวัติของโปรเจคที่เป็น Git ของเรา จะพบว่ามันไม่มีการเขียนข้อมูลรายการ commit ลงไปใน `experiment` แต่ข้อมูลการเปลี่ยนแปลงทั้งหมดไปปรากฎบน SVN ในลักษณะของการ merge commit แทน
 
-When someone else clones that work, all they see is the merge commit with all the work squashed into it; they don’t see the commit data about where it came from or when it was committed.
+หากคนอื่น clone โปรเจคนี้ออกไป สิ่งที่เขาจะเห็นคือการ merge commit ที่ถูกรวมเข้าด้วยกันแล้วแทน โดยจะไม่เห็นรายละเอียดว่ามีข้อมูลใดบ้างที่ commit เช่น ที่มาของรายการนี้ หรือ วันเวลาที่ commit
 
-### Subversion Branching ###
+### การสร้าง Branch ใน Subversion ###
 
-Branching in Subversion isn’t the same as branching in Git; if you can avoid using it much, that’s probably best. However, you can create and commit to branches in Subversion using git svn.
+การสร้าง branch ใน Subversion นั้นไม่ได้เหมือนกับการทำ branch ใน Git นัก แต่ถ้าทำเป็นลืมๆ หรือข้ามการทำ branch ไปได้ก็จะเป็นเรื่องดี แต่อย่างไรก็ตามเราก็ยังคงสามารถสร้าง branch และ commit เข้าไปใน Subversion ด้วยการใช้งาน git svn อยู่ดี
 
-#### Creating a New SVN Branch ####
+#### การสร้าง Branch ใหม่ใน SVN ####
 
-To create a new branch in Subversion, you run `git svn branch [branchname]`:
+สำหรับการสร้าง branch ใน Subversion ก็ทำได้ด้วยการใช้คำสั่ง `git svn branch [branchname]`:
 
 	$ git svn branch opera
 	Copying file:///tmp/test-svn/trunk at r87 to file:///tmp/test-svn/branches/opera...
@@ -246,19 +246,23 @@ To create a new branch in Subversion, you run `git svn branch [branchname]`:
 	Successfully followed parent
 	r89 = 9b6fe0b90c5c9adf9165f700897518dbc54a7cbf (opera)
 
-This does the equivalent of the `svn copy trunk branches/opera` command in Subversion and operates on the Subversion server. It’s important to note that it doesn’t check you out into that branch; if you commit at this point, that commit will go to `trunk` on the server, not `opera`.
+คำสั่งนี้จะเหมือนกับคำสั่ง `svn copy trunk branches/opera` ใน Subversion รวมไปถึงการทำงานบนเซิร์ฟเวอร์ Subversion แต่เรื่องสำคัญเรื่องหนึ่งคือเราไม่ได้ check out จาก branch นั้น เพราะเมื่อเรา commit กลับไปตอนนี้ รายการ commit ทั้งหมดจะไปอยู่ใน `trunk` บนเซิร์ฟเวอร์ ไม่ใช่ `opera`
 
-### Switching Active Branches ###
+### เปลี่ยน Active Branch ###
 
 Git figures out what branch your dcommits go to by looking for the tip of any of your Subversion branches in your history — you should have only one, and it should be the last one with a `git-svn-id` in your current branch history. 
+Git คิดถึงว่า เมื่อใช้ dcommits แล้ว จะไปอยู่ที่ branch ไหนด้วยการเข้าไปดูข้อมูลในประวัติการทำงานของ branch ใดๆ ที่อยู่ใน Subversion ของคุณ ซึ่งก็น่าจะมีอยู่เพียงรายการเดียวและน่าจะเป็นรายการสุดท้ายจาก `git-svn-id` ในประวัติการทำงานของ branch ปัจจุบัน
 
-If you want to work on more than one branch simultaneously, you can set up local branches to `dcommit` to specific Subversion branches by starting them at the imported Subversion commit for that branch. If you want an `opera` branch that you can work on separately, you can run
+If you want to work on more than one branch simultaneously, you can set up local branches to `dcommit` to specific Subversion branches by starting *them at the imported Subversion commit for that branch*. If you want an `opera` branch that you can work on separately, you can run
+ซึ่งถ้าต้องการทำพร้อมกันหลาย branch ก็ทำได้ด้วยการกำหนดให้ branch ทั้งหมดภายในเครื่องที่ต้องการทำงานพร้อมกันนั้น `dcommit` ไปยัง branch บน Subversion ด้วยการเริ่มต้นด้วยการนำข้อมูลการ commit ของ branch ใน Subversion ที่ต้องการทั้งหมดก่อน เช่น ถ้าต้องการ branch ชื่อ `opera` ที่เราทำงานแยกออกมาได้ ก็ทำได้ด้วยใช้คำสั่ง:
 
 	$ git branch opera remotes/opera
 
 Now, if you want to merge your `opera` branch into `trunk` (your `master` branch), you can do so with a normal `git merge`. But you need to provide a descriptive commit message (via `-m`), or the merge will say "Merge branch opera" instead of something useful.
+ขณะนี้ หากเราต้องการ merge ข้อมูลของ branch ชื่อ `opera` กลับไปยัง `trunk` (`master` branch) ก็ทำได้ด้วยคำสั่ง `git merge` เท่านั้น แต่ว่าต้องใส่คำอธิบายการ commit (commit message) เข้าไปด้วย (ระบุด้วยตัวเลือก `-m`) หรือไม่อย่างนั้นแล้วข้อความนั้นจะเป็น "Merge branch opera" แทนที่จะเป็นข้อความที่อธิบายได้ดีกว่านั้น
 
 Remember that although you’re using `git merge` to do this operation, and the merge likely will be much easier than it would be in Subversion (because Git will automatically detect the appropriate merge base for you), this isn’t a normal Git merge commit. You have to push this data back to a Subversion server that can’t handle a commit that tracks more than one parent; so, after you push it up, it will look like a single commit that squashed in all the work of another branch under a single commit. After you merge one branch into another, you can’t easily go back and continue working on that branch, as you normally can in Git. The `dcommit` command that you run erases any information that says what branch was merged in, so subsequent merge-base calculations will be wrong — the dcommit makes your `git merge` result look like you ran `git merge --squash`. Unfortunately, there’s no good way to avoid this situation — Subversion can’t store this information, so you’ll always be crippled by its limitations while you’re using it as your server. To avoid issues, you should delete the local branch (in this case, `opera`) after you merge it into trunk.
+ถึงแม้ว่าเราจะใช้ `git merge` และการ merge ก็ดูเหมือนจะง่ายมากเมื่อเทียบกับ Subversion (นั่นเพราะ Git จะตรวจสอบความเข้ากันได้สำหรับการ merge ให้อัตโนมัติ) แต่นี่ไม่ใช่เรื่องปกติสำหรับ Git ที่จะ merge commit
 
 ### Subversion Commands ###
 
