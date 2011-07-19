@@ -346,16 +346,14 @@ Git สามารถใช้ความสามารถนี้ได้�
 	+s going on, modify stuff and contribute changes. If the book spontaneously 
 	+Let's see if this works.
 
-Git สามารถตรวจสอบความเปลี่ยนแปลงได้อย่างชัดเจน ประโยคที่ผมใส่ลงไปคือ "Let's see if this works" ซึ่งผลออกมาถูกต้อง 
+Git สามารถตรวจสอบความเปลี่ยนแปลงได้อย่างชัดเจน ประโยคที่ผมใส่ลงไปคือ "Let's see if this works" ซึ่งผลออกมาถูกต้อง แต่ก็ไม่ได้ถูกต้อง 100% นะครับ ยังมีประโยคที่จริงๆ ไม่ได้แก้ไขอะไรโผล่ออกมาด้วย คงต้องรอคนทำ Word-to-plain-text ดีๆ ออกมาก่อน อย่างไรก็ตามเจ้า `strings` ก็สามารถใช้ได้ทั้งน Mac และ Linux และยังสามารถแปลง binary file ได้หลาย format อีกด้วย ถือว่าใช้ได้ดีทีเดียว
 
-Git successfully and succinctly tells me that I added the string "Let's see if this works", which is correct. It's not perfect ‚Äî it adds a bunch of random stuff at the end ‚Äî but it certainly works. If you can find or write a Word-to-plain-text converter that works well enough, that solution will likely be incredibly effective. However, `strings` is available on most Mac and Linux systems, so it may be a good first try to do this with many binary formats.
-
-Another interesting problem you can solve this way involves diffing image files. One way to do this is to run JPEG files through a filter that extracts their EXIF information ‚Äî metadata that is recorded with most image formats. If you download and install the `exiftool` program, you can use it to convert your images into text about the metadata, so at least the diff will show you a textual representation of any changes that happened:
+ปัญหาที่น่าสนใจอีกอย่าคือการ diff ไฟล์รูปภาพ แต่เราคงไปเทียบรูปภาพกันตรงๆ ได้ยาก ที่พอทำได้คือใช้ Metadata พวก EXIF ที่ติดมากับภาพในการเปรียบเทียบ เราจะใช้โปรแกรม `exiftool` มาช่วยดึง metadata ออกมาจากรูปภาพ อย่างน้อยเราก็จะได้เห็นของเก่าเที่ยบกับของใหม่บ้าง
 
 	$ echo '*.png diff=exif' >> .gitattributes
 	$ git config diff.exif.textconv exiftool
 
-If you replace an image in your project and run `git diff`, you see something like this:
+ทดลองแทนที่รูปภาพเดิมด้วยภาพใหม่ จากนั้นสั่ง `git diff` แล้วดูผลลัพธ์
 
 	diff --git a/image.png b/image.png
 	index 88839c4..4afcb7c 100644
@@ -376,7 +374,7 @@ If you replace an image in your project and run `git diff`, you see something li
 	 Bit Depth                       : 8
 	 Color Type                      : RGB with Alpha
 
-You can easily see that the file size and image dimensions have both changed.
+เราจะเห็นได้ชัดเจนว่าภาพมีการเปลี่ยนแปลงขนาด ความกว้างยาว เทียบกันทั้งภาพเก่าและภาพใหม่
 
 ### Keyword Expansion ###
 
