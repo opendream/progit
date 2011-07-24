@@ -139,7 +139,7 @@ Figure 3-12. The iss53 branch has moved forward with your work.
 
 แล้วโทรศัพท์ก็มาบอกว่า web site มีงานเข้า และคุณต้องซ่อมมันด่วน เพราะ Git คุณไม่จำเป็นต้อง deploy fix ของคุณไปกับความเปลี่ยนแปลงใน `iss53`  และคุณก็ไม่ต้องเปลืองแรงแก้ code กลับมาเป็นเหมือนเดิม ก่อนที่จะเริ่ม fix อะไรที่อยู่บน production ทั้งหมดที่ต้องทำก็แค่ switch กลับไปยัง master branch
 
-อย่างไรก็ตาม ก่อนทำแบบนั้น จำไว้ว่า working directory หรือ staging area ของคุณมีความเปลี่ยนแปลงที่ยังไม่โดน commit ซึ่ง conflict กับ branch branch ที่คุณกำลัง checkout Git ก็เลยไม่ปล่อยให้คุณ switch branches ถ้าจะให้ดี คุณควรจะมีสถานะการทำงาน cleanๆ ก่อนที่จะ switch branches จริงๆมันก็มีท่ายากที่เอาไว้แก้สถานการณ์นี้เหมือนกันนะ (คือการ stash เข้าไปก่อนแล้วค่อย commit amending ตาม) แต่ค่อยมาว่ากันมีหลัง สำหรับตอนนี้ แค่ commit ความเปลี่ยนแปลงทั้งหมดเข้าไปก่อนละกัน จะได้ switch กลับไป master branch ได้:
+อย่างไรก็ตาม ก่อนทำแบบนั้น จำไว้ว่า working directory หรือ staging area ของคุณมีความเปลี่ยนแปลงที่ยังไม่โดน commit ซึ่ง conflict กับ branch ที่คุณกำลัง checkout Git ก็เลยไม่ปล่อยให้คุณ switch branches ถ้าจะให้ดี คุณควรจะมีสถานะการทำงาน cleanๆ ก่อนที่จะ switch branches จริงๆมันก็มีท่ายากที่เอาไว้แก้สถานการณ์นี้เหมือนกันนะ (คือการ stash เข้าไปก่อนแล้วค่อย commit amending ตาม) แต่ค่อยมาว่ากันมีหลัง สำหรับตอนนี้ แค่ commit ความเปลี่ยนแปลงทั้งหมดเข้าไปก่อนละกัน จะได้ switch กลับไป master branch ได้:
 
 	$ git checkout master
 	Switched to branch "master"
@@ -195,7 +195,7 @@ Figure 3-15. Your iss53 branch can move forward independently.
 
 ### เบสิคการ Merge ###
 
-Suppose you’ve decided that your issue #53 work is complete and ready to be merged into your `master` branch. In order to do that, you’ll merge in your `iss53` branch, much like you merged in your `hotfix` branch earlier. All you have to do is check out the branch you wish to merge into and then run the `git merge` command:
+สมมติว่าคุณมั่นแล้วว่า issue #53 นี่เนียนแล้วและพร้อมที่จะ merge มันเข้า `master` branch คุณก็ merge branch `iss53` (เหมือนกะตอนที่ทำ branch `hotfix` ก่อนหน้าอ่ะแหละ) ที่ต้องทำทั้งหมดก็แค่ check out branch ที่อยากจะ merge เข้าไปใส่ และสั่ง command `git merge`:
 
 	$ git checkout master
 	$ git merge iss53
@@ -203,32 +203,32 @@ Suppose you’ve decided that your issue #53 work is complete and ready to be me
 	 README |    1 +
 	 1 files changed, 1 insertions(+), 0 deletions(-)
 
-This looks a bit different than the `hotfix` merge you did earlier. In this case, your development history has diverged from some older point. Because the commit on the branch you’re on isn’t a direct ancestor of the branch you’re merging in, Git has to do some work. In this case, Git does a simple three-way merge, using the two snapshots pointed to by the branch tips and the common ancestor of the two. Figure 3-16 highlights the three snapshots that Git uses to do its merge in this case.
+อันนี้อาจจะดูต่างกะตอน merge `hotfix` ก่อนหน้านิดส์นึง เพราะครั้งนี้ history การเปลี่ยนแปลงมันถูกแยกออกไปจากจุดก่อนหน้า นั่นเพราะว่า commit ของ branch ที่คุณกะลังอยู่ไม่ได้เป็นรากเหง้าโดยตรงของ branch ที่กำลังจะ merge เข้ามา Git เลยต้องออกแรง อย่างในกรณีนี้ Git ก็ทำ การ merge 3 ทางง่ายๆ โดยใช้ 2 snapshots ที่อยู่ที่ปลายทั้ง 2 ข้างของแต่ละ branch และรากเหง้าของทั้งสองที่เหมือนกัน Figure 3-16 จะ highlight 3 snapshots ที่ Git ใช้ในการ merge กรณีนี้ให้ดู
 
 Insert 18333fig0316.png 
 Figure 3-16. Git automatically identifies the best common-ancestor merge base for branch merging.
 
-Instead of just moving the branch pointer forward, Git creates a new snapshot that results from this three-way merge and automatically creates a new commit that points to it (see Figure 3-17). This is referred to as a merge commit and is special in that it has more than one parent.
+แทนที่จะแค่ขยับ pointer ของ branch ไปข้างหน้า Git สร้าง snapshot อันที่ที่เป็นผลจากการ merge 3 ทางนี้ และสร้าง commit อันใหม่ที่ชี้ไปยัง snapshot นั้นโดยอัตโนมัติ (see Figure 3-17) ปรกติเราเรียกท่านี้ว่า merge commit และความพิเศษของมันคือ มันมีแม่มากกว่า 1 อัน
 
-It’s worth pointing out that Git determines the best common ancestor to use for its merge base; this is different than CVS or Subversion (before version 1.5), where the developer doing the merge has to figure out the best merge base for themselves. This makes merging a heck of a lot easier in Git than in these other systems.
+อย่างนึงที่อยากจะอวดคือ Git ไปคุ้ยหารากเหง้าที่ซ้ำกันของทั้งสองกิ่งให้เพื่อที่จะใช้เป็น merge base ซึ่ง CVS อื่นหรือ Subversion (ก่อน version 1.5) ไม่มีปัญญา และ developer ที่จะ merge ต้องไปคุ้ยเองว่า merge base ที่ดีที่สุดคืออันไหน ด้วยเหตุนี้การ merge ใน Git ก็เลยง่ายกว่าระบบอื่นๆมว้ากกกส์
 
 Insert 18333fig0317.png 
 Figure 3-17. Git automatically creates a new commit object that contains the merged work.
 
-Now that your work is merged in, you have no further need for the `iss53` branch. You can delete it and then manually close the ticket in your ticket-tracking system:
+เอาล่ะ หลังจากงานคุณถูก merge เข้าไปเรียบร้อยแล้ว คุณก็ไม่จำเป็นต้องเลี้ยง branch `iss53` ให้เสียข้าวสุก ลบแม่มเลย แล้วก็ไปปิด ticket ในระบบ ticket-tracking
 
 	$ git branch -d iss53
 
-### Basic Merge Conflicts ###
+### เบสิคของ Merge Conflicts ###
 
-Occasionally, this process doesn’t go smoothly. If you changed the same part of the same file differently in the two branches you’re merging together, Git won’t be able to merge them cleanly. If your fix for issue #53 modified the same part of a file as the `hotfix`, you’ll get a merge conflict that looks something like this:
+ในบางเวลาที่ไม่เป็นใจ ถ้าคุณแก้ส่วนเดียวกันใน file เดียวกันไปคนละทิศคนละทางบน 2 branch ที่แตกต่างกัน เวลาคุณ merge มันเข้าด้วยกัน Git ก็ไม่รู้จะ merge มันเข้ามารวมกันเนียนๆได้ไง ถ้า fix ที่คุณทำไปบน issue #53 มีการแก้ส่วนเดียวกันบน file เดียวกันกับ `hotfix` คุณจะเจอ merge conflict ซึ่งมีหน้าตาประมาณนี้
 
 	$ git merge iss53
 	Auto-merging index.html
 	CONFLICT (content): Merge conflict in index.html
 	Automatic merge failed; fix conflicts and then commit the result.
 
-Git hasn’t automatically created a new merge commit. It has paused the process while you resolve the conflict. If you want to see which files are unmerged at any point after a merge conflict, you can run `git status`:
+Git ไม่ได้สร้าง merge commit อันใหม่ให้อัตโนมัติ มันกด pause เพื่อหยุดให้คุณ resolve merge conflict ถ้าคุณอยากดูว่า file ไหนบ้างที่ยังไม่ถูก merge ณ เวลาใดๆหลังจากเกิด merge conflict ก็สามารถดูได้ด้วยคำสั่ง `git status`:
 
 	[master*]$ git status
 	index.html: needs merge
@@ -240,7 +240,7 @@ Git hasn’t automatically created a new merge commit. It has paused the process
 	#	unmerged:   index.html
 	#
 
-Anything that has merge conflicts and hasn’t been resolved is listed as unmerged. Git adds standard conflict-resolution markers to the files that have conflicts, so you can open them manually and resolve those conflicts. Your file contains a section that looks something like this:
+อะไรก็ตามที่มี merge conflict และยังไม่ถูก resolve จะถูก list ออกมาว่า unmerged Git จะเติม conflict-resolution markers ลงไปใน files ที่มี conflicts เพื่อคุณจะได้เปิดมันและ resolve conflicts เหล่านั้นได้ file ของคุณจะมี section ที่หน้าตาประมาณนี้
 
 	<<<<<<< HEAD:index.html
 	<div id="footer">contact : email.support@github.com</div>
@@ -250,14 +250,14 @@ Anything that has merge conflicts and hasn’t been resolved is listed as unmerg
 	</div>
 	>>>>>>> iss53:index.html
 
-This means the version in HEAD (your master branch, because that was what you had checked out when you ran your merge command) is the top part of that block (everything above the `=======`), while the version in your `iss53` branch looks like everything in the bottom part. In order to resolve the conflict, you have to either choose one side or the other or merge the contents yourself. For instance, you might resolve this conflict by replacing the entire block with this:
+จากรูป version ที่ HEAD (ซึ่งก็คือ master branch เพราะว่านั่นคือที่ที่คุณ check out ออกมาตอนคุณ run merge command) จะเป็นส่วนบนสุดของ block นั้น (ไอ้ที่อยู่บน `=======` น่ะ) ขณะที่ version ที่อยู่ใน `iss53` branch จะอยู่ในส่วนล่าง ในการที่จะ resolve conflict คุณก็ต้องเลือกซักส่วน หรือไม่ก็ merge มันเข้าด้วยกันเอง ยกตัวอย่างเช่น คุณอาจจะ resolve conflict อันนี้โดยการแก้ทั้ง block ให้เป็นอย่างข้างล่าง
 
 	<div id="footer">
 	please contact us at email.support@github.com
 	</div>
 
-This resolution has a little of each section, and I’ve fully removed the `<<<<<<<`, `=======`, and `>>>>>>>` lines. After you’ve resolved each of these sections in each conflicted file, run `git add` on each file to mark it as resolved. Staging the file marks it as resolved in Git.
-If you want to use a graphical tool to resolve these issues, you can run `git mergetool`, which fires up an appropriate visual merge tool and walks you through the conflicts:
+resolution (การซ่อม) อันนี้เอามาจากทั้งสองส่วนอย่างละนิดอย่างละหน่อย และผมก็ได้ลบไอ้พวก `<<<<<<<`, `=======` และ `>>>>>>>` ออกไป หลังจากคุณ resolved แต่ละ section ใน file ที่มี conflict แล้ว run `git add` บนแต่ละ file เพื่อระบุว่ามันถูก resolved การ Stage file เป็นการระบุว่ามันถูก resolved แล้วใน Git
+ถ้าอยากใช้ graphical tool เพื่อ resolve issues เหล่านี้ ก็ run `git mergetool` ซึ่งจะเปิด visual merge tool แหล่มๆขึ้นมาและเรียงแต่ละ conflicts ขึ้นมาให้คุณแก้:
 
 	$ git mergetool
 	merge tool candidates: kdiff3 tkdiff xxdiff meld gvimdiff opendiff emerge vimdiff
@@ -268,11 +268,11 @@ If you want to use a graphical tool to resolve these issues, you can run `git me
 	  {remote}: modified
 	Hit return to start merge resolution tool (opendiff):
 
-If you want to use a merge tool other than the default (Git chose `opendiff` for me in this case because I ran the command on a Mac), you can see all the supported tools listed at the top after “merge tool candidates”. Type the name of the tool you’d rather use. In Chapter 7, we’ll discuss how you can change this default value for your environment.
+ถ้า merge tool ที่ถูกเลือกขึ้นมาโดย default นั้นไม่โดนใจ (Git เลือก `opendiff` ให้ผมในกรณีนี้เพราะผม run command บน Mac) คุณก็ดูว่า supported tools ที่ list อยู่ข้างบนหลังจากคำว่า “merge tool candidates” แล้วพิมพ์ชื่อ tool ที่อยากใช้ลงไป ใน Chapter 7 เราจะมาถกกันว่าคุณจะเปลี่ยน default value เหล่านี้ใน environment คุณได้ยังไง
 
-After you exit the merge tool, Git asks you if the merge was successful. If you tell the script that it was, it stages the file to mark it as resolved for you.
+หลังจากปิด merge tool ไป Git ก็จะถามคุณว่า merge สำเร็จมัย? ถ้าคุณตอบไปว่าชิววว มันก็จะ stages file นั้นเพื่อระบุว่ามันถูก resolved แล้วให้คุณ
 
-You can run `git status` again to verify that all conflicts have been resolved:
+ลอง run `git status` อีกทีเพื่อเช็คดูว่าไม่เหลือ conflicts ให้ resolve แล้วนะ
 
 	$ git status
 	# On branch master
@@ -282,7 +282,7 @@ You can run `git status` again to verify that all conflicts have been resolved:
 	#	modified:   index.html
 	#
 
-If you’re happy with that, and you verify that everything that had conflicts has been staged, you can type `git commit` to finalize the merge commit. The commit message by default looks something like this:
+โอเค แหล่ม เช็คอีกทีให้มั่นใจว่าทุกอย่างที่มี conflicts ถูก staged แล้ว แล้วก็พิมพ์ `git commit` เพื่อจบการ merge commit โดยปรกติแล้ว commit message ตาม default จะหน้าตาประมาณนี้
 
 	Merge branch 'iss53'
 
@@ -295,13 +295,13 @@ If you’re happy with that, and you verify that everything that had conflicts h
 	# and try again.
 	#
 
-You can modify that message with details about how you resolved the merge if you think it would be helpful to others looking at this merge in the future — why you did what you did, if it’s not obvious.
+คุณมาสามารถแก้เติมรายละเอียดลงไปว่าคุณ resolve merge อันนั้นได้ไงลงไปใน message ได้ถ้ารู้สึกว่ามันจะช่วยให้เพื่อนๆเข้าใจ merge นี้ง่ายขึ้นเวลาต้องกลับมาดูมันใหม่ในอนาคต (เช่นอธิบายว่าไอ้ที่ทำไปแบบนี้ ทำไปเพราะอะไร) แต่ถ้ามันชัดอยู่แล้วก็ไม่ต้อง
 
-## Branch Management ##
+## การบริหาร Branch ##
 
-Now that you’ve created, merged, and deleted some branches, let’s look at some branch-management tools that will come in handy when you begin using branches all the time.
+เอาล่ะ หลังจากที่คุณ created, merged และ deleted บาง branches แล้ว มาดู tools ที่ใช้ทำ branch-management (บริหาร branche) บ้าง เพราะอาจจะต้องใช้เวลาที่คุณทำ branches เยอะๆ
 
-The `git branch` command does more than just create and delete branches. If you run it with no arguments, you get a simple listing of your current branches:
+ไอ้ command `git branch` ทำได้มากกว่าแค่ create หรือ delete branches ถ้าคุณ run มันโดยไม่ใส่ arguments คุณจะได้ list ของ branches ปัจจุบันที่คุณมีอยู่:
 
 	$ git branch
 	  iss53
