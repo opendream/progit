@@ -308,7 +308,7 @@ resolution (การซ่อม) อันนี้เอามาจากท
 	* master
 	  testing
 
-Notice the `*` character that prefixes the `master` branch: it indicates the branch that you currently have checked out. This means that if you commit at this point, the `master` branch will be moved forward with your new work. To see the last commit on each branch, you can run `git branch -v`:
+สังเกตุไอ้ `*` ข้างหน้า `master` branch มันจะคอยปะอยู่หน้า branch ที่คุณกำลัง checked out อยู่ในปัจจุบัน ซึ่งแปลว่า ถ้า commit ตอนนี้ `master` branch จะถูกขยับไปข้างหน้าด้วยงานที่เพิ่มมาใหม่ การจะดู commit สุดท้ายของแต่ละ branch คุณก็ run `git branch -v`:
 
 	$ git branch -v
 	  iss53   93b412c fix javascript issue
