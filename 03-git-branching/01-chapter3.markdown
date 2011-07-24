@@ -315,38 +315,38 @@ resolution (การซ่อม) อันนี้เอามาจากท
 	* master  7a98805 Merge branch 'iss53'
 	  testing 782fd34 add scott to the author list in the readmes
 
-Another useful option to figure out what state your branches are in is to filter this list to branches that you have or have not yet merged into the branch you’re currently on. The useful `--merged` and `--no-merged` options have been available in Git since version 1.5.6 for this purpose. To see which branches are already merged into the branch you’re on, you can run `git branch --merged`:
+อีกทางหนึ่งที่ใช้ในการเช็ค state ของ branches คือการ list ดูว่ามี branch ไหนบ้างที่เคยถูก merge และ branch ไหนบ้างที่ยังไม่เคยถูก merge เข้ามายัง branch ที่คุณอยู่ option เทพที่ชื่อว่า `--merged` และ `--no-merged` ถูกเพิ่มเข้ามาใน Git ตั้งแต่ version 1.5.6 เพื่อประการนี้ การจะดูว่า branches ไหนบ้างที่เคยถูก merged เข้ามายัง branch ที่คุณอยู่ สามารถทำได้โดย run `git branch --merged`
 
 	$ git branch --merged
 	  iss53
 	* master
 
-Because you already merged in `iss53` earlier, you see it in your list. Branches on this list without the `*` in front of them are generally fine to delete with `git branch -d`; you’ve already incorporated their work into another branch, so you’re not going to lose anything.
+เพราะคุณเคย merged branch `iss53` เข้ามาแล้วเมื่อตะกี้ คุณก็เลยเห็นมันอยู่ใน list ปรกติแล้ว branches ต่างๆใน list นี้ (ยกเว้นอันที่กา `*` ไว้ข้างหน้านะ) สามารถ delete ทิ้งได้ตามสบายด้วยคำสั่ง `git branch -d` เพราะคุณได้ย้ายงานที่ทำในนั้นไปไว้ที่ branch อื่นแล้ว เพราะฉะนั้นลบไปก็ไม่มีงานหาย
 
-To see all the branches that contain work you haven’t yet merged in, you can run `git branch --no-merged`:
+การจะดูว่า branches ไหนบ้างที่มีงานที่ยังไม่ได้ถูก merged เข้ามาก็สามารถทำได้โดยการ run `git branch --no-merged`:
 
 	$ git branch --no-merged
 	  testing
 
-This shows your other branch. Because it contains work that isn’t merged in yet, trying to delete it with `git branch -d` will fail:
+คำสั่งนี้แสดงอีก branch นึง เพราะว่ามันมีงานที่คุณยังไม่เคย merged เข้ามา ถ้าคุณลอง delete มันด้วยคำสั่ง `git branch -d` มันก็จะ fail
 
 	$ git branch -d testing
 	error: The branch 'testing' is not an ancestor of your current HEAD.
 	If you are sure you want to delete it, run 'git branch -D testing'.
 
-If you really do want to delete the branch and lose that work, you can force it with `-D`, as the helpful message points out.
+ถ้าอยากจะ delete branch นั้นไปพร้อมๆกับงานที่ทำอยู่ในนั้นจริงๆ ก็สามารถบังคับให้มันลบได้ด้วย option `-D` ดังที่ help message บอกไว้ข้างบน
 
-## Branching Workflows ##
+## Workflows ของการแตก Branch ##
 
-Now that you have the basics of branching and merging down, what can or should you do with them? In this section, we’ll cover some common workflows that this lightweight branching makes possible, so you can decide if you would like to incorporate it into your own development cycle.
+เอาหล่ะ หลังจากคุณมีเบสิคของการแตก branch และการ merge กลับเข้ามาติดตัวแล้ว มาดูกันว่าคุณสามารถ (และสมควร) ที่จะทำอะไรกับมันบ้าง? ใน section นี้ เราจะโชว์ workflows ทั่วไปว่าการแตก branch อันรวดเร็วส์นี้สามารถทำอะไรได้บ้าง คุณจะได้ตัดสินใจได้ว่าควรที่จะเอามันไปประยุกต์ใช้กับกระบวนการพัฒนาที่คุณใช้อยู่ไหม
 
-### Long-Running Branches ###
+### Branch ที่อายุยืนนาน ###
 
-Because Git uses a simple three-way merge, merging from one branch into another multiple times over a long period is generally easy to do. This means you can have several branches that are always open and that you use for different stages of your development cycle; you can merge regularly from some of them into others.
+เพราะว่า Git มีท่า merge 3 ทาง การ merge จาก branch หนึ่งไปยังอีก branch หลายๆครั้งเป็นระยะเวลานานๆก็กลายเป็นเรื่องชิวๆไปโดยปริยาย นั่นแปลว่าคุณสามารถเปิดหลายๆ branches ทิ้งไว้สำหรับ stages ต่างๆในกระบวนการพัฒนาที่คุณใช้อยู่ และคุณก็สามารถ merge จากบาง branch ไปยัง branch อื่นๆได้อย่างสม่ำเสมอ
 
-Many Git developers have a workflow that embraces this approach, such as having only code that is entirely stable in their `master` branch — possibly only code that has been or will be released. They have another parallel branch named develop or next that they work from or use to test stability — it isn’t necessarily always stable, but whenever it gets to a stable state, it can be merged into `master`. It’s used to pull in topic branches (short-lived branches, like your earlier `iss53` branch) when they’re ready, to make sure they pass all the tests and don’t introduce bugs.
+นักพัฒนาที่ใช้ Git หลายคนมี workflow ที่สนับสนุนวิธีแบบนี้ ยกตัวอย่างเช่น มี code stable สุดยิดเก็บไว้ใน `master` branch (ส่วนใหญ่จะเป็น code ที่ถูก release ไปแล้วเตรียมจะออก) แล้วพวกเขาก็มีอีก branch หนึ่ง เปิดควบคู่กันไปโดยตั้งชื่อมันว่า develop หรือ next แล้วก็ทำงานกันบนนี้ ไม่ก็ใช้เพื่อ test ความเสถียรของระบบ (ซึ่ง branch นี้ไม่จำเป็นต้อง stable ตลอดเวลา) แล้วเมื่อไหร่ก็ตามที่มันเริ่ม stable เขาก็ merge มันเข้า `master` ไอ้ develop branch นี้จะเป็นที่ไว้ pull พวก topic branches (พวก branch อายุสั้นๆอย่าง `iss53` branch อันก่อนหน้านี้) เข้ามาเมื่อมันเสร็จเพื่อเช็คว่ามัน pass ทุกๆ tests และไม่มี bugs ใหม่ๆโผล่เข้ามา
 
-In reality, we’re talking about pointers moving up the line of commits you’re making. The stable branches are farther down the line in your commit history, and the bleeding-edge branches are farther up the history (see Figure 3-18).
+ในชีวิตจริงนั้น ถ้ามาดู pointers ที่ค่อยๆขยับขึ้นตามสายของ commits ของคุณ พวก branches ที่ stable จะอยู่ล่างๆใน commit history และพวก branches ที่เก็บของใหม่ๆแรงๆจะอยู่บนใน history (ดู Figure 3-18).
 
 Insert 18333fig0318.png 
 Figure 3-18. More stable branches are generally farther down the commit history.
