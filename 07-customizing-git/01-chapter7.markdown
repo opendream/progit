@@ -378,29 +378,31 @@ Git สามารถตรวจสอบความเปลี่ยนแ�
 
 ### Keyword Expansion ###
 
-SVN- or CVS-style keyword expansion is often requested by developers used to those systems. The main problem with this in Git is that you can't modify a file with information about the commit after you've committed, because Git checksums the file first. However, you can inject text into a file when it's checked out and remove it again before it's added to a commit. Git attributes offers you two ways to do this.
+ความสามารถในการทำ Keyword expansion เหมือนของ SVN- หรือ CVS-style นั้นถูกเรียกร้องโดยผู้ที่เคยใช้มาก่อน แต่ปัญหาคือระบบของ Git ไม่อนุญาติให้เราแก้ไขไฟล์ด้วยข้อมูลที่มากับการ commit หลังจากที่เราทำการ commit ไปแล้วเพราะ Git ได้ checksums ไปแล้ว อย่างไรก็ตาม เราสามารถใช้วิธีแทรก text เข้าไปใน file ตอนที่ checkout ก็ได้ จากนั้นก็ลบมันออกก่อนที่จะ commit เข้าไป โดยใช้เทคนิคของ Git attribute ในการทำ 
 
-First, you can inject the SHA-1 checksum of a blob into an `$Id$` field in the file automatically. If you set this attribute on a file or set of files, then the next time you check out that branch, Git will replace that field with the SHA-1 of the blob. It's important to notice that it isn't the SHA of the commit, but of the blob itself:
+ขั้นแรกทดลอง ใส่ SHA-1 checksum เข้าไปแทนที่ `$Id$` ในไฟล์แบบอัตโนมัติ ถ้าเรากำหนดค่านี้เข้าไปในไฟล์หนึ่งหรือหลายไฟล์ ตอนที่เรา checkout ิbranch นี้ออกมา ตัว Git จะแทนที่ `$Id$` ด้วย SHA-1 สิ่งสำคัญคือต้องไม่ลืมว่า เราไม่ได้ commit SHA เข้าไปแต่ส่งเข้าไปเฉพาะ blob (Binary Large OBjects) ของมัน
 
 	$ echo '*.txt ident' >> .gitattributes
 	$ echo '$Id$' > test.txt
 
-The next time you check out this file, Git injects the SHA of the blob:
+หลังจากนี้ทุกครั้งที่ check out โปรแกรม Git จะใส่ SHA of the blob เข้าไป
 
 	$ rm text.txt
 	$ git checkout -- text.txt
 	$ cat test.txt 
 	$Id: 42812b7653c7b88933f8a9d6cad0ca16714b9bb3 $
 
-However, that result is of limited use. If you've used keyword substitution in CVS or Subversion, you can include a datestamp ‚Äî the SHA isn't all that helpful, because it's fairly random and you can't tell if one SHA is older or newer than another.
+จะเห็นว่าสิ่งที่ได้มาเราใช้ได้ค่อนข้างจำกัด ถ้าเราใช้ระบบ keword ใน CVS หรือ Subversion เราสามารถใส่ datestamp ลงไปได้เลย เทียบกับ SHA จะไม่ได้ช่วยอะไรมากนัก เพราะเราคงบอกอะไรไม่ได้ว่า SHA ตัวนี้เก่าหรือใหม่กว่าอีกตัวนึง
 
-It turns out that you can write your own filters for doing substitutions in files on commit/checkout. These are the "clean" and "smudge" filters. In the `.gitattributes` file, you can set a filter for particular paths and then set up scripts that will process files just before they're checked out ("smudge", see Figure 7-2) and just before they're committed ("clean", see Figure 7-3). These filters can be set to do all sorts of fun things.
+สรุปได้ว่าเราควรเขียน filter ขึ้นมาเองสำหรับการแทนค่าอะไรก็ตามในไฟล์ตอนที่ commit/checkout โดยอาศัย "clean" และ "smudge" ในไฟล์ `.gitattributes` เราสามารถระบุส่วนที่ต้องการแก้ไขลงไป จากนั้น script จะทำการแก้ไขไฟล์ก่อน checkout ("smudge" ตามรูป 7-2) และก่อน commit ("clean", ตามรูป 7-3) เราสามารถเล่นอะไรหลายๆ อย่างได้ด้วยวิธีการนี้
 
 Insert 18333fig0702.png 
 Figure 7-2. The "smudge" filter is run on checkout.
 
 Insert 18333fig0703.png 
 Figure 7-3. The "clean" filter is run when files are staged.
+
+
 
 The original commit message for this functionality gives a simple example of running all your C source code through the `indent` program before committing. You can set it up by setting the filter attribute in your `.gitattributes` file to filter `*.c` files with the "indent" filter:
 
