@@ -402,37 +402,35 @@ Figure 7-2. The "smudge" filter is run on checkout.
 Insert 18333fig0703.png 
 Figure 7-3. The "clean" filter is run when files are staged.
 
-
-
-The original commit message for this functionality gives a simple example of running all your C source code through the `indent` program before committing. You can set it up by setting the filter attribute in your `.gitattributes` file to filter `*.c` files with the "indent" filter:
+ตัวอย่างต่อไปเป็นการส่ง C source code เข้าโปรแกรม `indent` ก่อนที่จะ commit โดยเราจะเพิ่ม filter attribute ไปในไฟล์ `.gitattributes` เพื่อคัด `*.c` มาใส่โปรแกรม "indent" 
 
 	*.c     filter=indent
 
-Then, tell Git what the "indent"" filter does on smudge and clean:
+จากนั้น ให้กำหนด "indent" สำหรับ smudge และ clean
 
 	$ git config --global filter.indent.clean indent
 	$ git config --global filter.indent.smudge cat
 
-In this case, when you commit files that match `*.c`, Git will run them through the indent program before it commits them and then run them through the `cat` program before it checks them back out onto disk. The `cat` program is basically a no-op: it spits out the same data that it gets in. This combination effectively filters all C source code files through `indent` before committing.
+ตามตัวอย่างข้างต้น เมื่อเรา commit ไฟล์ที่เป็น `*.c` โปรแกรม Git จะส่งไฟล์นั้นไปให้โปรแกรม `indent` ก่อนที่จะ commit เข้าไป และจะส่งมันให้กับโปรแกรม `cat` ก่อนที่จะ checkout ทั้งนี้โปรแกรม `cat` จะไม่ได้เพิ่มหรือลดอะไรในไฟล์ถ้าส่งข้อมูลอะไรให้ มันก็จะส่งกลับออกมาแบบเดียวกัน ถ้าทำแบบนี้จะทำให้ C source code ของเราถูกจัด indent ทุกครั้งก่อนที่จะ commit เข้าไป
 
-Another interesting example gets `$Date$` keyword expansion, RCS style. To do this properly, you need a small script that takes a filename, figures out the last commit date for this project, and inserts the date into the file. Here is a small Ruby script that does that:
+ตัวอย่างอีกอันที่น่าสนใจคือการเลียนแบบ `$Date$` keyword expansion วิธีการคือเราจะเขียน scrite ขึ้นมาตัวนึงสำหรับเลือกไฟล์ที่เราต้องการแล้วนำไฟล์นั้นมาแก้ไข เพื่อใส่วันที่ commit ล่าสุดของโครงการลงไป เราจะใช้ script ruby ต่อไปนี้
 
 	#! /usr/bin/env ruby
 	data = STDIN.read
 	last_date = `git log --pretty=format:"%ad" -1`
 	puts data.gsub('$Date$', '$Date: ' + last_date.to_s + '$')
 
-All the script does is get the latest commit date from the `git log` command, stick that into any `$Date$` strings it sees in stdin, and print the results ‚Äî it should be simple to do in whatever language you're most comfortable in. You can name this file `expand_date` and put it in your path. Now, you need to set up a filter in Git (call it `dater`) and tell it to use your `expand_date` filter to smudge the files on checkout. You'll use a Perl expression to clean that up on commit:
+สิ่งที่ script ตัวนี้ทำคือ เอาค่าวันที่สุดท้ายที่ commit จากคำสั่ง `git log` จากนั้นนำไปแทนที่ `$Date$` ในทุกไฟล์ที่เข้ามา หลังจากทำเสร็จแล้วก็ให้มันแสดงออกมา ซึ่ง Git จะนำค่าที่ได้ไปใช้ต่อ จริงๆ แล้วเราจะใช้ภาษาอะไรก็ได้แล้วแต่ถนัด สมติว่าเราตั้งชื่อไฟล์ว่า `expand_date` จากนั้นก็กำหนดค่า smudge ให้ไปชี้ที่ `expand_date` เพื่อให้แก้ไขค่าตอนที่สั่ง checkout และตอนที่เรา commit ก็ให้เปลี่ยนค่าที่เราใส่ลงไปให้กลับมาเป็น $Date$ เหมือนเดิมด้วยภาษา perl
 
 	$ git config filter.dater.smudge expand_date
 	$ git config filter.dater.clean 'perl -pe "s/\\\$Date[^\\\$]*\\\$/\\\$Date\\\$/"'
 
-This Perl snippet strips out anything it sees in a `$Date$` string, to get back to where you started. Now that your filter is ready, you can test it by setting up a file with your `$Date$` keyword and then setting up a Git attribute for that file that engages the new filter:
+คำสั่งภาษา perl ที่เห็นนี้ จะเปลี่ยนค่าที่อยู่ใน `$Date$` ให้กลับมาเหมือนตอนเริ่มต้นอีกครั้ง เอาละตอนนี้ตัวจัดการก็สมบูรณ์แล้ว เราสามารถทดสอบได้ด้วยการใส่ไฟล์ที่มีคำว่า $Date$ ลงใน code ของเรา
 
 	$ echo '# $Date$' > date_test.txt
 	$ echo 'date*.txt filter=dater' >> .gitattributes
 
-If you commit those changes and check out the file again, you see the keyword properly substituted:
+หลังจากที่เรา commit ค่าที่เราใส่ลงไป แล้วอลง check out ออกมาดู เราจะพบว่า keyword ของเราเปลี่ยนเป็นวันเวลาเรียบร้อยแล้ว
 
 	$ git add date_test.txt .gitattributes
 	$ git commit -m "Testing date expansion in Git"
@@ -441,7 +439,7 @@ If you commit those changes and check out the file again, you see the keyword pr
 	$ cat date_test.txt
 	# $Date: Tue Apr 21 07:26:52 2009 -0700$
 
-You can see how powerful this technique can be for customized applications. You have to be careful, though, because the `.gitattributes` file is committed and passed around with the project but the driver (in this case, `dater`) isn't; so, it won't work everywhere. When you design these filters, they should be able to fail gracefully and have the project still work properly.
+จะเห็นว่าเทคนิคนี้สามารถนำไปประยุกต์ใช้ได้มากมายในโปรแกรมของเรา แต่ที่ต้องระวังให้มากคือแม้ว่าไฟล์ `.gitattributes` จะถูกส่งขึ้น Git ไปกับ source code ของเราแต่ตัว driver (ในกรณีนี้คือ `dater`)ไม่ได้ถูกส่งไปด้วย ดังนั้นการ setup นี้จึงไม่ได้ทำงานได้ทุกที่ ดังนั้นถ้าเราเป็นคนออกแบบ filter เราจะต้องออกแบบให้แม้ว่า filter จะไม่ทำงาน ตัวโครงการก็ต้องสามารถทำงานได้ต่อไป
 
 ### Exporting Your Repository ###
 
