@@ -3,8 +3,10 @@
 You may have skipped to this chapter from a previous chapter, or you may have gotten here after reading the rest of the book — in either case, this is where you’ll go over the inner workings and implementation of Git. I found that learning this information was fundamentally important to understanding how useful and powerful Git is, but others have argued to me that it can be confusing and unnecessarily complex for beginners. Thus, I’ve made this discussion the last chapter in the book so you could read it early or later in your learning process. I leave it up to you to decide.
 
 Now that you’re here, let’s get started. First, if it isn’t yet clear, Git is fundamentally a content-addressable filesystem with a VCS user interface written on top of it. You’ll learn more about what this means in a bit.
+และแล้วคุณก็ถึงจุดนี้ เริ่มกันเถอะ อย่างแรก เผื่อใครยังสงสัยอยู่ โดยพื้นฐานแล้ว Git เป็นระบบไฟล์ที่อ้างถึงเนื้อหาในไฟล์ได้ โดยมีระบบ VCS เขียนครอบอยู่ แล้วคุณจะได้เรียนรู้เพิ่มเติมว่ามันคืออะไรอีกไม่นานนี้
 
 In the early days of Git (mostly pre 1.5), the user interface was much more complex because it emphasized this filesystem rather than a polished VCS. In the last few years, the UI has been refined until it’s as clean and easy to use as any system out there; but often, the stereotype lingers about the early Git UI that was complex and difficult to learn.
+ในช่วงแรกๆ ของ Git (น่าจะก่อน 1.5) UI นั้นซับซ้อนกว่าปัจจุบันมากเพราะว่ามันเน้นที่ระบบไฟล์แทนที่จะเป็น VCS ที่เกลาแล้ว ไม่กี่ปีมานี้ มันได้ถูกปรับ UI จนสะอาดสอ้านใช้งานง่าย แต่ก็ยังมีส่วนยากอยู่บ้าง
 
 The content-addressable filesystem layer is amazingly cool, so I’ll cover that first in this chapter; then, you’ll learn about the transport mechanisms and the repository maintenance tasks that you may eventually have to deal with.
 
