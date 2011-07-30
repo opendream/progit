@@ -469,19 +469,19 @@ Figure 7-3. The "clean" filter is run when files are staged.
 
 ### Merge Strategies ###
 
-You can also use Git attributes to tell Git to use different merge strategies for specific files in your project. One very useful option is to tell Git to not try to merge specific files when they have conflicts, but rather to use your side of the merge over someone else's.
+เราสามารถใช้ Git attritube ในการบอก Git ว่าเราจะใช้เทคนิคอะไรในการ Merge (Merge Strategies) ในแต่ละไฟล์ของโครงการ ตัวอย่างที่ใช้บ่อยๆ เช่นเราจะบอก git ว่าบางไฟล์ ถ้าเจอ conflicts ไม่ต้องทำการ merge แต่ให้เลือกใช้ไฟล์ใดไฟล์หนึ่งไปเลย
 
-This is helpful if a branch in your project has diverged or is specialized, but you want to be able to merge changes back in from it, and you want to ignore certain files. Say you have a database settings file called database.xml that is different in two branches, and you want to merge in your other branch without messing up the database file. You can set up an attribute like this:
+การกำหนด merge strategies จะค่อนข้างใช้บ่อยในโครงการที่แตกออกมาจากโครงการอื่นเพราะมีความต้องการเฉพาะ แต่เราตอ้งการ merget กลับไปให้โครงการหลัก ทำให้เราไม่ต้องการ merge ในบางไฟล์ ยกตัวอย่างเช่นไฟล์ database.xml ซึ่งจะต่างกันในแต่ละ branch และเราไม่้ต้องการ Merge มันเข้าดัวยกัน เราสามารถกำหนดค่าได้ดังนี้ 
 
 	database.xml merge=ours
 
-If you merge in the other branch, instead of having merge conflicts with the database.xml file, you see something like this:
+เมื่อเรา merge ไปยัง branch อื่น แทนที่จะเกิด conflicts ในไฟล์ database.xml เราจะเห็นข้อความดังนี้
 
 	$ git merge topic
 	Auto-merging database.xml
 	Merge made by recursive.
 
-In this case, database.xml stays at whatever version you originally had.
+ในกรณีนี้ database.xml จะไม่เคยเปลี่ยนไปจากต้นฉบับเลย
 
 ## Git Hooks ##
 
