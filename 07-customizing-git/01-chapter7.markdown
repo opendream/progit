@@ -443,28 +443,26 @@ Figure 7-3. The "clean" filter is run when files are staged.
 
 ### Exporting Your Repository ###
 
-Git attribute data also allows you to do some interesting things when exporting an archive of your project.
+เราสามารถตั้งค่าใน Git attribute เพื่อกำหนดรูปแบบเท่ๆ ในการ export project ของเราได้ (export เป็น zip หรือ tar.gz)
 
 #### export-ignore ####
 
-You can tell Git not to export certain files or directories when generating an archive. If there is a subdirectory or file that you don't want to include in your archive file but that you do want checked into your project, you can determine those files via the `export-ignore` attribute.
-
-For example, say you have some test files in a `test/` subdirectory, and it doesn't make sense to include them in the tarball export of your project. You can add the following line to your Git attributes file:
+เราสามารถกำหนดได้ว่าจะไม่ export ไฟล์หรือ directory ใดบ้าง โดยกำหนดไปที่ค่า `export-ignore` ตัวอย่างเช่น ถ้าเราไม่ต้องการ export directory `test/` เพราะมันดูไม่เหมาะสมตอนที่คนต้องการ export เป็น tar/zip ไปใช้ เราสามารถกำหนดในไฟล์ Git attributes ดังนี้ 
 
 	test/ export-ignore
 
-Now, when you run git archive to create a tarball of your project, that directory won't be included in the archive.
+เอาล่ะ ครั้งหน้าตอนที่สั่ง git archive เพื่อสร้าง tarball เราจะไม่เห็น directory ที่กำหนดไว้ในผลลัพธ์
 
 #### export-subst ####
 
-Another thing you can do for your archives is some simple keyword substitution. Git lets you put the string `$Format:$` in any file with any of the `--pretty=format` formatting shortcodes, many of which you saw in Chapter 2. For instance, if you want to include a file named `LAST_COMMIT` in your project, and the last commit date was automatically injected into it when `git archive` ran, you can set up the file like this:
+อีกอย่างที่เราสามารถทำได้ตอนที่สั่ง archive คือการทำ simple keyword substitution โปรแกรม Git ให้เราสามารถใส่ `$format:$` ไว้ในไฟล์ไหนก็ได้ ด้วย `--pretty=format` (ส่วนมากเราจะเห็นในบนที่สองแล้ว) ถ้าเราต้องการใส่ไฟล์ `LAST_COMMIT` ไว้ใน archive พร้อมกับวันที่เรา commit ครั้งสุดท้าย ตอนที่สั่ง `git archive` เราสามารถทำได้โดย
 
 	$ echo 'Last commit date: $Format:%cd$' > LAST_COMMIT
 	$ echo "LAST_COMMIT export-subst" >> .gitattributes
 	$ git add LAST_COMMIT .gitattributes
 	$ git commit -am 'adding LAST_COMMIT file for archives'
 
-When you run `git archive`, the contents of that file when people open the archive file will look like this:
+ทีนี้เมื่อเราสั่ง `git archive` ข้อมูลที่อยู่ในไฟล์ ตอนที่ผู้ใช้แตก archive ออกมาจะเป็นดังนี้
 
 	$ cat LAST_COMMIT
 	Last commit date: $Format:Tue Apr 21 08:38:48 2009 -0700$
