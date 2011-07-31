@@ -379,31 +379,31 @@ Figure 3-21. Your history after merging in dumbidea and iss91v2.
 
 ## Remote Branches ##
 
-Remote branches are references to the state of branches on your remote repositories. They’re local branches that you can’t move; they’re moved automatically whenever you do any network communication. Remote branches act as bookmarks to remind you where the branches on your remote repositories were the last time you connected to them.
+Remote branches คือคำที่ใช้อ้างถึงสถานะของ branches ที่ remote repositories พวกมันคือ local branches ที่คุณย้ายที่มันไม่ได้เพราะมันจะย้ายเองโดยอัตโนมัติเมื่อคุณติดต่อกับ any network พวก Remote branches จะทำตัวเหมือน bookmarks ที่คอยเตือนว่า branches ทั้งหลายบน remote repositories อยู่ตรงไหนตอนที่คุณ connected กับ remote ครั้งสุดท้าย
 
-They take the form `(remote)/(branch)`. For instance, if you wanted to see what the `master` branch on your `origin` remote looked like as of the last time you communicated with it, you would check the `origin/master` branch. If you were working on an issue with a partner and they pushed up an `iss53` branch, you might have your own local `iss53` branch; but the branch on the server would point to the commit at `origin/iss53`.
+รูปแบบพวกมันคือ `(remote)/(branch)` ตัวอย่างเช่น ถ้าคุณอยากเห็นว่า branch `master` เมื่อครั้งสุดท้ายเมื่อคุณติดต่อกับ `origin` remote หน้าตาเป็นยังไง คุณก็ดูได้ที่ branch `origin/master` ถ้าคุณกำลังทำซัก issue นึงกับเพื่อนๆแล้วเพื่อน push branch ที่ชื่อ `iss53` ขึ้นมา (คุณอาจจะมี local `iss53` branch อยู่แล้ว แต่ branch บน server จะชี้ไปยัง commit ที่ `origin/iss53`)
 
-This may be a bit confusing, so let’s look at an example. Let’s say you have a Git server on your network at `git.ourcompany.com`. If you clone from this, Git automatically names it `origin` for you, pulls down all its data, creates a pointer to where its `master` branch is, and names it `origin/master` locally; and you can’t move it. Git also gives you your own `master` branch starting at the same place as origin’s `master` branch, so you have something to work from (see Figure 3-22).
+ฟังแล้วอาจจะยังงงๆ มาดูตัวอย่างกันดีกว่า สมมติว่าคุณมี Git server อยู่ใน network ของคุณชื่อ `git.ourcompany.com` ถ้าคุณ clone จากที่นี่ Git จะตั้งชื่อมันว่า `origin` ให้คุณโดยอัตโนมัติ, ดึงข้อมูลทั้งหมดของมันลงมา, แล้วสร้าง pointer ไปยัง `master` branch ของมัน, แล้วตั้งชื่อว่า `origin/master` บนเครื่องของคุณ โดยที่คุณจะไม่สามารถย้ายที่มันได้ นอกจากนี้ Git ก็จะให้ `master` branch ส่วนตัวกับคุณ โดยมันจะเริ่มต้นจากที่เดียวกับ `master` branch ของ  origin เพื่อเป็นจุดเริ่มต้นในการทำงานให้กับคุณ (ดู Figure 3-22).
 
 Insert 18333fig0322.png 
 Figure 3-22. A Git clone gives you your own master branch and origin/master pointing to origin’s master branch.
 
-If you do some work on your local master branch, and, in the meantime, someone else pushes to `git.ourcompany.com` and updates its master branch, then your histories move forward differently. Also, as long as you stay out of contact with your origin server, your `origin/master` pointer doesn’t move (see Figure 3-23).
+ถ้าคุณทำงานอะไรซักอย่างไปบน master branch บนเครื่องคุณ โดยระหว่างนั้นมีใครซักคน push ของใส่ `git.ourcompany.com` และ update master branch บนนั้น histories ของคุณก็ยังค่อยๆขยับไปข้างหน้าตามเรื่องตามราวของมัน ตราบใดที่คุณยังไม่ติดต่อกับ origin server ไอ้ pointer `origin/master` ของคุณก็จะไม่ขยับไปไหน (ดู Figure 3-23).
 
 Insert 18333fig0323.png 
 Figure 3-23. Working locally and having someone push to your remote server makes each history move forward differently.
 
-To synchronize your work, you run a `git fetch origin` command. This command looks up which server origin is (in this case, it’s `git.ourcompany.com`), fetches any data from it that you don’t yet have, and updates your local database, moving your `origin/master` pointer to its new, more up-to-date position (see Figure 3-24).
+เพื่อที่จะ synchronize งานที่คุณทำ คุณก็จะ run command `git fetch origin` โดย command นี้จะไปหาว่า server origin อยู่ไหน (ในกรณีนี้คือ `git.ourcompany.com`) แล้ว fetches ข้อมูลทั้งหมดที่คุณยังไม่มีจากมัน, updates database บนเครื่องคุณ, ขยับ pointer `origin/master` ไปยังที่ใหม่ที่ up-to-date กว่าเดิม (ดู Figure 3-24).
 
 Insert 18333fig0324.png 
 Figure 3-24. The git fetch command updates your remote references.
 
-To demonstrate having multiple remote servers and what remote branches for those remote projects look like, let’s assume you have another internal Git server that is used only for development by one of your sprint teams. This server is at `git.team1.ourcompany.com`. You can add it as a new remote reference to the project you’re currently working on by running the `git remote add` command as we covered in Chapter 2. Name this remote `teamone`, which will be your shortname for that whole URL (see Figure 3-25).
+เพื่อจะทำให้เห็นภาพการมี remote servers หลายๆอันและดูว่า remote branches สำหรับ remote projects เหล่านั้นหน้าตาเป็นยังไง, มาลองสมมติกันว่าคุณมี Git server อีกอันนึงที่อีก sprint team นึงใช้ develop โดยเฉพาะ server อันนี้อยู่ที่ `git.team1.ourcompany.com` คุณสามารถเพิ่มมันเข้าไปเป็น remote reference อันใหม่ของ project ที่คุณกำลังทำงานอยู่โดยการ run command `git remote add` อย่างที่เราเคยเล่าไว้ใน Chapter 2 ตั้งชื่อ remote นี้ว่า `teamone` ซึ่งจะกลายเป็นชื่อย่อสำหรับ URL อันนั้นทั้งอัน (ดู Figure 3-25).
 
 Insert 18333fig0325.png 
 Figure 3-25. Adding another server as a remote.
 
-Now, you can run `git fetch teamone` to fetch everything the remote `teamone` server has that you don’t have yet. Because that server is a subset of the data your `origin` server has right now, Git fetches no data but sets a remote branch called `teamone/master` to point to the commit that `teamone` has as its `master` branch (see Figure 3-26).
+ตอนนี้คุณสามารถ run `git fetch teamone` เพื่อ fetch ทุกอย่างที่ remote `teamone` server มีแต่คุณยังไม่มี เนื่องจาก server นั้นเป็นแค่ subset ของข้อมูลที่คุณมีบน `origin` server ในตอนนี้ Git ก็จะไม่ fetch ข้อมูลอะไร แค่ตั้ง remote branch ชื่อ `teamone/master` ชี้ไปยัง commit ที่ `teamone` มีอยู่ใน `master` branch ของมัน (ดู Figure 3-26).
 
 Insert 18333fig0326.png 
 Figure 3-26. You get a reference to teamone’s master branch position locally.
