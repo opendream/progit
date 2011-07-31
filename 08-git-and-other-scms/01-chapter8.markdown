@@ -309,7 +309,7 @@ You should know two important things about `git svn log`. First, it works offlin
 
 #### ข้อมูลเซิร์ฟเวอร์ SVN ####
 
-You can also get the same sort of information that `svn info` gives you by running `git svn info`:
+ถ้าต้องการผลลัพธ์ที่เหมือนกันกับคำสั่ง `svn info` ก็ให้ใช้คำสั่ง `git svn info`:
 
 	$ git svn info
 	Path: .
@@ -323,17 +323,18 @@ You can also get the same sort of information that `svn info` gives you by runni
 	Last Changed Rev: 87
 	Last Changed Date: 2009-05-02 16:07:37 -0700 (Sat, 02 May 2009)
 
-This is like `blame` and `log` in that it runs offline and is up to date only as of the last time you communicated with the Subversion server.
+เช่นเดียวกันกับคำสั่ง `blame` และ `log` ที่จะทำงานแบบออฟไลน์เท่านั้นและอัพเดตแค่ล่าสุดที่ติดต่อกับเซิร์ฟเวอร์ Subversion
 
-#### Ignoring What Subversion Ignores ####
 
-If you clone a Subversion repository that has `svn:ignore` properties set anywhere, you’ll likely want to set corresponding `.gitignore` files so you don’t accidentally commit files that you shouldn’t. `git svn` has two commands to help with this issue. The first is `git svn create-ignore`, which automatically creates corresponding `.gitignore` files for you so your next commit can include them.
+#### อย่าไปสนเรื่องที่ Subversion ไม่สนใจ ####
 
-The second command is `git svn show-ignore`, which prints to stdout the lines you need to put in a `.gitignore` file so you can redirect the output into your project exclude file:
+ถ้าหากเรา clone ข้อมูลจาก repository ของ Subversion ที่มีการกำหนดค่า `svn:ignore` ภายในโปรเจคนั้น ดังนั้นเรื่องหนึ่งที่เราต้องการคือกำหนดค่าในไฟล์ `.gitignore` ทุกไฟล์ให้เหมือนกันก็เพื่อไม่ให้เราต้อง commit ไฟล์ต่างๆ ที่ไม่ต้องการ ซึ่ง `git svn` ได้เตรียมคำสั่งไว้ 2 คำสั่งเพื่อจัดการปัญหานี้ คำสั่งแรกคือ `git svn create-ignore` ที่จะกำหนดค่าต่างๆ ของไฟล์ `.gitignore` ให้อัตโนมัติ ดังนั้นเมื่อส่งรายการ commit ครั้งต่อไปก็จะนำเอาข้อมูลดังกล่าวมาใช้งานได้ทันที
+
+คำสั่งอีกคำสั่งหนึ่งก็คือ `git svn show-ignore` ซึ่งจะแสดงข้อมูลที่ต้องนำเอาไปใส่ในไฟล์ `.gitignore` บนหน้าจอ แต่เราก็สามารถเปลี่ยนการแสดงบนให้ไปยังไฟล์สำหรับใช้แยกไฟล์ที่ไม่สนใจของโปรเจได้ดังนี้:
 
 	$ git svn show-ignore > .git/info/exclude
 
-That way, you don’t litter the project with `.gitignore` files. This is a good option if you’re the only Git user on a Subversion team, and your teammates don’t want `.gitignore` files in the project.
+ด้วยวิธีการนี้เอง ทำให้โปรเจคมีไฟล์ `.gitignor` อยู่อย่างเกลื่อนกลาด ซึ่งวิธีนี้เป็นตัวเลือกที่ดี หากเราเป็นเพียงคนเดียวในทีมที่ใช้ Git ร่วมกันกับ Subversion และเพื่อนร่วมทีมคนอื่นก็คงไม่อยากได้ไฟล์ `.gitignore` มาอยู่ในโปเจค
 
 ### Git-Svn Summary ###
 
