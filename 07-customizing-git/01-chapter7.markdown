@@ -378,23 +378,23 @@ Git สามารถตรวจสอบความเปลี่ยนแ�
 
 ### Keyword Expansion ###
 
-SVN- or CVS-style keyword expansion is often requested by developers used to those systems. The main problem with this in Git is that you can't modify a file with information about the commit after you've committed, because Git checksums the file first. However, you can inject text into a file when it's checked out and remove it again before it's added to a commit. Git attributes offers you two ways to do this.
+ความสามารถในการทำ Keyword expansion เหมือนของ SVN- หรือ CVS-style นั้นถูกเรียกร้องโดยผู้ที่เคยใช้มาก่อน แต่ปัญหาคือระบบของ Git ไม่อนุญาติให้เราแก้ไขไฟล์ด้วยข้อมูลที่มากับการ commit หลังจากที่เราทำการ commit ไปแล้วเพราะ Git ได้ checksums ไปแล้ว อย่างไรก็ตาม เราสามารถใช้วิธีแทรก text เข้าไปใน file ตอนที่ checkout ก็ได้ จากนั้นก็ลบมันออกก่อนที่จะ commit เข้าไป โดยใช้เทคนิคของ Git attribute ในการทำ 
 
-First, you can inject the SHA-1 checksum of a blob into an `$Id$` field in the file automatically. If you set this attribute on a file or set of files, then the next time you check out that branch, Git will replace that field with the SHA-1 of the blob. It's important to notice that it isn't the SHA of the commit, but of the blob itself:
+ขั้นแรกทดลอง ใส่ SHA-1 checksum เข้าไปแทนที่ `$Id$` ในไฟล์แบบอัตโนมัติ ถ้าเรากำหนดค่านี้เข้าไปในไฟล์หนึ่งหรือหลายไฟล์ ตอนที่เรา checkout ิbranch นี้ออกมา ตัว Git จะแทนที่ `$Id$` ด้วย SHA-1 สิ่งสำคัญคือต้องไม่ลืมว่า เราไม่ได้ commit SHA เข้าไปแต่ส่งเข้าไปเฉพาะ blob (Binary Large OBjects) ของมัน
 
 	$ echo '*.txt ident' >> .gitattributes
 	$ echo '$Id$' > test.txt
 
-The next time you check out this file, Git injects the SHA of the blob:
+หลังจากนี้ทุกครั้งที่ check out โปรแกรม Git จะใส่ SHA of the blob เข้าไป
 
 	$ rm text.txt
 	$ git checkout -- text.txt
 	$ cat test.txt 
 	$Id: 42812b7653c7b88933f8a9d6cad0ca16714b9bb3 $
 
-However, that result is of limited use. If you've used keyword substitution in CVS or Subversion, you can include a datestamp ‚Äî the SHA isn't all that helpful, because it's fairly random and you can't tell if one SHA is older or newer than another.
+จะเห็นว่าสิ่งที่ได้มาเราใช้ได้ค่อนข้างจำกัด ถ้าเราใช้ระบบ keword ใน CVS หรือ Subversion เราสามารถใส่ datestamp ลงไปได้เลย เทียบกับ SHA จะไม่ได้ช่วยอะไรมากนัก เพราะเราคงบอกอะไรไม่ได้ว่า SHA ตัวนี้เก่าหรือใหม่กว่าอีกตัวนึง
 
-It turns out that you can write your own filters for doing substitutions in files on commit/checkout. These are the "clean" and "smudge" filters. In the `.gitattributes` file, you can set a filter for particular paths and then set up scripts that will process files just before they're checked out ("smudge", see Figure 7-2) and just before they're committed ("clean", see Figure 7-3). These filters can be set to do all sorts of fun things.
+สรุปได้ว่าเราควรเขียน filter ขึ้นมาเองสำหรับการแทนค่าอะไรก็ตามในไฟล์ตอนที่ commit/checkout โดยอาศัย "clean" และ "smudge" ในไฟล์ `.gitattributes` เราสามารถระบุส่วนที่ต้องการแก้ไขลงไป จากนั้น script จะทำการแก้ไขไฟล์ก่อน checkout ("smudge" ตามรูป 7-2) และก่อน commit ("clean", ตามรูป 7-3) เราสามารถเล่นอะไรหลายๆ อย่างได้ด้วยวิธีการนี้
 
 Insert 18333fig0702.png 
 Figure 7-2. The "smudge" filter is run on checkout.
@@ -402,35 +402,35 @@ Figure 7-2. The "smudge" filter is run on checkout.
 Insert 18333fig0703.png 
 Figure 7-3. The "clean" filter is run when files are staged.
 
-The original commit message for this functionality gives a simple example of running all your C source code through the `indent` program before committing. You can set it up by setting the filter attribute in your `.gitattributes` file to filter `*.c` files with the "indent" filter:
+ตัวอย่างต่อไปเป็นการส่ง C source code เข้าโปรแกรม `indent` ก่อนที่จะ commit โดยเราจะเพิ่ม filter attribute ไปในไฟล์ `.gitattributes` เพื่อคัด `*.c` มาใส่โปรแกรม "indent" 
 
 	*.c     filter=indent
 
-Then, tell Git what the "indent"" filter does on smudge and clean:
+จากนั้น ให้กำหนด "indent" สำหรับ smudge และ clean
 
 	$ git config --global filter.indent.clean indent
 	$ git config --global filter.indent.smudge cat
 
-In this case, when you commit files that match `*.c`, Git will run them through the indent program before it commits them and then run them through the `cat` program before it checks them back out onto disk. The `cat` program is basically a no-op: it spits out the same data that it gets in. This combination effectively filters all C source code files through `indent` before committing.
+ตามตัวอย่างข้างต้น เมื่อเรา commit ไฟล์ที่เป็น `*.c` โปรแกรม Git จะส่งไฟล์นั้นไปให้โปรแกรม `indent` ก่อนที่จะ commit เข้าไป และจะส่งมันให้กับโปรแกรม `cat` ก่อนที่จะ checkout ทั้งนี้โปรแกรม `cat` จะไม่ได้เพิ่มหรือลดอะไรในไฟล์ถ้าส่งข้อมูลอะไรให้ มันก็จะส่งกลับออกมาแบบเดียวกัน ถ้าทำแบบนี้จะทำให้ C source code ของเราถูกจัด indent ทุกครั้งก่อนที่จะ commit เข้าไป
 
-Another interesting example gets `$Date$` keyword expansion, RCS style. To do this properly, you need a small script that takes a filename, figures out the last commit date for this project, and inserts the date into the file. Here is a small Ruby script that does that:
+ตัวอย่างอีกอันที่น่าสนใจคือการเลียนแบบ `$Date$` keyword expansion วิธีการคือเราจะเขียน scrite ขึ้นมาตัวนึงสำหรับเลือกไฟล์ที่เราต้องการแล้วนำไฟล์นั้นมาแก้ไข เพื่อใส่วันที่ commit ล่าสุดของโครงการลงไป เราจะใช้ script ruby ต่อไปนี้
 
 	#! /usr/bin/env ruby
 	data = STDIN.read
 	last_date = `git log --pretty=format:"%ad" -1`
 	puts data.gsub('$Date$', '$Date: ' + last_date.to_s + '$')
 
-All the script does is get the latest commit date from the `git log` command, stick that into any `$Date$` strings it sees in stdin, and print the results ‚Äî it should be simple to do in whatever language you're most comfortable in. You can name this file `expand_date` and put it in your path. Now, you need to set up a filter in Git (call it `dater`) and tell it to use your `expand_date` filter to smudge the files on checkout. You'll use a Perl expression to clean that up on commit:
+สิ่งที่ script ตัวนี้ทำคือ เอาค่าวันที่สุดท้ายที่ commit จากคำสั่ง `git log` จากนั้นนำไปแทนที่ `$Date$` ในทุกไฟล์ที่เข้ามา หลังจากทำเสร็จแล้วก็ให้มันแสดงออกมา ซึ่ง Git จะนำค่าที่ได้ไปใช้ต่อ จริงๆ แล้วเราจะใช้ภาษาอะไรก็ได้แล้วแต่ถนัด สมติว่าเราตั้งชื่อไฟล์ว่า `expand_date` จากนั้นก็กำหนดค่า smudge ให้ไปชี้ที่ `expand_date` เพื่อให้แก้ไขค่าตอนที่สั่ง checkout และตอนที่เรา commit ก็ให้เปลี่ยนค่าที่เราใส่ลงไปให้กลับมาเป็น $Date$ เหมือนเดิมด้วยภาษา perl
 
 	$ git config filter.dater.smudge expand_date
 	$ git config filter.dater.clean 'perl -pe "s/\\\$Date[^\\\$]*\\\$/\\\$Date\\\$/"'
 
-This Perl snippet strips out anything it sees in a `$Date$` string, to get back to where you started. Now that your filter is ready, you can test it by setting up a file with your `$Date$` keyword and then setting up a Git attribute for that file that engages the new filter:
+คำสั่งภาษา perl ที่เห็นนี้ จะเปลี่ยนค่าที่อยู่ใน `$Date$` ให้กลับมาเหมือนตอนเริ่มต้นอีกครั้ง เอาละตอนนี้ตัวจัดการก็สมบูรณ์แล้ว เราสามารถทดสอบได้ด้วยการใส่ไฟล์ที่มีคำว่า $Date$ ลงใน code ของเรา
 
 	$ echo '# $Date$' > date_test.txt
 	$ echo 'date*.txt filter=dater' >> .gitattributes
 
-If you commit those changes and check out the file again, you see the keyword properly substituted:
+หลังจากที่เรา commit ค่าที่เราใส่ลงไป แล้วอลง check out ออกมาดู เราจะพบว่า keyword ของเราเปลี่ยนเป็นวันเวลาเรียบร้อยแล้ว
 
 	$ git add date_test.txt .gitattributes
 	$ git commit -m "Testing date expansion in Git"
@@ -439,51 +439,49 @@ If you commit those changes and check out the file again, you see the keyword pr
 	$ cat date_test.txt
 	# $Date: Tue Apr 21 07:26:52 2009 -0700$
 
-You can see how powerful this technique can be for customized applications. You have to be careful, though, because the `.gitattributes` file is committed and passed around with the project but the driver (in this case, `dater`) isn't; so, it won't work everywhere. When you design these filters, they should be able to fail gracefully and have the project still work properly.
+จะเห็นว่าเทคนิคนี้สามารถนำไปประยุกต์ใช้ได้มากมายในโปรแกรมของเรา แต่ที่ต้องระวังให้มากคือแม้ว่าไฟล์ `.gitattributes` จะถูกส่งขึ้น Git ไปกับ source code ของเราแต่ตัว driver (ในกรณีนี้คือ `dater`)ไม่ได้ถูกส่งไปด้วย ดังนั้นการ setup นี้จึงไม่ได้ทำงานได้ทุกที่ ดังนั้นถ้าเราเป็นคนออกแบบ filter เราจะต้องออกแบบให้แม้ว่า filter จะไม่ทำงาน ตัวโครงการก็ต้องสามารถทำงานได้ต่อไป
 
 ### Exporting Your Repository ###
 
-Git attribute data also allows you to do some interesting things when exporting an archive of your project.
+เราสามารถตั้งค่าใน Git attribute เพื่อกำหนดรูปแบบเท่ๆ ในการ export project ของเราได้ (export เป็น zip หรือ tar.gz)
 
 #### export-ignore ####
 
-You can tell Git not to export certain files or directories when generating an archive. If there is a subdirectory or file that you don't want to include in your archive file but that you do want checked into your project, you can determine those files via the `export-ignore` attribute.
-
-For example, say you have some test files in a `test/` subdirectory, and it doesn't make sense to include them in the tarball export of your project. You can add the following line to your Git attributes file:
+เราสามารถกำหนดได้ว่าจะไม่ export ไฟล์หรือ directory ใดบ้าง โดยกำหนดไปที่ค่า `export-ignore` ตัวอย่างเช่น ถ้าเราไม่ต้องการ export directory `test/` เพราะมันดูไม่เหมาะสมตอนที่คนต้องการ export เป็น tar/zip ไปใช้ เราสามารถกำหนดในไฟล์ Git attributes ดังนี้ 
 
 	test/ export-ignore
 
-Now, when you run git archive to create a tarball of your project, that directory won't be included in the archive.
+เอาล่ะ ครั้งหน้าตอนที่สั่ง git archive เพื่อสร้าง tarball เราจะไม่เห็น directory ที่กำหนดไว้ในผลลัพธ์
 
 #### export-subst ####
 
-Another thing you can do for your archives is some simple keyword substitution. Git lets you put the string `$Format:$` in any file with any of the `--pretty=format` formatting shortcodes, many of which you saw in Chapter 2. For instance, if you want to include a file named `LAST_COMMIT` in your project, and the last commit date was automatically injected into it when `git archive` ran, you can set up the file like this:
+อีกอย่างที่เราสามารถทำได้ตอนที่สั่ง archive คือการทำ simple keyword substitution โปรแกรม Git ให้เราสามารถใส่ `$format:$` ไว้ในไฟล์ไหนก็ได้ ด้วย `--pretty=format` (ส่วนมากเราจะเห็นในบนที่สองแล้ว) ถ้าเราต้องการใส่ไฟล์ `LAST_COMMIT` ไว้ใน archive พร้อมกับวันที่เรา commit ครั้งสุดท้าย ตอนที่สั่ง `git archive` เราสามารถทำได้โดย
 
 	$ echo 'Last commit date: $Format:%cd$' > LAST_COMMIT
 	$ echo "LAST_COMMIT export-subst" >> .gitattributes
 	$ git add LAST_COMMIT .gitattributes
 	$ git commit -am 'adding LAST_COMMIT file for archives'
 
-When you run `git archive`, the contents of that file when people open the archive file will look like this:
+ทีนี้เมื่อเราสั่ง `git archive` ข้อมูลที่อยู่ในไฟล์ ตอนที่ผู้ใช้แตก archive ออกมาจะเป็นดังนี้
 
 	$ cat LAST_COMMIT
 	Last commit date: $Format:Tue Apr 21 08:38:48 2009 -0700$
 
 ### Merge Strategies ###
 
-You can also use Git attributes to tell Git to use different merge strategies for specific files in your project. One very useful option is to tell Git to not try to merge specific files when they have conflicts, but rather to use your side of the merge over someone else's.
+เราสามารถใช้ Git attritube ในการบอก Git ว่าเราจะใช้เทคนิคอะไรในการ Merge (Merge Strategies) ในแต่ละไฟล์ของโครงการ ตัวอย่างที่ใช้บ่อยๆ เช่นเราจะบอก git ว่าบางไฟล์ ถ้าเจอ conflicts ไม่ต้องทำการ merge แต่ให้เลือกใช้ไฟล์ใดไฟล์หนึ่งไปเลย
 
-This is helpful if a branch in your project has diverged or is specialized, but you want to be able to merge changes back in from it, and you want to ignore certain files. Say you have a database settings file called database.xml that is different in two branches, and you want to merge in your other branch without messing up the database file. You can set up an attribute like this:
+การกำหนด merge strategies จะค่อนข้างใช้บ่อยในโครงการที่แตกออกมาจากโครงการอื่นเพราะมีความต้องการเฉพาะ แต่เราตอ้งการ merget กลับไปให้โครงการหลัก ทำให้เราไม่ต้องการ merge ในบางไฟล์ ยกตัวอย่างเช่นไฟล์ database.xml ซึ่งจะต่างกันในแต่ละ branch และเราไม่้ต้องการ Merge มันเข้าดัวยกัน เราสามารถกำหนดค่าได้ดังนี้ 
 
 	database.xml merge=ours
 
-If you merge in the other branch, instead of having merge conflicts with the database.xml file, you see something like this:
+เมื่อเรา merge ไปยัง branch อื่น แทนที่จะเกิด conflicts ในไฟล์ database.xml เราจะเห็นข้อความดังนี้
 
 	$ git merge topic
 	Auto-merging database.xml
 	Merge made by recursive.
 
-In this case, database.xml stays at whatever version you originally had.
+ในกรณีนี้ database.xml จะไม่เคยเปลี่ยนไปจากต้นฉบับเลย
 
 ## Git Hooks ##
 

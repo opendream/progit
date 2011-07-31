@@ -250,27 +250,23 @@
 
 ### เปลี่ยน Active Branch ###
 
-Git figures out what branch your dcommits go to by looking for the tip of any of your Subversion branches in your history — you should have only one, and it should be the last one with a `git-svn-id` in your current branch history. 
 Git คิดถึงว่า เมื่อใช้ dcommits แล้ว จะไปอยู่ที่ branch ไหนด้วยการเข้าไปดูข้อมูลในประวัติการทำงานของ branch ใดๆ ที่อยู่ใน Subversion ของคุณ ซึ่งก็น่าจะมีอยู่เพียงรายการเดียวและน่าจะเป็นรายการสุดท้ายจาก `git-svn-id` ในประวัติการทำงานของ branch ปัจจุบัน
 
-If you want to work on more than one branch simultaneously, you can set up local branches to `dcommit` to specific Subversion branches by starting *them at the imported Subversion commit for that branch*. If you want an `opera` branch that you can work on separately, you can run
 ซึ่งถ้าต้องการทำพร้อมกันหลาย branch ก็ทำได้ด้วยการกำหนดให้ branch ทั้งหมดภายในเครื่องที่ต้องการทำงานพร้อมกันนั้น `dcommit` ไปยัง branch บน Subversion ด้วยการเริ่มต้นด้วยการนำข้อมูลการ commit ของ branch ใน Subversion ที่ต้องการทั้งหมดก่อน เช่น ถ้าต้องการ branch ชื่อ `opera` ที่เราทำงานแยกออกมาได้ ก็ทำได้ด้วยใช้คำสั่ง:
 
 	$ git branch opera remotes/opera
 
-Now, if you want to merge your `opera` branch into `trunk` (your `master` branch), you can do so with a normal `git merge`. But you need to provide a descriptive commit message (via `-m`), or the merge will say "Merge branch opera" instead of something useful.
 ขณะนี้ หากเราต้องการ merge ข้อมูลของ branch ชื่อ `opera` กลับไปยัง `trunk` (`master` branch) ก็ทำได้ด้วยคำสั่ง `git merge` เท่านั้น แต่ว่าต้องใส่คำอธิบายการ commit (commit message) เข้าไปด้วย (ระบุด้วยตัวเลือก `-m`) หรือไม่อย่างนั้นแล้วข้อความนั้นจะเป็น "Merge branch opera" แทนที่จะเป็นข้อความที่อธิบายได้ดีกว่านั้น
 
-Remember that although you’re using `git merge` to do this operation, and the merge likely will be much easier than it would be in Subversion (because Git will automatically detect the appropriate merge base for you), this isn’t a normal Git merge commit. You have to push this data back to a Subversion server that can’t handle a commit that tracks more than one parent; so, after you push it up, it will look like a single commit that squashed in all the work of another branch under a single commit. After you merge one branch into another, you can’t easily go back and continue working on that branch, as you normally can in Git. The `dcommit` command that you run erases any information that says what branch was merged in, so subsequent merge-base calculations will be wrong — the dcommit makes your `git merge` result look like you ran `git merge --squash`. Unfortunately, there’s no good way to avoid this situation — Subversion can’t store this information, so you’ll always be crippled by its limitations while you’re using it as your server. To avoid issues, you should delete the local branch (in this case, `opera`) after you merge it into trunk.
-ถึงแม้ว่าเราจะใช้ `git merge` และการ merge ก็ดูเหมือนจะง่ายมากเมื่อเทียบกับ Subversion (นั่นเพราะ Git จะตรวจสอบความเข้ากันได้สำหรับการ merge ให้อัตโนมัติ) แต่นี่ไม่ใช่เรื่องปกติสำหรับ Git ที่จะ merge commit
+ถึงแม้ว่าเราจะใช้ `git merge` และการ merge ก็ดูท่าจะง่ายมากเมื่อเทียบกับ Subversion (นั่นเพราะ Git จะตรวจสอบความเข้ากันได้สำหรับการ merge ให้อัตโนมัติ) แต่นี่ไม่ใช่สำหรับการ merge ของ Git เราต้อง push ข้อมูลเหล่านี้กลับไปยังเซิร์ฟเวอร์ Subversion นั่นทำให้ไม่สามารถควบคุมการ commit ที่แย่งออกไปหลายโปรเจคได้ ดังนั้น หลังจากส่งข้อมูลกลับไปแล้ว ก็จะเหมือนกับว่า commit นั้นโดนบีบอัดเข้าไปกับงานที่หมดของ branch อื่นๆ ภายใต้ commit เดียว และเมื่อใดที่เกิดการควบรวม branch หนึ่งไปยังอีก branch หนึ่งแล้ว มันต้องใช้พลังเยอะมากทีเดียวถ้าต้องการที่จะกลับไปทำงานต่อที่ branch แรกนั้น แต่สำหรับ Git แล้ว มันเด็กมาก คำสั่ง `dcommit` นั้นใช้สำหรับลบข้อมูลใดๆ ก็ตามที่บอกว่า branch ใดที่ถูก merge เข้ามา ดังนั้นการคำนวณเพื่อหาข้อมูลก่อนหน้าที่ merge มานั้นผิดพลาดไป ซึ่งคำสั่ง dcommit จะทำให้ผลลัพธ์ได้ที่จาก `git merge` เหมือนกับผลลัพธ์ที่ได้จาก `git merge --squash` โชคร้ายหน่อยที่ไมมีวิธีการอื่นเลยเพื่อหลีกเลี่ยงสถานะการณ์นี้เนื่องจาก Subversion ไม่สามารถเก็บข้อมูลได้ ดังนั้นเราก็คงต้องทำงานด้วยวิธีพิกลพิการ อันเนื่องมาจากข้อจำกัดหลายด้านของระบบซึ่งมันจะเป็นอยู่แบบนี้ต่อไปตราบใดที่เรายังคงใช้งานเซิร์ฟเวอร์ที่เป็น Subversion เช่นนี้การหลีกเลี่ยง issue นี้ก็คือ เราต้องลบ local branch (ในกรณีนี้คือ `opear`) หลังจากเรา mege มันเข้าไปยัง remositor แล้ว
 
-### Subversion Commands ###
+### คำสั่งต่างๆ ของ Subversion ###
 
-The `git svn` toolset provides a number of commands to help ease the transition to Git by providing some functionality that’s similar to what you had in Subversion. Here are a few commands that give you what Subversion used to.
+`git svn` เป็นชุดเครื่องมือที่เตรียมคำสั่งต่างๆ สำหรับอำนวยความสะดวกสำหรับการย้ายมายัง Git ด้วยการเตรียมฟังก์ชันการใช้งานต่างๆ คล้ายกันกับที่มีใน Subversion ซึ่งบางคำสั่งก็เตรียมไว้เช่นเดียวกันกับที่ Subversion ใช้
 
-#### SVN Style History ####
+#### รูปแบบการเก็บประวัติของ SVN ####
 
-If you’re used to Subversion and want to see your history in SVN output style, you can run `git svn log` to view your commit history in SVN formatting:
+ถ้าใช้ Subversion มาก่อน และได้ลองเปิดดูประวัติการทำงานแบบ SVN output style ซึ่งตอนนี้ถ้าต้องการดูประวิตการทำงานรูบแบบเดียวกันนั้นก็ให้ใช้คำสั่ง `git svn log`:
 
 	$ git svn log
 	------------------------------------------------------------------------
@@ -289,10 +285,11 @@ If you’re used to Subversion and want to see your history in SVN output style,
 	updated the changelog
 
 You should know two important things about `git svn log`. First, it works offline, unlike the real `svn log` command, which asks the Subversion server for the data. Second, it only shows you commits that have been committed up to the Subversion server. Local Git commits that you haven’t dcommited don’t show up; neither do commits that people have made to the Subversion server in the meantime. It’s more like the last known state of the commits on the Subversion server.
+สำหรับคำสัง `git svn log` นี้มี 2 เรื่องสำคัญที่ต้องรู้ไว้ คือ เรื่องแรก คำสั่งนี้จะทำงานแบบออฟไลน์ ซึ่งไม่เหมือนกับคำสั่ง `svn log` จริงๆ ที่จะไปถามเซิร์ฟเวอร์ Subversion เพื่อขอข้อมูล และเรื่องที่สองคือ คำสั่งนี้จะแสดงเฉพาะรายการทำงานที่ commit ไปยังเซิร์ฟเวอร์ Subversion แต่ประวัติการ commit ด้วย Git ซึ่งยังไม่ได้ใช้คำสั่ง dcommited จะไม่ได้ได้เอามาแสดง
 
-#### SVN Annotation ####
+#### หมายเหตุใน SVN ####
 
-Much as the `git svn log` command simulates the `svn log` command offline, you can get the equivalent of `svn annotate` by running `git svn blame [FILE]`. The output looks like this:
+`git svn log` จำลองการทำงานหลายอย่างของ `svn log` ให้ทำงานได้แบบออฟไลน์ ซึ่งถ้าหากต้องการผลลัพธ์เช่นเดียวกันกับ `svn annotate` ให้ใช้คำสั่ง `git svn blame [FILE]` โดยผลลัพธ์ที่ได้ออกมาคือ:
 
 	$ git svn blame README.txt 
 	 2   temporal Protocol Buffers - Google's data interchange format
@@ -308,9 +305,9 @@ Much as the `git svn log` command simulates the `svn log` command offline, you c
 	 2   temporal Buffer compiler (protoc) execute the following:
 	 2   temporal 
 
-Again, it doesn’t show commits that you did locally in Git or that have been pushed to Subversion in the meantime.
+เหมือนกับที่ผ่านมา ผลัพธ์ด้านบนจะไม่แสดงข้อมูลการ commit ที่ทำด้วย Git ไปแล้วในเครื่องหรือส่งไปยังเซิร์ฟเวอร์ Subversion ระหว่างนั้นแล้ว
 
-#### SVN Server Information ####
+#### ข้อมูลเซิร์ฟเวอร์ SVN ####
 
 You can also get the same sort of information that `svn info` gives you by running `git svn info`:
 
