@@ -351,17 +351,17 @@ resolution (การซ่อม) อันนี้เอามาจากท
 Insert 18333fig0318.png 
 Figure 3-18. More stable branches are generally farther down the commit history.
 
-It’s generally easier to think about them as work silos, where sets of commits graduate to a more stable silo when they’re fully tested (see Figure 3-19).
+ถ้าจะเปรียบให้ง่าย ก็ลองมองมันเป็นยุ้งข้าวที่เก็บ commits ต่างๆ โดย commit จะค่อยๆถูกขยับไปในยุ้งที่เสถียรขึ้นเมื่อมันถูก tested เรียบร้อย (ดู Figure 3-19).
 
 Insert 18333fig0319.png 
 Figure 3-19. It may be helpful to think of your branches as silos.
 
-You can keep doing this for several levels of stability. Some larger projects also have a `proposed` or `pu` (proposed updates) branch that has integrated branches that may not be ready to go into the `next` or `master` branch. The idea is that your branches are at various levels of stability; when they reach a more stable level, they’re merged into the branch above them.
-Again, having multiple long-running branches isn’t necessary, but it’s often helpful, especially when you’re dealing with very large or complex projects.
+คุณสามารถแยกแบบนี้ซ้ำๆเป็นกี่ระดับความเสถียรก็ได้ สำหรับ projects ใหญ่ๆบาง projects จะมี branch `proposed` หรือ `pu` (proposed updates) ซึ่งเป็น integrated branches ที่ยังไม่พร้อมจะเอาไปลง branch `next` หรือ `master` สรุปแล้ว ไอเดียคือ branches ต่างๆจะถูกแยกให้มีระดับความเสถียรไม่เท่ากัน เมื่อไหร่ที่มันเสถียรขึ้น ก็จะถูก merge ไปยัง branch ระดับที่สูงขึ้น
+ย้ำอีกที การมี long-running branches หลายๆอันนั้นไม่จำเป็น อย่างไรก็ตาม มันมักจะมีประโยชน์เวลาที่คุณกำลังทำ project ใหญ่ๆที่ซับซ้อนมากๆ 
 
 ### Topic Branches ###
 
-Topic branches, however, are useful in projects of any size. A topic branch is a short-lived branch that you create and use for a single particular feature or related work. This is something you’ve likely never done with a VCS before because it’s generally too expensive to create and merge branches. But in Git it’s common to create, work on, merge, and delete branches several times a day.
+Topic branches, ในทางกลับกัน, are useful in projects of any size. A topic branch is a short-lived branch that you create and use for a single particular feature or related work. This is something you’ve likely never done with a VCS before because it’s generally too expensive to create and merge branches. But in Git it’s common to create, work on, merge, and delete branches several times a day.
 
 You saw this in the last section with the `iss53` and `hotfix` branches you created. You did a few commits on them and deleted them directly after merging them into your main branch. This technique allows you to context-switch quickly and completely — because your work is separated into silos where all the changes in that branch have to do with that topic, it’s easier to see what has happened during code review and such. You can keep the changes there for minutes, days, or months, and merge them in when they’re ready, regardless of the order in which they were created or worked on.
 
