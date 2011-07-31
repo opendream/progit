@@ -308,111 +308,111 @@ resolution (การซ่อม) อันนี้เอามาจากท
 	* master
 	  testing
 
-Notice the `*` character that prefixes the `master` branch: it indicates the branch that you currently have checked out. This means that if you commit at this point, the `master` branch will be moved forward with your new work. To see the last commit on each branch, you can run `git branch -v`:
+สังเกตุไอ้ `*` ข้างหน้า `master` branch มันจะคอยปะอยู่หน้า branch ที่คุณกำลัง checked out อยู่ในปัจจุบัน ซึ่งแปลว่า ถ้า commit ตอนนี้ `master` branch จะถูกขยับไปข้างหน้าด้วยงานที่เพิ่มมาใหม่ การจะดู commit สุดท้ายของแต่ละ branch คุณก็ run `git branch -v`:
 
 	$ git branch -v
 	  iss53   93b412c fix javascript issue
 	* master  7a98805 Merge branch 'iss53'
 	  testing 782fd34 add scott to the author list in the readmes
 
-Another useful option to figure out what state your branches are in is to filter this list to branches that you have or have not yet merged into the branch you’re currently on. The useful `--merged` and `--no-merged` options have been available in Git since version 1.5.6 for this purpose. To see which branches are already merged into the branch you’re on, you can run `git branch --merged`:
+อีกทางหนึ่งที่ใช้ในการเช็ค state ของ branches คือการ list ดูว่ามี branch ไหนบ้างที่เคยถูก merge และ branch ไหนบ้างที่ยังไม่เคยถูก merge เข้ามายัง branch ที่คุณอยู่ option เทพที่ชื่อว่า `--merged` และ `--no-merged` ถูกเพิ่มเข้ามาใน Git ตั้งแต่ version 1.5.6 เพื่อประการนี้ การจะดูว่า branches ไหนบ้างที่เคยถูก merged เข้ามายัง branch ที่คุณอยู่ สามารถทำได้โดย run `git branch --merged`
 
 	$ git branch --merged
 	  iss53
 	* master
 
-Because you already merged in `iss53` earlier, you see it in your list. Branches on this list without the `*` in front of them are generally fine to delete with `git branch -d`; you’ve already incorporated their work into another branch, so you’re not going to lose anything.
+เพราะคุณเคย merged branch `iss53` เข้ามาแล้วเมื่อตะกี้ คุณก็เลยเห็นมันอยู่ใน list ปรกติแล้ว branches ต่างๆใน list นี้ (ยกเว้นอันที่กา `*` ไว้ข้างหน้านะ) สามารถ delete ทิ้งได้ตามสบายด้วยคำสั่ง `git branch -d` เพราะคุณได้ย้ายงานที่ทำในนั้นไปไว้ที่ branch อื่นแล้ว เพราะฉะนั้นลบไปก็ไม่มีงานหาย
 
-To see all the branches that contain work you haven’t yet merged in, you can run `git branch --no-merged`:
+การจะดูว่า branches ไหนบ้างที่มีงานที่ยังไม่ได้ถูก merged เข้ามาก็สามารถทำได้โดยการ run `git branch --no-merged`:
 
 	$ git branch --no-merged
 	  testing
 
-This shows your other branch. Because it contains work that isn’t merged in yet, trying to delete it with `git branch -d` will fail:
+คำสั่งนี้แสดงอีก branch นึง เพราะว่ามันมีงานที่คุณยังไม่เคย merged เข้ามา ถ้าคุณลอง delete มันด้วยคำสั่ง `git branch -d` มันก็จะ fail
 
 	$ git branch -d testing
 	error: The branch 'testing' is not an ancestor of your current HEAD.
 	If you are sure you want to delete it, run 'git branch -D testing'.
 
-If you really do want to delete the branch and lose that work, you can force it with `-D`, as the helpful message points out.
+ถ้าอยากจะ delete branch นั้นไปพร้อมๆกับงานที่ทำอยู่ในนั้นจริงๆ ก็สามารถบังคับให้มันลบได้ด้วย option `-D` ดังที่ help message บอกไว้ข้างบน
 
-## Branching Workflows ##
+## Workflows ของการแตก Branch ##
 
-Now that you have the basics of branching and merging down, what can or should you do with them? In this section, we’ll cover some common workflows that this lightweight branching makes possible, so you can decide if you would like to incorporate it into your own development cycle.
+เอาหล่ะ หลังจากคุณมีเบสิคของการแตก branch และการ merge กลับเข้ามาติดตัวแล้ว มาดูกันว่าคุณสามารถ (และสมควร) ที่จะทำอะไรกับมันบ้าง? ใน section นี้ เราจะโชว์ workflows ทั่วไปว่าการแตก branch อันรวดเร็วส์นี้สามารถทำอะไรได้บ้าง คุณจะได้ตัดสินใจได้ว่าควรที่จะเอามันไปประยุกต์ใช้กับกระบวนการพัฒนาที่คุณใช้อยู่ไหม
 
-### Long-Running Branches ###
+### Branch ที่อายุยืนนาน ###
 
-Because Git uses a simple three-way merge, merging from one branch into another multiple times over a long period is generally easy to do. This means you can have several branches that are always open and that you use for different stages of your development cycle; you can merge regularly from some of them into others.
+เพราะว่า Git มีท่า merge 3 ทาง การ merge จาก branch หนึ่งไปยังอีก branch หลายๆครั้งเป็นระยะเวลานานๆก็กลายเป็นเรื่องชิวๆไปโดยปริยาย นั่นแปลว่าคุณสามารถเปิดหลายๆ branches ทิ้งไว้สำหรับ stages ต่างๆในกระบวนการพัฒนาที่คุณใช้อยู่ และคุณก็สามารถ merge จากบาง branch ไปยัง branch อื่นๆได้อย่างสม่ำเสมอ
 
-Many Git developers have a workflow that embraces this approach, such as having only code that is entirely stable in their `master` branch — possibly only code that has been or will be released. They have another parallel branch named develop or next that they work from or use to test stability — it isn’t necessarily always stable, but whenever it gets to a stable state, it can be merged into `master`. It’s used to pull in topic branches (short-lived branches, like your earlier `iss53` branch) when they’re ready, to make sure they pass all the tests and don’t introduce bugs.
+นักพัฒนาที่ใช้ Git หลายคนมี workflow ที่สนับสนุนวิธีแบบนี้ ยกตัวอย่างเช่น มี code stable สุดยิดเก็บไว้ใน `master` branch (ส่วนใหญ่จะเป็น code ที่ถูก release ไปแล้วเตรียมจะออก) แล้วพวกเขาก็มีอีก branch หนึ่ง เปิดควบคู่กันไปโดยตั้งชื่อมันว่า develop หรือ next แล้วก็ทำงานกันบนนี้ ไม่ก็ใช้เพื่อ test ความเสถียรของระบบ (ซึ่ง branch นี้ไม่จำเป็นต้อง stable ตลอดเวลา) แล้วเมื่อไหร่ก็ตามที่มันเริ่ม stable เขาก็ merge มันเข้า `master` ไอ้ develop branch นี้จะเป็นที่ไว้ pull พวก topic branches (พวก branch อายุสั้นๆอย่าง `iss53` branch อันก่อนหน้านี้) เข้ามาเมื่อมันเสร็จเพื่อเช็คว่ามัน pass ทุกๆ tests และไม่มี bugs ใหม่ๆโผล่เข้ามา
 
-In reality, we’re talking about pointers moving up the line of commits you’re making. The stable branches are farther down the line in your commit history, and the bleeding-edge branches are farther up the history (see Figure 3-18).
+ในชีวิตจริงนั้น ถ้ามาดู pointers ที่ค่อยๆขยับขึ้นตามสายของ commits ของคุณ พวก branches ที่ stable จะอยู่ล่างๆใน commit history และพวก branches ที่เก็บของใหม่ๆแรงๆจะอยู่บนใน history (ดู Figure 3-18).
 
 Insert 18333fig0318.png 
 Figure 3-18. More stable branches are generally farther down the commit history.
 
-It’s generally easier to think about them as work silos, where sets of commits graduate to a more stable silo when they’re fully tested (see Figure 3-19).
+ถ้าจะเปรียบให้ง่าย ก็ลองมองมันเป็นยุ้งข้าวที่เก็บ commits ต่างๆ โดย commit จะค่อยๆถูกขยับไปในยุ้งที่เสถียรขึ้นเมื่อมันถูก tested เรียบร้อย (ดู Figure 3-19).
 
 Insert 18333fig0319.png 
 Figure 3-19. It may be helpful to think of your branches as silos.
 
-You can keep doing this for several levels of stability. Some larger projects also have a `proposed` or `pu` (proposed updates) branch that has integrated branches that may not be ready to go into the `next` or `master` branch. The idea is that your branches are at various levels of stability; when they reach a more stable level, they’re merged into the branch above them.
-Again, having multiple long-running branches isn’t necessary, but it’s often helpful, especially when you’re dealing with very large or complex projects.
+คุณสามารถแยกแบบนี้ซ้ำๆเป็นกี่ระดับความเสถียรก็ได้ สำหรับ projects ใหญ่ๆบาง projects จะมี branch `proposed` หรือ `pu` (proposed updates) ซึ่งเป็น integrated branches ที่ยังไม่พร้อมจะเอาไปลง branch `next` หรือ `master` สรุปแล้ว ไอเดียคือ branches ต่างๆจะถูกแยกให้มีระดับความเสถียรไม่เท่ากัน เมื่อไหร่ที่มันเสถียรขึ้น ก็จะถูก merge ไปยัง branch ระดับที่สูงขึ้น
+ย้ำอีกที การมี long-running branches หลายๆอันนั้นไม่จำเป็น อย่างไรก็ตาม มันมักจะมีประโยชน์เวลาที่คุณกำลังทำ project ใหญ่ๆที่ซับซ้อนมากๆ 
 
 ### Topic Branches ###
 
-Topic branches, however, are useful in projects of any size. A topic branch is a short-lived branch that you create and use for a single particular feature or related work. This is something you’ve likely never done with a VCS before because it’s generally too expensive to create and merge branches. But in Git it’s common to create, work on, merge, and delete branches several times a day.
+ส่วน topic branches เป็นคนละเรื่องนะจ๊ะ เพราะมันมีประโยชน์กับ projects ทุก size topic branch นั้นคือ branch ที่มีอายุสั้นๆ short-lived ที่คุณสร้างและใช้สำหรับ feature ใดๆซักอัน branche แบบนี้เป็นอะไรที่คุณน่าจะไม่เคยทำมาก่อนกับ VCS อื่นๆเพราะโดยปรกติแล้วการ create และ merge branches มันเปลืองพลังงานมาก แต่ใน Git การ create branch, switch branch ทำงาน, merge branch และ delete branches เป็นเรื่องธรรมดาที่ทำกันได้ทุกวัน (อวดอีกแล้ว :P)
 
-You saw this in the last section with the `iss53` and `hotfix` branches you created. You did a few commits on them and deleted them directly after merging them into your main branch. This technique allows you to context-switch quickly and completely — because your work is separated into silos where all the changes in that branch have to do with that topic, it’s easier to see what has happened during code review and such. You can keep the changes there for minutes, days, or months, and merge them in when they’re ready, regardless of the order in which they were created or worked on.
+อย่างที่คุณเห็นตัวอย่างไปแล้วใน branch `iss53` และ `hotfix` ที่คุณ create ขึ้นมา, commit ลงไปและก็ได้ delete พวกมันทันทีหลังจาก merge พวกมันเข้า branch หลัก เทคนิคแบบนี้จะทำให้คุณ context-switch ได้อย่างเฉียบขาดและรวดเร็วส์ (เพราะงานที่คุณทำถูกแยกออกมาอยู่ในยุ้งของตัวเองโดยที่ความเปลี่ยนแปลงทั้งหมดที่คุณสร้างมันเกี่ยวข้องกับ topic นั้นๆโดยตรง) การจะติดตามว่าอะไรเปลี่ยนไปยังไงก็ง่ายไม่ว่าจะเป็นตอนทำ code review หรืออะไรต่างๆ คุณจะเก็บความเปลี่ยนแปลงที่เกิดขึ้นไว้ใน branch นั้นเป็นหลายนาที, หลายวัน หรือหลายเดือนก็ตามใจ แล้วค่อย merge มันเข้ามาเมื่อมันเสร็จโดยที่ไม่เกี่ยวว่ามันจะถูกสร้างหรือทำเมื่อไหร่
 
-Consider an example of doing some work (on `master`), branching off for an issue (`iss91`), working on it for a bit, branching off the second branch to try another way of handling the same thing (`iss91v2`), going back to your master branch and working there for a while, and then branching off there to do some work that you’re not sure is a good idea (`dumbidea` branch). Your commit history will look something like Figure 3-20.
+ลองจินตนาการว่าคุณกำลังทำงาน (บน `master`), แล้วแตก branch ออกไปสำหรับ issue ซักอัน (สมมติชื่อ `iss91`) แล้วก็ทำงานบนนั้นไปซักแป๊ปแล้วแตก branch ออกไปอีกอันเพื่อลองแก้ปัญหาเดิมด้วยวิธีใหม่ (ชื่อ `iss91v2`) แล้วกลับไปที่ master branch และทำงานบนนั้นไปซักแป๊ปแล้วแตก branch ออกไปเพื่อลองไอเดียอะไรซักอย่างที่ไม่รู้ว่าเจ๋งป่าว (ชื่อ branch `dumbidea`) ตอนนี้ commit history ของคุณจะมีหน้าตาประมาณรูป Figure 3-20.
 
 Insert 18333fig0320.png 
 Figure 3-20. Your commit history with multiple topic branches.
 
-Now, let’s say you decide you like the second solution to your issue best (`iss91v2`); and you showed the `dumbidea` branch to your coworkers, and it turns out to be genius. You can throw away the original `iss91` branch (losing commits C5 and C6) and merge in the other two. Your history then looks like Figure 3-21.
+ทีนี้, สมมติวันคุณตัดสินใจละ ว่าคุณชอบวิธีที่สองที่คุณทำสำหรับ issue มากกว่า (`iss91v2`) แล้วคุณก็โชว์ branch `dumbidea` ให้เพื่อนดูแล้วผลปรากฏว่ามันแหล่มมาก คุณก็สามารถโยนไอ้ branch `iss91` อันแรกทิ้ง (ทำให้ commits C5 and C6 หายไป) และ merge อีกสองอันเข้ามา ทำให้ history หน้าตาเหมือนรูป Figure 3-21.
 
 Insert 18333fig0321.png 
 Figure 3-21. Your history after merging in dumbidea and iss91v2.
 
-It’s important to remember when you’re doing all this that these branches are completely local. When you’re branching and merging, everything is being done only in your Git repository — no server communication is happening.
+ประเด็นสำคัญอันหนึ่งที่อยากจะเน้นคือขณะที่คุณทำไอ้ทุกอย่างที่เล่ามา branches เหล่านี้อยู่บน local ทั้งนั้น ไม่ว่าจะเป็นตอน branch ตอน merging ทุกอย่างเกิดขึ้นบน Git repository ของคุณเท่านั้น (ไม่มีการติดต่อกับ server เลยนะ)
 
 ## Remote Branches ##
 
-Remote branches are references to the state of branches on your remote repositories. They’re local branches that you can’t move; they’re moved automatically whenever you do any network communication. Remote branches act as bookmarks to remind you where the branches on your remote repositories were the last time you connected to them.
+Remote branches คือคำที่ใช้อ้างถึงสถานะของ branches ที่ remote repositories พวกมันคือ local branches ที่คุณย้ายที่มันไม่ได้เพราะมันจะย้ายเองโดยอัตโนมัติเมื่อคุณติดต่อกับ any network พวก Remote branches จะทำตัวเหมือน bookmarks ที่คอยเตือนว่า branches ทั้งหลายบน remote repositories อยู่ตรงไหนตอนที่คุณ connected กับ remote ครั้งสุดท้าย
 
-They take the form `(remote)/(branch)`. For instance, if you wanted to see what the `master` branch on your `origin` remote looked like as of the last time you communicated with it, you would check the `origin/master` branch. If you were working on an issue with a partner and they pushed up an `iss53` branch, you might have your own local `iss53` branch; but the branch on the server would point to the commit at `origin/iss53`.
+รูปแบบพวกมันคือ `(remote)/(branch)` ตัวอย่างเช่น ถ้าคุณอยากเห็นว่า branch `master` เมื่อครั้งสุดท้ายเมื่อคุณติดต่อกับ `origin` remote หน้าตาเป็นยังไง คุณก็ดูได้ที่ branch `origin/master` ถ้าคุณกำลังทำซัก issue นึงกับเพื่อนๆแล้วเพื่อน push branch ที่ชื่อ `iss53` ขึ้นมา (คุณอาจจะมี local `iss53` branch อยู่แล้ว แต่ branch บน server จะชี้ไปยัง commit ที่ `origin/iss53`)
 
-This may be a bit confusing, so let’s look at an example. Let’s say you have a Git server on your network at `git.ourcompany.com`. If you clone from this, Git automatically names it `origin` for you, pulls down all its data, creates a pointer to where its `master` branch is, and names it `origin/master` locally; and you can’t move it. Git also gives you your own `master` branch starting at the same place as origin’s `master` branch, so you have something to work from (see Figure 3-22).
+ฟังแล้วอาจจะยังงงๆ มาดูตัวอย่างกันดีกว่า สมมติว่าคุณมี Git server อยู่ใน network ของคุณชื่อ `git.ourcompany.com` ถ้าคุณ clone จากที่นี่ Git จะตั้งชื่อมันว่า `origin` ให้คุณโดยอัตโนมัติ, ดึงข้อมูลทั้งหมดของมันลงมา, แล้วสร้าง pointer ไปยัง `master` branch ของมัน, แล้วตั้งชื่อว่า `origin/master` บนเครื่องของคุณ โดยที่คุณจะไม่สามารถย้ายที่มันได้ นอกจากนี้ Git ก็จะให้ `master` branch ส่วนตัวกับคุณ โดยมันจะเริ่มต้นจากที่เดียวกับ `master` branch ของ  origin เพื่อเป็นจุดเริ่มต้นในการทำงานให้กับคุณ (ดู Figure 3-22).
 
 Insert 18333fig0322.png 
 Figure 3-22. A Git clone gives you your own master branch and origin/master pointing to origin’s master branch.
 
-If you do some work on your local master branch, and, in the meantime, someone else pushes to `git.ourcompany.com` and updates its master branch, then your histories move forward differently. Also, as long as you stay out of contact with your origin server, your `origin/master` pointer doesn’t move (see Figure 3-23).
+ถ้าคุณทำงานอะไรซักอย่างไปบน master branch บนเครื่องคุณ โดยระหว่างนั้นมีใครซักคน push ของใส่ `git.ourcompany.com` และ update master branch บนนั้น histories ของคุณก็ยังค่อยๆขยับไปข้างหน้าตามเรื่องตามราวของมัน ตราบใดที่คุณยังไม่ติดต่อกับ origin server ไอ้ pointer `origin/master` ของคุณก็จะไม่ขยับไปไหน (ดู Figure 3-23).
 
 Insert 18333fig0323.png 
 Figure 3-23. Working locally and having someone push to your remote server makes each history move forward differently.
 
-To synchronize your work, you run a `git fetch origin` command. This command looks up which server origin is (in this case, it’s `git.ourcompany.com`), fetches any data from it that you don’t yet have, and updates your local database, moving your `origin/master` pointer to its new, more up-to-date position (see Figure 3-24).
+เพื่อที่จะ synchronize งานที่คุณทำ คุณก็จะ run command `git fetch origin` โดย command นี้จะไปหาว่า server origin อยู่ไหน (ในกรณีนี้คือ `git.ourcompany.com`) แล้ว fetches ข้อมูลทั้งหมดที่คุณยังไม่มีจากมัน, updates database บนเครื่องคุณ, ขยับ pointer `origin/master` ไปยังที่ใหม่ที่ up-to-date กว่าเดิม (ดู Figure 3-24).
 
 Insert 18333fig0324.png 
 Figure 3-24. The git fetch command updates your remote references.
 
-To demonstrate having multiple remote servers and what remote branches for those remote projects look like, let’s assume you have another internal Git server that is used only for development by one of your sprint teams. This server is at `git.team1.ourcompany.com`. You can add it as a new remote reference to the project you’re currently working on by running the `git remote add` command as we covered in Chapter 2. Name this remote `teamone`, which will be your shortname for that whole URL (see Figure 3-25).
+เพื่อจะทำให้เห็นภาพการมี remote servers หลายๆอันและดูว่า remote branches สำหรับ remote projects เหล่านั้นหน้าตาเป็นยังไง, มาลองสมมติกันว่าคุณมี Git server อีกอันนึงที่อีก sprint team นึงใช้ develop โดยเฉพาะ server อันนี้อยู่ที่ `git.team1.ourcompany.com` คุณสามารถเพิ่มมันเข้าไปเป็น remote reference อันใหม่ของ project ที่คุณกำลังทำงานอยู่โดยการ run command `git remote add` อย่างที่เราเคยเล่าไว้ใน Chapter 2 ตั้งชื่อ remote นี้ว่า `teamone` ซึ่งจะกลายเป็นชื่อย่อสำหรับ URL อันนั้นทั้งอัน (ดู Figure 3-25).
 
 Insert 18333fig0325.png 
 Figure 3-25. Adding another server as a remote.
 
-Now, you can run `git fetch teamone` to fetch everything the remote `teamone` server has that you don’t have yet. Because that server is a subset of the data your `origin` server has right now, Git fetches no data but sets a remote branch called `teamone/master` to point to the commit that `teamone` has as its `master` branch (see Figure 3-26).
+ตอนนี้คุณสามารถ run `git fetch teamone` เพื่อ fetch ทุกอย่างที่ remote `teamone` server มีแต่คุณยังไม่มี เนื่องจาก server นั้นเป็นแค่ subset ของข้อมูลที่คุณมีบน `origin` server ในตอนนี้ Git ก็จะไม่ fetch ข้อมูลอะไร แค่ตั้ง remote branch ชื่อ `teamone/master` ชี้ไปยัง commit ที่ `teamone` มีอยู่ใน `master` branch ของมัน (ดู Figure 3-26).
 
 Insert 18333fig0326.png 
 Figure 3-26. You get a reference to teamone’s master branch position locally.
 
-### Pushing ###
+### การ Push ###
 
-When you want to share a branch with the world, you need to push it up to a remote that you have write access to. Your local branches aren’t automatically synchronized to the remotes you write to — you have to explicitly push the branches you want to share. That way, you can use private branches for work you don’t want to share, and push up only the topic branches you want to collaborate on.
+เมื่อใดที่คุณอยากจะ share branch ซักอันให้กับชาวโลก คุณต้อง push มันขึ้นไปยัง remote ซักอันที่คุณมี write access เนื่องจากพวก branches ต่างๆบนเครื่องคุณมันไม่ได้ synchronize กับ remotes ที่คุณติดต่อโดยอัตโนมัติ คุณต้องเป็นคน push พวกมันขึ้นไปเองถ้าคุณอยากจะ share ทำให้คุณสามารถใช้ private branches ทำงานที่คุณเขินไม่อยากจะ share และ push เฉพาะ topic branches ที่คุณต้องการความร่วมมือขึ้นไป
 
-If you have a branch named `serverfix` that you want to work on with others, you can push it up the same way you pushed your first branch. Run `git push (remote) (branch)`:
+ถ้าคุณมี branch ซักอันชื่อ `serverfix` ที่คุณอยากจะทำงานร่วมกันกับเพื่อนๆ คุณสามารถ push มันขึ้นไปด้วยวิธีเดียวกันกับที่คุณ push branch อันแรกเลย นั่นคือ run `git push (remote) (branch)`:
 
 	$ git push origin serverfix
 	Counting objects: 20, done.
@@ -422,9 +422,9 @@ If you have a branch named `serverfix` that you want to work on with others, you
 	To git@github.com:schacon/simplegit.git
 	 * [new branch]      serverfix -> serverfix
 
-This is a bit of a shortcut. Git automatically expands the `serverfix` branchname out to `refs/heads/serverfix:refs/heads/serverfix`, which means, “Take my serverfix local branch and push it to update the remote’s serverfix branch.” We’ll go over the `refs/heads/` part in detail in Chapter 9, but you can generally leave it off. You can also do `git push origin serverfix:serverfix`, which does the same thing — it says, “Take my serverfix and make it the remote’s serverfix.” You can use this format to push a local branch into a remote branch that is named differently. If you didn’t want it to be called `serverfix` on the remote, you could instead run `git push origin serverfix:awesomebranch` to push your local `serverfix` branch to the `awesomebranch` branch on the remote project.
+อันนี้เป็น shortcut นิดส์ๆ โดย Git จะขยายชื่อ branch `serverfix` ออกเป็น `refs/heads/serverfix:refs/heads/serverfix` โดยอัตโนมัติ ซึ่งแปลว่า “เอา serverfix ที่เป็น local branch คนเครื่องฉันไป push ใส่ serverfix บน remote ให้ที” เด๋วเราค่อยมาว่ากันในรายละเอียดของส่วน `refs/heads/` ใน Chapter 9 ตอนนี้ทำเป็นลืมๆมันไปก่อน แน่นอนว่าคุณสามารถทำ `git push origin serverfix:serverfix` ก็ได้ เพราะมันจะได้ผลออกมาเหมือนกัน (เพราะมันแปลว่า “เอา serverfix ของฉันไปทำเป็น serverfix ของ remote ซะ”) คุณสามารถใช้ format เพื่อ push local branch ซักอันไปยัง remote branch ซึ่งมีชื่อต่างกันได้ ถ้าคุณไม่อยากให้มันมีชื่อว่า `serverfix` บน remote คุณก้ run `git push origin serverfix:awesomebranch` แทนเพื่อที่จะ push `serverfix` branch บนเครื่องไปเป็น `awesomebranch` branch บน remote project
 
-The next time one of your collaborators fetches from the server, they will get a reference to where the server’s version of `serverfix` is under the remote branch `origin/serverfix`:
+ครั้งต่อไปที่เพื่อนคุณซักคน fetch ของจาก server เค้าจะได้ reference อันนึงที่ชี้ไปยัง `serverfix` version บน server ในรูปแบบ remote branch ชื่อ `origin/serverfix`:
 
 	$ git fetch origin
 	remote: Counting objects: 20, done.
@@ -434,19 +434,19 @@ The next time one of your collaborators fetches from the server, they will get a
 	From git@github.com:schacon/simplegit
 	 * [new branch]      serverfix    -> origin/serverfix
 
-It’s important to note that when you do a fetch that brings down new remote branches, you don’t automatically have local, editable copies of them. In other words, in this case, you don’t have a new `serverfix` branch — you only have an `origin/serverfix` pointer that you can’t modify.
+สิ่งสำคัญที่คุณจำให้ขึ้นใจคือเมื่อใดก็ตามที่คุณ fetch remote branches มาใหม่ คุณไม่ได้มี local copy ของมันโดยอัตโนมัติ อย่างในกรณีนี้ คุณไม่ได้มี `serverfix` branch บนเครื่อง คุณมีแค่ pointer ชื่อ `origin/serverfix` ที่คุณแก้ไขมันไม่ได้
 
-To merge this work into your current working branch, you can run `git merge origin/serverfix`. If you want your own `serverfix` branch that you can work on, you can base it off your remote branch:
+การจะ merge งานจากนี้เข้าไปใน working branch ของคุณ คุณสามารถ run `git merge origin/serverfix` แต่ถ้าคุณอยากจจะมี `serverfix` branch เป็นของตัวเอง คุณก็สามารถ base มันออกมาจาก remote branch ได้:
 
 	$ git checkout -b serverfix origin/serverfix
 	Branch serverfix set up to track remote branch refs/remotes/origin/serverfix.
 	Switched to a new branch "serverfix"
 
-This gives you a local branch that you can work on that starts where `origin/serverfix` is.
+แบบนี้คุณก็จะได้ local branch บนเครื่องที่คุณสามารถทำงานได้โดยมันจะเริ่มต้นจากจุดที่ `origin/serverfix` อยู่
 
-### Tracking Branches ###
+### การติดตาม Branches ###
 
-Checking out a local branch from a remote branch automatically creates what is called a _tracking branch_. Tracking branches are local branches that have a direct relationship to a remote branch. If you’re on a tracking branch and type `git push`, Git automatically knows which server and branch to push to. Also, running `git pull` while on one of these branches fetches all the remote references and then automatically merges in the corresponding remote branch.
+การ check out local branch ซักอันจาก remote branch จะสร้างสิ่งที่เรียกว่า _tracking branch_ ให้โดยอัตโนมัติ ไอ้พวก tracking branches เนี่ยคือ local branches ที่สัมพันธ์โดยตรงกับ remote branch เมื่อไหร่ที่คุณพิมพ์ `git push` ขณะอยู่บน tracking branch Git จะรู้โดยอัตโนมัติว่าจะต้อง push ใส่ server อะไร branch ไหน นอกจากนี้ การ run `git pull` ขณะอยู่บน branches แบบนี้ก็จะ fetches remote references ทั้งหมดและทำการ merge remote branch ที่เกี่ยวข้องให้โดยอัตโนมัติ
 
 When you clone a repository, it generally automatically creates a `master` branch that tracks `origin/master`. That’s why `git push` and `git pull` work out of the box with no other arguments. However, you can set up other tracking branches if you wish — ones that don’t track branches on `origin` and don’t track the `master` branch. The simple case is the example you just saw, running `git checkout -b [branch] [remotename]/[branch]`. If you have Git version 1.6.2 or later, you can also use the `--track` shorthand:
 
