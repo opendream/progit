@@ -361,21 +361,21 @@ Figure 3-19. It may be helpful to think of your branches as silos.
 
 ### Topic Branches ###
 
-Topic branches, ในทางกลับกัน, are useful in projects of any size. A topic branch is a short-lived branch that you create and use for a single particular feature or related work. This is something you’ve likely never done with a VCS before because it’s generally too expensive to create and merge branches. But in Git it’s common to create, work on, merge, and delete branches several times a day.
+ส่วน topic branches เป็นคนละเรื่องนะจ๊ะ เพราะมันมีประโยชน์กับ projects ทุก size topic branch นั้นคือ branch ที่มีอายุสั้นๆ short-lived ที่คุณสร้างและใช้สำหรับ feature ใดๆซักอัน branche แบบนี้เป็นอะไรที่คุณน่าจะไม่เคยทำมาก่อนกับ VCS อื่นๆเพราะโดยปรกติแล้วการ create และ merge branches มันเปลืองพลังงานมาก แต่ใน Git การ create branch, switch branch ทำงาน, merge branch และ delete branches เป็นเรื่องธรรมดาที่ทำกันได้ทุกวัน (อวดอีกแล้ว :P)
 
-You saw this in the last section with the `iss53` and `hotfix` branches you created. You did a few commits on them and deleted them directly after merging them into your main branch. This technique allows you to context-switch quickly and completely — because your work is separated into silos where all the changes in that branch have to do with that topic, it’s easier to see what has happened during code review and such. You can keep the changes there for minutes, days, or months, and merge them in when they’re ready, regardless of the order in which they were created or worked on.
+อย่างที่คุณเห็นตัวอย่างไปแล้วใน branch `iss53` และ `hotfix` ที่คุณ create ขึ้นมา, commit ลงไปและก็ได้ delete พวกมันทันทีหลังจาก merge พวกมันเข้า branch หลัก เทคนิคแบบนี้จะทำให้คุณ context-switch ได้อย่างเฉียบขาดและรวดเร็วส์ (เพราะงานที่คุณทำถูกแยกออกมาอยู่ในยุ้งของตัวเองโดยที่ความเปลี่ยนแปลงทั้งหมดที่คุณสร้างมันเกี่ยวข้องกับ topic นั้นๆโดยตรง) การจะติดตามว่าอะไรเปลี่ยนไปยังไงก็ง่ายไม่ว่าจะเป็นตอนทำ code review หรืออะไรต่างๆ คุณจะเก็บความเปลี่ยนแปลงที่เกิดขึ้นไว้ใน branch นั้นเป็นหลายนาที, หลายวัน หรือหลายเดือนก็ตามใจ แล้วค่อย merge มันเข้ามาเมื่อมันเสร็จโดยที่ไม่เกี่ยวว่ามันจะถูกสร้างหรือทำเมื่อไหร่
 
-Consider an example of doing some work (on `master`), branching off for an issue (`iss91`), working on it for a bit, branching off the second branch to try another way of handling the same thing (`iss91v2`), going back to your master branch and working there for a while, and then branching off there to do some work that you’re not sure is a good idea (`dumbidea` branch). Your commit history will look something like Figure 3-20.
+ลองจินตนาการว่าคุณกำลังทำงาน (บน `master`), แล้วแตก branch ออกไปสำหรับ issue ซักอัน (สมมติชื่อ `iss91`) แล้วก็ทำงานบนนั้นไปซักแป๊ปแล้วแตก branch ออกไปอีกอันเพื่อลองแก้ปัญหาเดิมด้วยวิธีใหม่ (ชื่อ `iss91v2`) แล้วกลับไปที่ master branch และทำงานบนนั้นไปซักแป๊ปแล้วแตก branch ออกไปเพื่อลองไอเดียอะไรซักอย่างที่ไม่รู้ว่าเจ๋งป่าว (ชื่อ branch `dumbidea`) ตอนนี้ commit history ของคุณจะมีหน้าตาประมาณรูป Figure 3-20.
 
 Insert 18333fig0320.png 
 Figure 3-20. Your commit history with multiple topic branches.
 
-Now, let’s say you decide you like the second solution to your issue best (`iss91v2`); and you showed the `dumbidea` branch to your coworkers, and it turns out to be genius. You can throw away the original `iss91` branch (losing commits C5 and C6) and merge in the other two. Your history then looks like Figure 3-21.
+ทีนี้, สมมติวันคุณตัดสินใจละ ว่าคุณชอบวิธีที่สองที่คุณทำสำหรับ issue มากกว่า (`iss91v2`) แล้วคุณก็โชว์ branch `dumbidea` ให้เพื่อนดูแล้วผลปรากฏว่ามันแหล่มมาก คุณก็สามารถโยนไอ้ branch `iss91` อันแรกทิ้ง (ทำให้ commits C5 and C6 หายไป) และ merge อีกสองอันเข้ามา ทำให้ history หน้าตาเหมือนรูป Figure 3-21.
 
 Insert 18333fig0321.png 
 Figure 3-21. Your history after merging in dumbidea and iss91v2.
 
-It’s important to remember when you’re doing all this that these branches are completely local. When you’re branching and merging, everything is being done only in your Git repository — no server communication is happening.
+ประเด็นสำคัญอันหนึ่งที่อยากจะเน้นคือขณะที่คุณทำไอ้ทุกอย่างที่เล่ามา branches เหล่านี้อยู่บน local ทั้งนั้น ไม่ว่าจะเป็นตอน branch ตอน merging ทุกอย่างเกิดขึ้นบน Git repository ของคุณเท่านั้น (ไม่มีการติดต่อกับ server เลยนะ)
 
 ## Remote Branches ##
 
