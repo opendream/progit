@@ -446,7 +446,7 @@ Figure 3-26. You get a reference to teamone’s master branch position locally.
 
 ### การติดตาม Branches ###
 
-Checking out a local branch from a remote branch automatically creates what is called a _tracking branch_. Tracking branches are local branches that have a direct relationship to a remote branch. If you’re on a tracking branch and type `git push`, Git automatically knows which server and branch to push to. Also, running `git pull` while on one of these branches fetches all the remote references and then automatically merges in the corresponding remote branch.
+การ check out local branch ซักอันจาก remote branch จะสร้างสิ่งที่เรียกว่า _tracking branch_ ให้โดยอัตโนมัติ ไอ้พวก tracking branches เนี่ยคือ local branches ที่สัมพันธ์โดยตรงกับ remote branch เมื่อไหร่ที่คุณพิมพ์ `git push` ขณะอยู่บน tracking branch Git จะรู้โดยอัตโนมัติว่าจะต้อง push ใส่ server อะไร branch ไหน นอกจากนี้ การ run `git pull` ขณะอยู่บน branches แบบนี้ก็จะ fetches remote references ทั้งหมดและทำการ merge remote branch ที่เกี่ยวข้องให้โดยอัตโนมัติ
 
 When you clone a repository, it generally automatically creates a `master` branch that tracks `origin/master`. That’s why `git push` and `git pull` work out of the box with no other arguments. However, you can set up other tracking branches if you wish — ones that don’t track branches on `origin` and don’t track the `master` branch. The simple case is the example you just saw, running `git checkout -b [branch] [remotename]/[branch]`. If you have Git version 1.6.2 or later, you can also use the `--track` shorthand:
 
