@@ -408,11 +408,11 @@ Figure 3-25. Adding another server as a remote.
 Insert 18333fig0326.png 
 Figure 3-26. You get a reference to teamone’s master branch position locally.
 
-### Pushing ###
+### การ Push ###
 
-When you want to share a branch with the world, you need to push it up to a remote that you have write access to. Your local branches aren’t automatically synchronized to the remotes you write to — you have to explicitly push the branches you want to share. That way, you can use private branches for work you don’t want to share, and push up only the topic branches you want to collaborate on.
+เมื่อใดที่คุณอยากจะ share branch ซักอันให้กับชาวโลก คุณต้อง push มันขึ้นไปยัง remote ซักอันที่คุณมี write access เนื่องจากพวก branches ต่างๆบนเครื่องคุณมันไม่ได้ synchronize กับ remotes ที่คุณติดต่อโดยอัตโนมัติ คุณต้องเป็นคน push พวกมันขึ้นไปเองถ้าคุณอยากจะ share ทำให้คุณสามารถใช้ private branches ทำงานที่คุณเขินไม่อยากจะ share และ push เฉพาะ topic branches ที่คุณต้องการความร่วมมือขึ้นไป
 
-If you have a branch named `serverfix` that you want to work on with others, you can push it up the same way you pushed your first branch. Run `git push (remote) (branch)`:
+ถ้าคุณมี branch ซักอันชื่อ `serverfix` ที่คุณอยากจะทำงานร่วมกันกับเพื่อนๆ คุณสามารถ push มันขึ้นไปด้วยวิธีเดียวกันกับที่คุณ push branch อันแรกเลย นั่นคือ run `git push (remote) (branch)`:
 
 	$ git push origin serverfix
 	Counting objects: 20, done.
@@ -422,9 +422,9 @@ If you have a branch named `serverfix` that you want to work on with others, you
 	To git@github.com:schacon/simplegit.git
 	 * [new branch]      serverfix -> serverfix
 
-This is a bit of a shortcut. Git automatically expands the `serverfix` branchname out to `refs/heads/serverfix:refs/heads/serverfix`, which means, “Take my serverfix local branch and push it to update the remote’s serverfix branch.” We’ll go over the `refs/heads/` part in detail in Chapter 9, but you can generally leave it off. You can also do `git push origin serverfix:serverfix`, which does the same thing — it says, “Take my serverfix and make it the remote’s serverfix.” You can use this format to push a local branch into a remote branch that is named differently. If you didn’t want it to be called `serverfix` on the remote, you could instead run `git push origin serverfix:awesomebranch` to push your local `serverfix` branch to the `awesomebranch` branch on the remote project.
+อันนี้เป็น shortcut นิดส์ๆ โดย Git จะขยายชื่อ branch `serverfix` ออกเป็น `refs/heads/serverfix:refs/heads/serverfix` โดยอัตโนมัติ ซึ่งแปลว่า “เอา serverfix ที่เป็น local branch คนเครื่องฉันไป push ใส่ serverfix บน remote ให้ที” เด๋วเราค่อยมาว่ากันในรายละเอียดของส่วน `refs/heads/` ใน Chapter 9 ตอนนี้ทำเป็นลืมๆมันไปก่อน แน่นอนว่าคุณสามารถทำ `git push origin serverfix:serverfix` ก็ได้ เพราะมันจะได้ผลออกมาเหมือนกัน (เพราะมันแปลว่า “เอา serverfix ของฉันไปทำเป็น serverfix ของ remote ซะ”) คุณสามารถใช้ format เพื่อ push local branch ซักอันไปยัง remote branch ซึ่งมีชื่อต่างกันได้ ถ้าคุณไม่อยากให้มันมีชื่อว่า `serverfix` บน remote คุณก้ run `git push origin serverfix:awesomebranch` แทนเพื่อที่จะ push `serverfix` branch บนเครื่องไปเป็น `awesomebranch` branch บน remote project
 
-The next time one of your collaborators fetches from the server, they will get a reference to where the server’s version of `serverfix` is under the remote branch `origin/serverfix`:
+ครั้งต่อไปที่เพื่อนคุณซักคน fetch ของจาก server เค้าจะได้ reference อันนึงที่ชี้ไปยัง `serverfix` version บน server ในรูปแบบ remote branch ชื่อ `origin/serverfix`:
 
 	$ git fetch origin
 	remote: Counting objects: 20, done.
@@ -434,17 +434,17 @@ The next time one of your collaborators fetches from the server, they will get a
 	From git@github.com:schacon/simplegit
 	 * [new branch]      serverfix    -> origin/serverfix
 
-It’s important to note that when you do a fetch that brings down new remote branches, you don’t automatically have local, editable copies of them. In other words, in this case, you don’t have a new `serverfix` branch — you only have an `origin/serverfix` pointer that you can’t modify.
+สิ่งสำคัญที่คุณจำให้ขึ้นใจคือเมื่อใดก็ตามที่คุณ fetch remote branches มาใหม่ คุณไม่ได้มี local copy ของมันโดยอัตโนมัติ อย่างในกรณีนี้ คุณไม่ได้มี `serverfix` branch บนเครื่อง คุณมีแค่ pointer ชื่อ `origin/serverfix` ที่คุณแก้ไขมันไม่ได้
 
-To merge this work into your current working branch, you can run `git merge origin/serverfix`. If you want your own `serverfix` branch that you can work on, you can base it off your remote branch:
+การจะ merge งานจากนี้เข้าไปใน working branch ของคุณ คุณสามารถ run `git merge origin/serverfix` แต่ถ้าคุณอยากจจะมี `serverfix` branch เป็นของตัวเอง คุณก็สามารถ base มันออกมาจาก remote branch ได้:
 
 	$ git checkout -b serverfix origin/serverfix
 	Branch serverfix set up to track remote branch refs/remotes/origin/serverfix.
 	Switched to a new branch "serverfix"
 
-This gives you a local branch that you can work on that starts where `origin/serverfix` is.
+แบบนี้คุณก็จะได้ local branch บนเครื่องที่คุณสามารถทำงานได้โดยมันจะเริ่มต้นจากจุดที่ `origin/serverfix` อยู่
 
-### Tracking Branches ###
+### การติดตาม Branches ###
 
 Checking out a local branch from a remote branch automatically creates what is called a _tracking branch_. Tracking branches are local branches that have a direct relationship to a remote branch. If you’re on a tracking branch and type `git push`, Git automatically knows which server and branch to push to. Also, running `git pull` while on one of these branches fetches all the remote references and then automatically merges in the corresponding remote branch.
 
