@@ -511,21 +511,21 @@ Figure 7-3. The "clean" filter is run when files are staged.
 
 #### E-mail Workflow Hooks ####
 
-You can set up three client-side hooks for an e-mail-based workflow. They're all invoked by the `git am` command, so if you aren't using that command in your workflow, you can safely skip to the next section. If you're taking patches over e-mail prepared by `git format-patch`, then some of these may be helpful to you.
+Git เปิดให้เรา hook ได้สามที่สำหรับการทำ e-mail-base workflow โดย hook ของเราจะถูกเรียกโดยคำสั่ง `git am` ดังนั้นถ้าใครไม่ได้ใช้คำสั่งนี้ใน workflow ก็สามารถอ่านข้ามส่วนนี้ไปได้เลย แต่ใครที่ยังส่ง patches ด้วย e-mail และใช้คำสั่ง `git fotmat-patch` ขอให้ลองอ่านดู บางทีอาจจะช่วยคุณได้มากทีเดียว
 
-The first hook that is run is `applypatch-msg`. It takes a single argument: the name of the temporary file that contains the proposed commit message. Git aborts the patch if this script exits non-zero. You can use this to make sure a commit message is properly formatted or to normalize the message by having the script edit it in place.
+hook ตัวแรกคือ `applypatch-msg` จะรับหนึ่ง argument คือชื่อของ temporary file ที่เก็บ commit message ในกรณีนี้ Git จะยกเลิก patch นี้ถ้าเราจบ script ด้วย non-zero เราสามารถใช้ hook ตัวนี้สำหรับตรวจสอบ commit message ว่าถูกต้องตามรูปแบบที่กำหนดหรือไม่ หรืออาจจะใช้ในการปรับแต่งข้อความก่อนก็ได้
 
-The next hook to run when applying patches via `git am` is `pre-applypatch`. It takes no arguments and is run after the patch is applied, so you can use it to inspect the snapshot before making the commit. You can run tests or otherwise inspect the working tree with this script. If something is missing or the tests don't pass, exiting non-zero also aborts the `git am` script without committing the patch.
+hook ตัวต่อไปจะทำงานเมื่อ apply patches ผ่าน `git am` หรือก็คือ `pre-applypatch` โดยไม่รับ argument ใดๆ และทำงานหลังจากที่ patch ถูก apply ไปแล้ว ดังนั้นเราจะใช้มันในการตรวจสอบ snapshot ก่อนที่จะทำการ commit เช่น เราสามารถสั่ง run test ก่อนได้ ถ้าไม่ผ่านก็ให้จบ script ด้วย non-zero จะทำให้ patch นั้นไม่ถูก commit เข้าไป
 
-The last hook to run during a `git am` operation is `post-applypatch`. You can use it to notify a group or the author of the patch you pulled in that you've done so. You can't stop the patching process with this script.
+hook ตัวสุดท้ายจะทำงานระหว่างที่คำสั่ง `git am` หรือ `post-applypatch` กำลังทำงานอยู่ เราสามารถใช้มันเพื่อแจ้งให้คนในกลุ่ม หรือเจ้าของ patch ทราบว่าเรากำลัง pull สิ่งที่คุณทำอยู่ เป็นต้น เราไม่สามารถใช้ hook ตัวนี้ในการหยุด patching process ได้
 
-#### Other Client Hooks ####
+#### Client Hooks อื่นๆ ####
 
-The `pre-rebase` hook runs before you rebase anything and can halt the process by exiting non-zero. You can use this hook to disallow rebasing any commits that have already been pushed. The example `pre-rebase` hook that Git installs does this, although it assumes that next is the name of the branch you publish. You'll likely need to change that to whatever your stable, published branch is.
+ไฟล์ `pre-rebase` ้เป็น hook ที่ทำงานก่อนที่ rebase จะทำงาน และเราสามารถหยุด process ได้โดยการจบ script ด้วย non-zero เราสามารถใช้ hook ตัวนี้เพื่อไม่ให้เกิดการ rebase commit ใดๆ ที่ถูก push ไปแล้ว ดูตัวอย่างวิธีการเขียนได้ในไฟล์ตัวอย่าง `pre-rebase` ใน hooks directory อย่างไรก็ตามตัว script จะใช้คำว่า "next" เป็นชื่อของ branch ที่เราจะใช้ในการ publish ถ้าต้องการใช้ branch ชื่ออื่น ก็ให้เข้าไปเปลี่ยนเป็นชื่อ branch ที่เราคิดว่าจะใช้ในการ publish
 
-After you run a successful `git checkout`, the `post-checkout` hook runs; you can use it to set up your working directory properly for your project environment. This may mean moving in large binary files that you don't want source controlled, auto-generating documentation, or something along those lines.
+หลังจากที่คำสั่ง `git checkout` ทำงานเสร็จแล้ว hook ที่ชื่อ `post-checkout` จะเริ่มทำงาน เราสามารถใช้ hook นี้ในการตั้งค่าให้ working directory ของเราได้ นั่นหมายความว่าเราสามารถจัดการโยกย้ายไฟล์ binary ขนาดใหญ่ๆ ที่เราไม่ต้องการให้อยู่ใน code เข้ามาได้ หรือจะเป็นพวก auto-generating document หรืออะไรได้ตามแต่จะสะดวก
 
-Finally, the `post-merge` hook runs after a successful `merge` command. You can use it to restore data in the working tree that Git can't track, such as permissions data. This hook can likewise validate the presence of files external to Git control that you may want copied in when the working tree changes.
+สุดท้ายคือ `post-merge` hook ซึ่งจะทำงานเมื่อ `merge` เสร็จ เราสามารถใช้มันเพื่อดึงข้อมูลซึ่ง Git ไม่ได้ track เอาไว้ กลับมาได้ เช่น permission data เป็นต้น นอกจากนั้นเรายังสามารถใช้ hook ตัวนี้ในการ copy สิ่งที่อยู่นอก working directory เข้ามาแบบเดียวกับ `post-checkout` ได้ด้วย
 
 ### Server-Side Hooks ###
 
