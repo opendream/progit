@@ -529,17 +529,17 @@ hook ตัวสุดท้ายจะทำงานระหว่างท
 
 ### Server-Side Hooks ###
 
-In addition to the client-side hooks, you can use a couple of important server-side hooks as a system administrator to enforce nearly any kind of policy for your project. These scripts run before and after pushes to the server. The pre hooks can exit non-zero at any time to reject the push as well as print an error message back to the client; you can set up a push policy that's as complex as you wish.
+นอกจากการใช้ client-side แล้ว เรายังสามารถใช้ server-side ้hook เพื่่อช่วยให้ system admin สามารถควบคุม policy ใน project ได้ด้วย script ที่ใช้จะทำงานก่อนและหลังการ push มาที่ server และสำหรับ pre hook เราสามารถสั่งหยุดการ push ได้ด้วยการจบ script ด้วย non-zero และทำการส่ง error message กลับไปให้กับ client
 
 #### pre-receive and post-receive ####
 
-The first script to run when handling a push from a client is `pre-receive`. It takes a list of references that are being pushed from stdin; if it exits non-zero, none of them are accepted. You can use this hook to do things like make sure none of the updated references are non-fast-forwards; or to check that the user doing the pushing has create, delete, or push access or access to push updates to all the files they're modifying with the push.
+script ตัวแรกที่ถูกสั่งให้ทำงานหลังจากที่ server ได้รับ push จาก client คือ `pre-receive` มันจะรับ list ของ references ที่ส่งผ่าน push เข้ามาจาก stdin ถ้า script จบด้วย non-zero ก็จะไม่มีอะไรผ่านเข้ามาใน repository เราสามารถใช้ hook ตัวนี้เพื่อให้แน่ใจว่าไม่มี update ตัวไหนที่เป็น non-fast-forward หรือ ใช้มันสำหรับตรวจสอบว่าผู้ใช้ทำอะไร เช่น create, delete หรือ push access หรือสามารถดูไฟล์ทุกตัวที่ถูกแก้ไขผ่านทาง push
 
-The `post-receive` hook runs after the entire process is completed and can be used to update other services or notify users. It takes the same stdin data as the `pre-receive` hook. Examples include e-mailing a list, notifying a continuous integration server, or updating a ticket-tracking system ‚Äî you can even parse the commit messages to see if any tickets need to be opened, modified, or closed. This script can't stop the push process, but the client doesn't disconnect until it has completed; so, be careful when you try to do anything that may take a long time.
+อีกตัวคือ `post-receive` ้hook ซึ่งจะถูกสั่งให้ทำงานหลังจากที่ push ทำงานเสร็จแล้ว เราสามาถใช้มันในการ update service อื่นๆ หรือส่งข้อความให้กับผู้ใช้ก็ได้ ตัว hook จะได้รับข้อมูลเช่นเดียวกับ `pre-recevie` ้hook ตัวอย่างการใช้งานเช่น ส่ง e-mail ของการแก้ไข หรือ สั่งให้ continuous integration server ทำงาน หรือสั่ง update ticket-tracking system หรือเราสามารถดู commit messages เพื่อจัดการ เปิด ปิด หรือแก้ไข ticket ได้ ้script นี้ไม่สามารถหยุดกระบวนการ push ได้ แต่ผู้ใช้จะไม่สามารถ disconnect ได้ จนกว่ากระบวนการจะสิ้นสุด ดังนั้นถ้าจะทำอะไรก็ต้องคิดด้วยว่าจะใช้เวลานานหรือเปล่า
 
 #### update ####
 
-The update script is very similar to the `pre-receive` script, except that it's run once for each branch the pusher is trying to update. If the pusher is trying to push to multiple branches, `pre-receive` runs only once, whereas update runs once per branch they're pushing to. Instead of reading from stdin, this script takes three arguments: the name of the reference (branch), the SHA-1 that reference pointed to before the push, and the SHA-1 the user is trying to push. If the update script exits non-zero, only that reference is rejected; other references can still be updated.
+update script จะคล้ายๆ กับ `pre-receive` script ยกเว้นแต่ว่ามันทำงานแค่ครั้งเดียวในแต่ละ branch เมื่อคน push สั่ง update ดังนั้นถ้าคน push พยายามจะ push ทีละหลายๆ branch เจ้า `pre-receive` จะทำงานแค่ครั้งเดียว ในขณะที่ update จะทำงาน branch ละหนึ่งครั้ง และแทนที่จะอ่านข้อมูลจาก stdin ตัว script จะรับสาม argument คือ ชื่อของ branch, SHA-1 ที่อ้างอืงมาก่อนที่จะ push และสุดท้าย SHA-1 ที่ user ใช้ในการ push ทั้งนี้ถ้า update script ถูกจบด้วย non-zero จะมีเฉพาะ reference นั้นๆ ที่ถูก reject ส่วน reference อื่นๆ จะยังคง update ต่อไป
 
 ## An Example Git-Enforced Policy ##
 
