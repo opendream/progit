@@ -462,15 +462,15 @@ Figure 3-26. You get a reference to teamone’s master branch position locally.
 
 ตอนนี้ local branch ที่ชื่อ sf จะ push และ pull จาก origin/serverfix โดยอัตโนมัติ
 
-### Deleting Remote Branches ###
+### การลบ Remote Branches ###
 
-Suppose you’re done with a remote branch — say, you and your collaborators are finished with a feature and have merged it into your remote’s `master` branch (or whatever branch your stable codeline is in). You can delete a remote branch using the rather obtuse syntax `git push [remotename] :[branch]`. If you want to delete your `serverfix` branch from the server, you run the following:
+สมมติว่าคุณจะทิ้ง remote branch ยกตัวอย่างเช่น คุณและเพื่อนๆทำ feature อันนึงเสร็จและได้ merged มันเข้าไปยัง remote `master` branch (หรือ branch ลิงอะไรก็ช่างที่เอาไว้เก็บ code ที่ stable อ่ะ) คุณสามารถ delete remote branch ได้อย่างงงๆด้วยคำสั่ง `git push [remotename] :[branch]` สมมติว่าอยากจะลบ `serverfix` branch จาก server ก็ run คำสั่งดังนี้:
 
 	$ git push origin :serverfix
 	To git@github.com:schacon/simplegit.git
 	 - [deleted]         serverfix
 
-Boom. No more branch on your server. You may want to dog-ear this page, because you’ll need that command, and you’ll likely forget the syntax. A way to remember this command is by recalling the `git push [remotename] [localbranch]:[remotebranch]` syntax that we went over a bit earlier. If you leave off the `[localbranch]` portion, then you’re basically saying, “Take nothing on my side and make it be `[remotebranch]`.”
+ตูม! ไม่เหลือซากของ branch บน server ละ พับมุมหน้านี้ไว้นะ เพราะคุณจะต้องใช้ command นี้แน่ๆ และคุณต้องลืม syntax ของคำสั่งแน่นอน ฟันธง! วิธีจำคำสั่งนี้คือพยายามนึกถึง syntax ของ `git push [remotename] [localbranch]:[remotebranch]` ที่ผ่านมาก่อนหน้านี้ไว้ ถ้าคุณละไอ้ส่วน `[localbranch]` ไว้ แปลว่าคุณกำลังบอกว่า “ไม่ต้องเอาอะไรจาก local ไปเลย แล้วทำให้มันเป็น `[remotebranch]` (ลบนั่นแหละ)”
 
 ## Rebasing ##
 
