@@ -448,19 +448,19 @@ Figure 3-26. You get a reference to teamone’s master branch position locally.
 
 การ check out local branch ซักอันจาก remote branch จะสร้างสิ่งที่เรียกว่า _tracking branch_ ให้โดยอัตโนมัติ ไอ้พวก tracking branches เนี่ยคือ local branches ที่สัมพันธ์โดยตรงกับ remote branch เมื่อไหร่ที่คุณพิมพ์ `git push` ขณะอยู่บน tracking branch Git จะรู้โดยอัตโนมัติว่าจะต้อง push ใส่ server อะไร branch ไหน นอกจากนี้ การ run `git pull` ขณะอยู่บน branches แบบนี้ก็จะ fetches remote references ทั้งหมดและทำการ merge remote branch ที่เกี่ยวข้องให้โดยอัตโนมัติ
 
-When you clone a repository, it generally automatically creates a `master` branch that tracks `origin/master`. That’s why `git push` and `git pull` work out of the box with no other arguments. However, you can set up other tracking branches if you wish — ones that don’t track branches on `origin` and don’t track the `master` branch. The simple case is the example you just saw, running `git checkout -b [branch] [remotename]/[branch]`. If you have Git version 1.6.2 or later, you can also use the `--track` shorthand:
+ตอนที่คุณ clone repository ซักอัน, มันจะสร้าง `master` branch ให้โดยอัตโนมัติเพื่อติดตาม `origin/master` ทำให้ `git push` และ `git pull` work ตั้งแต่แรก อย่างไรก็ตาม คุณสามารถ set up tracking branches อื่นๆ (นอกเหนือจาก server `origin` และ branch `master`) ได้ถ้าต้องการ การ run `git checkout -b [branch] [remotename]/[branch]` ที่เห็นไปตะกี้ก็เป็นตัวอย่างนึง  ถ้าคุณมี Git version 1.6.2 ขึ้นไป คุณจะสามารถใช้ option ลัด `--track` ตามตัวอย่างข้างล่าง:
 
 	$ git checkout --track origin/serverfix
 	Branch serverfix set up to track remote branch refs/remotes/origin/serverfix.
 	Switched to a new branch "serverfix"
 
-To set up a local branch with a different name than the remote branch, you can easily use the first version with a different local branch name:
+เพื่อ set up local branch ด้วยชื่อที่ต่างกันกับ remote branch หรือไม่ก็ใช้ version แรก แต่ใส่ชื่อ local branch ให้ต่างออกไป:
 
 	$ git checkout -b sf origin/serverfix
 	Branch sf set up to track remote branch refs/remotes/origin/serverfix.
 	Switched to a new branch "sf"
 
-Now, your local branch sf will automatically push to and pull from origin/serverfix.
+ตอนนี้ local branch ที่ชื่อ sf จะ push และ pull จาก origin/serverfix โดยอัตโนมัติ
 
 ### Deleting Remote Branches ###
 
