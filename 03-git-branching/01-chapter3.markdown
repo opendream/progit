@@ -472,46 +472,46 @@ Figure 3-26. You get a reference to teamone’s master branch position locally.
 
 ตูม! ไม่เหลือซากของ branch บน server ละ พับมุมหน้านี้ไว้นะ เพราะคุณจะต้องใช้ command นี้แน่ๆ และคุณต้องลืม syntax ของคำสั่งแน่นอน ฟันธง! วิธีจำคำสั่งนี้คือพยายามนึกถึง syntax ของ `git push [remotename] [localbranch]:[remotebranch]` ที่ผ่านมาก่อนหน้านี้ไว้ ถ้าคุณละไอ้ส่วน `[localbranch]` ไว้ แปลว่าคุณกำลังบอกว่า “ไม่ต้องเอาอะไรจาก local ไปเลย แล้วทำให้มันเป็น `[remotebranch]` (ลบนั่นแหละ)”
 
-## Rebasing ##
+## การ Rebase ##
 
-In Git, there are two main ways to integrate changes from one branch into another: the `merge` and the `rebase`. In this section you’ll learn what rebasing is, how to do it, why it’s a pretty amazing tool, and in what cases you won’t want to use it.
+Git มีสองวิธีหลักๆในการ integrate changes จาก branch นึงไปยังอีก branch นึง นั่งคือการ `merge` กับการ `rebase` ใน section นี้คุณจะได้เรียนรู้ว่าการ rebase คืออะไร, ทำยังไง, ทำไมมันถึงน่าตื่นตาตื่นใจ, และในกรณีไหนที่คุณไม่อยากจะใช้มัน
 
-### The Basic Rebase ###
+### เบสิค Rebase ###
 
-If you go back to an earlier example from the Merge section (see Figure 3-27), you can see that you diverged your work and made commits on two different branches.
+ถ้าคุณย้อนกลับไปดูตัวอย่างก่อนหน้าใน section Merge (ดู Figure 3-27) คุณจะเห็นว่าคุณได้คุณได้แยกงานคุณออกมาและสร้าง commits บน 2 branches ที่แตกต่างกัน
 
 Insert 18333fig0327.png 
 Figure 3-27. Your initial diverged commit history.
 
-The easiest way to integrate the branches, as we’ve already covered, is the `merge` command. It performs a three-way merge between the two latest branch snapshots (C3 and C4) and the most recent common ancestor of the two (C2), creating a new snapshot (and commit), as shown in Figure 3-28.
+วิธีที่ง่ายที่สุดที่จะ integrate มันเข้าด้วยกันคือการ `merge` (อย่างที่เห็นก่อนหน้านี้) มันจะทำการ merge สามทาง ระหว่าง snapshots ล่าสุดของทั้งสอง branch (C3 และ C4) และบรรพบุรุษล่าสุดที่ทั้งสอง branch share กัน (C2), สร้าง snapshot อันใหม่ (และ commit), ดัง Figure 3-28.
 
 Insert 18333fig0328.png 
 Figure 3-28. Merging a branch to integrate the diverged work history.
 
-However, there is another way: you can take the patch of the change that was introduced in C3 and reapply it on top of C4. In Git, this is called _rebasing_. With the `rebase` command, you can take all the changes that were committed on one branch and replay them on another one.
+นอกจากนี้ยังมีอีกทาง นั่นคือไปเอา patch ของ change ที่เกิดขึ้นใน C3 แล้วเอามา apply บน C4 สำหรับ Git วิธีนี้เรียกว่า _rebasing_ ด้วย command `rebase` คุณสามารถเอา changes ที่ถูก committed บน branch นึงไป replay บนอีก branch ได้
 
-In this example, you’d run the following:
+อย่างในตัวอย่างนี้ คุณก็จะต้อง run คำสั่งต่อไปนี้:
 
 	$ git checkout experiment
 	$ git rebase master
 	First, rewinding head to replay your work on top of it...
 	Applying: added staged command
 
-It works by going to the common ancestor of the two branches (the one you’re on and the one you’re rebasing onto), getting the diff introduced by each commit of the branch you’re on, saving those diffs to temporary files, resetting the current branch to the same commit as the branch you are rebasing onto, and finally applying each change in turn. Figure 3-29 illustrates this process.
+วิธีการทำงานของมันคือย้ายไปยังบรรพบุรุษที่แชร์กันระหว่างสอง branches (ระหว่างอันที่คุณกำลังอยู่และอันที่คุณจะ rebasing เข้าไป), หา diff (ความเปลี่ยนแปลง) ที่เกิดขึ้นในแต่ละ commit ของ branch ที่คุณกำลังอยู่, save diffs เหล่านั้นใส่ใน temporary files, reset branch ปัจจุบันให้เป็นเหมือน commit ของ branch ที่คุณกำลังจะ rebase ไป, และสุดท้าย apply แต่ละ change ตามลำดับ Figure 3-29 จะแสดงให้เห็นว่ามันดำเนินไปยังไง
 
 Insert 18333fig0329.png 
 Figure 3-29. Rebasing the change introduced in C3 onto C4.
 
-At this point, you can go back to the master branch and do a fast-forward merge (see Figure 3-30).
+ณ บัดนาว คุณสามารถกลับไปยัง master branch แล้วทำ fast-forward merge ได้ (ดังรูป Figure 3-30).
 
 Insert 18333fig0330.png 
 Figure 3-30. Fast-forwarding the master branch.
 
-Now, the snapshot pointed to by C3' is exactly the same as the one that was pointed to by C5 in the merge example. There is no difference in the end product of the integration, but rebasing makes for a cleaner history. If you examine the log of a rebased branch, it looks like a linear history: it appears that all the work happened in series, even when it originally happened in parallel.
+ตอนนี้ snapshot ที่ถูกชี้โดย C3' หน้าตาเหมือนกันกับอันที่ถูกชี้ว่า C5 ในตัวอย่างการ merge เป๊ะๆ ไม่มีความแตกต่างใดๆในผลของการ integrate แต่การ rebase ทำให้ history สะอาดกว่า ถ้าคุณลองดู log ของ branch ที่ถูก rebase มา จะเห็นว่า history มันเป็นเส้นตรงราวกับว่างานทั้งหมดเกิดขึ้นตามลำดับแม้ว่าตอนแรกมันจะเกิดขึ้นควบคู่กันก็ตาม
 
-Often, you’ll do this to make sure your commits apply cleanly on a remote branch — perhaps in a project to which you’re trying to contribute but that you don’t maintain. In this case, you’d do your work in a branch and then rebase your work onto `origin/master` when you were ready to submit your patches to the main project. That way, the maintainer doesn’t have to do any integration work — just a fast-forward or a clean apply.
+บ่อยครั้ง คุณจะเลือก rebase เพื่อให้ commits เรียงกันอย่างสวยงามส์บน remote branch ยกตัวอย่างเช่นใน project ที่คุณเข้าไปแจมแต่ไม่ได้ maintain เอง กรณีแบบนี้ คุณจะทำงานของคุณบน branch ซักอัน แล้ว rebase งานของคุณไปยัง `origin/master` เวลาที่คุณพร้อมจะ submit patches ของคุณลงบน main project ด้วยวิธีนี้ คนที่ maintain ก็ไม่ต้องทำการ integration ใดๆ แค่ fast-forward หรือ apply cleanๆ
 
-Note that the snapshot pointed to by the final commit you end up with, whether it’s the last of the rebased commits for a rebase or the final merge commit after a merge, is the same snapshot — it’s only the history that is different. Rebasing replays changes from one line of work onto another in the order they were introduced, whereas merging takes the endpoints and merges them together.
+สังเกตุดู snapshot ที่ถูกชี้โดย commit สุดท้ายที่คุณมี ไม่ว่าจะเป็นกรณี rebase หรือ merge ก็ตาม มันเป็น snapshot เดียวกัน มีแค่ history เท่านั้นที่แตกต่าง การ Rebase จะ replay changes จากสายงานหนึ่งไปยังอีกอันตามลำดับที่มันถูกเปลี่ยนแปลง ขณะที่การ merge จะเอาเอาทั้งสองปลาย merge เข้าด้วยกัน
 
 ### More Interesting Rebases ###
 
