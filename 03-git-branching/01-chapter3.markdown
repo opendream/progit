@@ -513,23 +513,23 @@ Figure 3-30. Fast-forwarding the master branch.
 
 สังเกตุดู snapshot ที่ถูกชี้โดย commit สุดท้ายที่คุณมี ไม่ว่าจะเป็นกรณี rebase หรือ merge ก็ตาม มันเป็น snapshot เดียวกัน มีแค่ history เท่านั้นที่แตกต่าง การ Rebase จะ replay changes จากสายงานหนึ่งไปยังอีกอันตามลำดับที่มันถูกเปลี่ยนแปลง ขณะที่การ merge จะเอาเอาทั้งสองปลาย merge เข้าด้วยกัน
 
-### More Interesting Rebases ###
+### Rebase ระดับเมพ ###
 
-You can also have your rebase replay on something other than the rebase branch. Take a history like Figure 3-31, for example. You branched a topic branch (`server`) to add some server-side functionality to your project, and made a commit. Then, you branched off that to make the client-side changes (`client`) and committed a few times. Finally, you went back to your server branch and did a few more commits.
+คุณสามารถให้ rebase ของคุณ replay บนอย่างอื่นนอกจาก rebase branch ได้ด้วยนะ สมมติ history หน้าตาเหมือน Figure 3-31 คุณแตก topic branch ชื่อ (`server`) เพื่อเพิ่ม functionality บางอย่างบน server-side ของ project คุณ แล้วคุณก็ commit หลังจากนั้น, คุณแตก branch ออกไปอีกเพื่อทำ changes สำหรับ client-side (ชื่อ `client`) แล้วก็ commit อีกไม่กี่ที สุดท้าย คุณกลับมาที่ server branch ของคุณแล้ว commit ไปอีก 2-3 ที
 
 Insert 18333fig0331.png 
 Figure 3-31. A history with a topic branch off another topic branch.
 
-Suppose you decide that you want to merge your client-side changes into your mainline for a release, but you want to hold off on the server-side changes until it’s tested further. You can take the changes on client that aren’t on server (C8 and C9) and replay them on your master branch by using the `--onto` option of `git rebase`:
+สมมติว่าคุณตัดสินใจที่จะ merge changes ของ client-side เข้าไปใน mainline เพื่อที่จะ release, แต่คุณดันอยากเก็บ changes ของ server-side เอาไว้ก่อนจนกว่ามันจะโดน tested อีกซักหน่อย คุณสามารถเอา changes บน client ที่ไม่อยู่บน server (C8 และ C9) แล้ว reply มันบน master branch ได้โดยใช้ option `--onto` ของ `git rebase`:
 
 	$ git rebase --onto master server client
 
-This basically says, “Check out the client branch, figure out the patches from the common ancestor of the `client` and `server` branches, and then replay them onto `master`.” It’s a bit complex; but the result, shown in Figure 3-32, is pretty cool.
+ซึ่งเป็นการบอกว่า, “check out client branch ซะ, แล้วหา patches จากบรรพบุรุษที่แชร์กันระหว่าง branch `client` กับ `server`, แล้ว replay มันไปบน `master`” ถึงจะฟังดูงงๆ แต่ผลลัพธ์ (ดังรูป Figure 3-32) ค่อนข้างแหล่มทีเดียว
 
 Insert 18333fig0332.png 
 Figure 3-32. Rebasing a topic branch off another topic branch.
 
-Now you can fast-forward your master branch (see Figure 3-33):
+คราวนี้คุณก็ fast-forward master branch ของคุณ (ดังรูป Figure 3-33):
 
 	$ git checkout master
 	$ git merge client
@@ -537,21 +537,21 @@ Now you can fast-forward your master branch (see Figure 3-33):
 Insert 18333fig0333.png 
 Figure 3-33. Fast-forwarding your master branch to include the client branch changes.
 
-Let’s say you decide to pull in your server branch as well. You can rebase the server branch onto the master branch without having to check it out first by running `git rebase [basebranch] [topicbranch]` — which checks out the topic branch (in this case, `server`) for you and replays it onto the base branch (`master`):
+ทีนี้สมมติว่าคุณตัดสินใจที่จะ pull server branch เข้ามาด้วยเช่นกัน คุณก็ rebase server branch ไปบน the master branch โดยไม่ต้อง check out มันออกมาเลยโดยการ run `git rebase [basebranch] [topicbranch]` ซึ่งจะทำการ check out topic branch (ซึ่งในกรณีนี้ชื่อ `server`) ให้คุณ แล้ว replay มันไปบน base branch (`master`):
 
 	$ git rebase master server
 
-This replays your `server` work on top of your `master` work, as shown in Figure 3-34.
+การทำแบบนี้จะ replays งานใน `server` ลงบนงานใน `master` ดัง Figure 3-34.
 
 Insert 18333fig0334.png 
 Figure 3-34. Rebasing your server branch on top of your master branch.
 
-Then, you can fast-forward the base branch (`master`):
+หลังจากนั้นคุณก็ fast-forward branch หลัก (`master`):
 
 	$ git checkout master
 	$ git merge server
 
-You can remove the `client` and `server` branches because all the work is integrated and you don’t need them anymore, leaving your history for this entire process looking like Figure 3-35:
+ตอนนี้ก็ลบ branches `client` กับ `server` ได้ละ เพราะว่างานทั้งหมดถูก integrated เรียบร้อยเลยไม่รู้จะเก็บไว้ทำซากอะไร ผลที่ได้คือ history ทั้งยวงจะหน้าตาประมาณ Figure 3-35:
 
 	$ git branch -d client
 	$ git branch -d server
@@ -559,40 +559,40 @@ You can remove the `client` and `server` branches because all the work is integr
 Insert 18333fig0335.png 
 Figure 3-35. Final commit history.
 
-### The Perils of Rebasing ###
+### ภยันตรายของการ Rebase ###
 
-Ahh, but the bliss of rebasing isn’t without its drawbacks, which can be summed up in a single line:
+อาาา ความสุขสันต์ของการ rebase ไม่ได้มาฟรีๆ มันมีข้อเสียด้วยซึ่งสามารถสรุปได้เป็นประโยคสั้นๆบรรทัดเดียวว่า:
 
-**Do not rebase commits that you have pushed to a public repository.**
+**อย่าได้ rebase commits ที่คุณเคย pushed ไปยัง public repository .. มันเป็นบาป**
 
-If you follow that guideline, you’ll be fine. If you don’t, people will hate you, and you’ll be scorned by friends and family.
+ตราบใดที่คุณทำตามคำแนะนำนี้ ชีวิตจะสดใส แต่ถ้าไม่ทำตาม ชาวประชาจะประนามคุณ เพื่อนๆและครอบครัวจะเหยียดหยามคุณ (จากผู้แปล: เชื่อเหอะ juacompe โดนมาแล้วตอนแปล progit เนี่ยแหละ T-T)
 
-When you rebase stuff, you’re abandoning existing commits and creating new ones that are similar but different. If you push commits somewhere and others pull them down and base work on them, and then you rewrite those commits with `git rebase` and push them up again, your collaborators will have to re-merge their work and things will get messy when you try to pull their work back into yours.
+ตอนที่คุณ rebase ของ คุณกำลังทิ้ง commits ที่มีอยู่ แล้วสร้างอันใหม่ที่ค่อนข้างเหมือนแต่ก็แตกต่าง ถ้าคุณ push commits ไปไว้ที่ไหนซักที่ แล้วคนอื่นๆ pull มันออกไปแล้วทำงานต่อยอดไปบนนั้น และแล้วคุณก็เขียนทับ commits เหล่านั้นด้วย `git rebase` แล้ว push มันกลับขึ้นไปอีกที, บรรดาเพื่อนร่วมงานจะต้อง merge งานทั้งหมดที่ทำมาเข้ามาใหม่ แล้วนรกก็จะเริ่มต้นขึ้นเมื่อคุณดึงงานของพวกเพื่อนๆเข้ามา
 
-Let’s look at an example of how rebasing work that you’ve made public can cause problems. Suppose you clone from a central server and then do some work off that. Your commit history looks like Figure 3-36.
+ลองดูตัวอย่างกันว่าการ rebase งานที่เคยเปิดให้เป็น public แล้วมันเกิดปัญหายังไง สมมติว่าคุณ clone จาก server กลางซักตัวแล้วทำงานไปบนนั้น history ของ commits ก็จะหน้าตาประมาณ Figure 3-36.
 
 Insert 18333fig0336.png 
 Figure 3-36. Clone a repository, and base some work on it.
 
-Now, someone else does more work that includes a merge, and pushes that work to the central server. You fetch them and merge the new remote branch into your work, making your history look something like Figure 3-37.
+ทีนี้, ใครอีกคนก็ทำงานต่อแล้วก็ merge เข้ามา, แล้วก็ pushes งานนั้นเข้า server กลาง คุณก็ fetch งานพวกนั้นเข้ามาแล้วก็ merge remote branch อันใหม่เข้ามากับงานของคุณ, ทำให้ history ของคุณหน้าตาประมาณ Figure 3-37.
 
 Insert 18333fig0337.png 
 Figure 3-37. Fetch more commits, and merge them into your work.
 
-Next, the person who pushed the merged work decides to go back and rebase their work instead; they do a `git push --force` to overwrite the history on the server. You then fetch from that server, bringing down the new commits.
+หลังจากนั้น, ไอ้หมอนั่นที่ pushed งานที่ถูก merged ขึ้นมาก็ตัดสินใจที่จะย้อนกลับไปแล้ว rebase งานของมันแทน ซึ่งไอ้หมดนั่นก็จะสั่ง `git push --force` เพื่อทับ history บน server หลังจากนั้นคุณก็ fetch ของมาจาก server แล้วก็ได้ commits ใหม่ติดมา
 
 Insert 18333fig0338.png 
 Figure 3-38. Someone pushes rebased commits, abandoning commits you’ve based your work on.
 
-At this point, you have to merge this work in again, even though you’ve already done so. Rebasing changes the SHA-1 hashes of these commits so to Git they look like new commits, when in fact you already have the C4 work in your history (see Figure 3-39).
+ณ จุดนี้ คุณต้อง merge งานนี้เข้ามาใหม่อีกที แม้ว่าจะเคยทำไปทีนึงแล้วก็ตาม การ Rebase แก้ไขไอ้ SHA-1 hashes ของ commits เหล่านี้ทำให้ Git มองมันเป็นเหมือน commits ใหม่, ทั้งๆที่จริงๆแล้วคุณมีงานใน C4 อยู่ใน history ของคุณอยู่แล้ว (ดู Figure 3-39).
 
 Insert 18333fig0339.png 
 Figure 3-39. You merge in the same work again into a new merge commit.
 
-You have to merge that work in at some point so you can keep up with the other developer in the future. After you do that, your commit history will contain both the C4 and C4' commits, which have different SHA-1 hashes but introduce the same work and have the same commit message. If you run a `git log` when your history looks like this, you’ll see two commits that have the same author date and message, which will be confusing. Furthermore, if you push this history back up to the server, you’ll reintroduce all those rebased commits to the central server, which can further confuse people.
+ยังไงคุณจะต้อง merge ได้งานใหม่นี่เข้ามาซักวันแหละเพื่อจะได้ update code ตามเพื่อนๆได้ ซึ่งหลังจากทำแล้ว commit history ของคุณจะมีทั้ง commits C4 และ C4' ซึ่งมี SHA-1 hashes ต่างกันแต่เป็นงานเดียวกันและมี commit message เหมือนกัน ถ้าคุณ run `git log` ตอนที่ history คุณเป็นแบบนี้ คุณจะเห็นสอง commits ที่มี author date และ message เหมือนกันเป๊ะ แล้วมันจะชวนมึนมาก ยิ่งกว่านั้นคือถ้าคุณ push history นี้กลับไปยัง server คุณจะยัดพวก commits ที่ถูก rebased มาซ้ำเข้าไปที่ server กลาง ซึ่งจะไปทำให้คนอื่นๆมึนกันต่อ
 
-If you treat rebasing as a way to clean up and work with commits before you push them, and if you only rebase commits that have never been available publicly, then you’ll be fine. If you rebase commits that have already been pushed publicly, and people may have based work on those commits, then you may be in for some frustrating trouble.
+ถ้าคุณใช้การ rebase เฉพาะการเก็บกวาดและจัดระเบียบ commits ก่อนที่คุณจะ push มันและ ถ้าคุณ rebase เฉพาะแต่ commits ที่ไม่เคยถูกเปิดเผยให้ชาวประชา ปัญหาก็จะไม่เกิด แต่ถ้าคุณ rebase commits ที่เคยถูก pushed ออกไปให้สาธารณะชนแล้ว คนอื่นๆอาจจะทำงานต่อยอดไปจาก commits เหล่านั้น แล้วงานจะเข้า
 
-## Summary ##
+## สรุป ##
 
-We’ve covered basic branching and merging in Git. You should feel comfortable creating and switching to new branches, switching between branches and merging local branches together.  You should also be able to share your branches by pushing them to a shared server, working with others on shared branches and rebasing your branches before they are shared.
+เราได้ผ่านเบสิคการแตก branch และการ merge ใน Git ไปแล้ว ตอนนี้การสร้าง branch ใหม่และย้ายไปทำงานบนนั้น, หรือว่าย้ายกลับไปกลับมา หรือว่า merge local branches เข้าด้วยกันน่าจะเป็นเรื่องชิวๆละ นอกจากนี้คุณน่าจะสามารถ share branches ของตัวเองโดยการ push มันขึ้นไปบน shared server, หรือว่าทำงานร่วมกับเพื่อนบน branches ที่ถูก shared หรือจะเป็นการ rebase branches ของคุณก่อนจะแชร์มัน
