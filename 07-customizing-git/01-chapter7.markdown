@@ -549,7 +549,7 @@ update script จะคล้ายๆ กับ `pre-receive` script ยกเ�
 
 ### Server-Side Hook ###
 
-All the server-side work will go into the update file in your hooks directory. The update file runs once per branch being pushed and takes the reference being pushed to, the old revision where that branch was, and the new revision being pushed. You also have access to the user doing the pushing if the push is being run over SSH. If you've allowed everyone to connect with a single user (like "git") via public-key authentication, you may have to give that user a shell wrapper that determines which user is connecting based on the public key, and set an environment variable specifying that user. Here I assume the connecting user is in the `$USER` environment variable, so your update script begins by gathering all the information you need:
+การทำ server-side hook จะทำที่ไฟล์ใน hooks directory โดยไฟล์ update จะถูกเรียกทำงาน branch ละหนึ่งครั้งในกรณีที่ผู้ใช้ push ขึ้นมาทีละหลาย branch โดยจะรับ parameter เป็นค่าอ้างอิงไปยัง revision เก่าของ branch นั้น และรับ revision ใหม่ที่ถูก push ขึ้นมา เรายังสามารถเข้าถึงข้อมูลผู้ใช้ขณะที่ผู้ใช้ push ได้ด้วยถ้าผู้ใช้ push ด้วย SSH แล้วถ้าเราอนุญาติให้ทุกคนเชื่อมต่อเข้ามาด้วย single user (like "git") ด้วย public-key authentication เราจะสามารถรู้ได้ด้วยว่าผู้ใช้คนไหนเชิ่มต่อมาด้วย public key และใช้ในการกำหนดลักษณะการรับ push ของ user คนนั้นๆ ในที่นี้เราสมติว่าชื่อผู้ใช้อยู่ใน `$USER` ดังนั้นเราจะเริ่มต้น script ด้วยการรวบรวมข้อมูลที่เราต้องการขึ้นมาก่อน
 
 	#!/usr/bin/env ruby
 
@@ -560,13 +560,13 @@ All the server-side work will go into the update file in your hooks directory. T
 
 	puts "Enforcing Policies... \n(#{$refname}) (#{$oldrev[0,6]}) (#{$newrev[0,6]})"
 
-Yes, I'm using global variables. Don't judge me ‚Äî it's easier to demonstrate in this manner.
+ในตัวอย่างจะใช้ Global variable เพื่อให้เข้าใจง่าย ถ้าในการทำงานจริง ก็ลองแก้กันดูนะครับ
 
 #### Enforcing a Specific Commit-Message Format ####
 
-Your first challenge is to enforce that each commit message must adhere to a particular format. Just to have a target, assume that each message has to include a string that looks like "ref: 1234" because you want each commit to link to a work item in your ticketing system. You must look at each commit being pushed up, see if that string is in the commit message, and, if the string is absent from any of the commits, exit non-zero so the push is rejected.
+ด่านแรกของเราคือการบังคับให้ทุก commit message จะต้องใช้รูปแบบตามที่เรากำหนด สมติว่าทุก message จะต้องมีข้อความประมาณว่า "ref: 1234" เพราะเราต้องการให้ทุก commit จะต้องเชื่อมโยงไปยังระบบออก ticket สิ่งที่เราต้องทำคือการอ่านทุก commit ที่ถูกส่งเข้ามาแล้วดูว่าข้อความที่อยู่ใน commit message นั้นเป็นไปตามที่กำหนดหรือไม่ ถ้าไม่ใช่ก็ทำการจบ script ด้วย non-zero เพื่อยกเลิกการ push นั้น
 
-You can get a list of the SHA-1 values of all the commits that are being pushed by taking the `$newrev` and `$oldrev` values and passing them to a Git plumbing command called `git rev-list`. This is basically the `git log` command, but by default it prints out only the SHA-1 values and no other information. So, to get a list of all the commit SHAs introduced between one commit SHA and another, you can run something like this:
+เราต้องดึงเอารายการค่า SHA-1 ออกมาจาก commit ที่ถูก push ขึ้นมา โดยใช้ตัวแปร `$newrev` และ `$oldrev` และคำสั่ง `git rev-list` สิ่งที่ได้จากคำสั่งนี้จะเหมือน `git log` แต่จะมีเฉพาะค่า SHA-1 เท่านั้น ไม่มีข้อมูลอื่น ดังนั้น ถ้าต้องการค่า SHA ทั้งหมดเราก็จะบอกลงไปว่าเราต้องการตั้งแต่ตัวอ้างอิงไหนถึงตัวไหน ดังนี้
 
 	$ git rev-list 538c33..d14fc7
 	d14fc7c847ab946ec39590d87783c69b031bdfb7
@@ -575,9 +575,9 @@ You can get a list of the SHA-1 values of all the commits that are being pushed 
 	dfa04c9ef3d5197182f13fb5b9b1fb7717d2222a
 	17716ec0f1ff5c77eff40b7fe912f9f6cfd0e475
 
-You can take that output, loop through each of those commit SHAs, grab the message for it, and test that message against a regular expression that looks for a pattern.
+เราจะใช้รายการ SHA-1 นี้ ไปดึงเอา message ออกมาทีละอัน จากนั้นก็ทดสอบความถูกต้องด้วย regular expression เพื่อดูว่าตรงกับรูปแบบที่เราวางไว้หรือเปล่า
 
-You have to figure out how to get the commit message from each of these commits to test. To get the raw commit data, you can use another plumbing command called `git cat-file`. I'll go over all these plumbing commands in detail in Chapter 9; but for now, here's what that command gives you:
+ตอนนี้เราอาจจะสงสัยว่าจะไปเอา commit message มาได้อย่างไร เราสามารถทำได้โดยใช้คำสั่ง `git cat-file` ไว้จะอธิบายอย่างละเอียดในบทที่ 9 อีกที สำหรับตอนนี้เราจะใช้คำสั่งนี้แบบนี้ครับ
 
 	$ git cat-file commit ca82a6
 	tree cfda3bf379e4f8dba8717dee55aab78aef7f4daf
@@ -587,12 +587,12 @@ You have to figure out how to get the commit message from each of these commits 
 
 	changed the version number
 
-A simple way to get the commit message from a commit when you have the SHA-1 value is to go to the first blank line and take everything after that. You can do so with the `sed` command on Unix systems:
+เทคนิคการดึง commit message ออกจากจากข้อความทั้งหมดที่ได้จาก SHA-1 จะทำการการวิ่งไปหาบรรทัดว่างจากนั้นถือว่าทุกอย่างที่อยู่ใต้บรรทัดนั้นเป็น commit message เราสามารถใช้คำสั่ง `sed` ของ UNIX มาช่วยดึงได้ดังนี้
 
 	$ git cat-file commit ca82a6 | sed '1,/^$/d'
 	changed the version number
 
-You can use that incantation to grab the commit message from each commit that is trying to be pushed and exit if you see anything that doesn't match. To exit the script and reject the push, exit non-zero. The whole method looks like this:
+เราจะใช้ท่าข้างต้นในการดึงเอา commit message ออกมาตรวจที่ละตัว ถ้า commit message ที่เค้าพยายาม push ทั้งหมดมีตัวใดตัวหนึ่งไม่ตรงกับเงื่อนไขที่วางเอาไว้ เราก็จะจบ script เพิ่อยกเลิกการ push โดยการจบไฟล์ด้วย non-zero ดังนี้
 
 	$regex = /\[ref: (\d+)\]/
 
@@ -609,22 +609,22 @@ You can use that incantation to grab the commit message from each commit that is
 	end
 	check_message_format
 
-Putting that in your `update` script will reject updates that contain commits that have messages that don't adhere to your rule.
+เอา code ข้างต้นใส่ไว้ใน `update` script จากนั้น commit message ใดที่ไม่เข้ากับเงื่อนไขจะถูกยกเลิกการ push ทุกครั้ง
 
 #### Enforcing a User-Based ACL System ####
 
-Suppose you want to add a mechanism that uses an access control list (ACL) that specifies which users are allowed to push changes to which parts of your projects. Some people have full access, and others only have access to push changes to certain subdirectories or specific files. To enforce this, you'll write those rules to a file named `acl` that lives in your bare Git repository on the server. You'll have the `update` hook look at those rules, see what files are being introduced for all the commits being pushed, and determine whether the user doing the push has access to update all those files.
+สมติว่าเราต้องการกำหนด access control list (ACL) เพื่อระบุว่าผู้ใช้คนไหนสามารถแก้ไขไฟล์ใน part ไหนได้บ้าง ผู้ใช้บางคนสามารถเข้าถึงได้ทั้งหมด และมีบางคนที่ทำได้เฉพาะการ push ไปยัง directory ที่กำหนด หรือไฟล์ที่กำหนดเท่านั้น การที่จะตั้งเงื่อนไขแบบนี้ได้เราจะต้องกำหนดไว้ในไฟล์ชื่อ `acl` ซึ่งอยู่ใน git repository บน server จากนั้นเราต้องแก้ไขไฟล์ `update` เพื่อให้มันทำตามกฏที่เราตั้งขึ้น โดยดูว่าไฟล์แต่ะลไฟล์ที่ commit ไว้สามารถ push ได้ตามสิทธิ์ของ user คนนั้นๆ หรือไม่
 
-The first thing you'll do is write your ACL. Here you'll use a format very much like the CVS ACL mechanism: it uses a series of lines, where the first field is `avail` or `unavail`, the next field is a comma-delimited list of the users to which the rule applies, and the last field is the path to which the rule applies (blank meaning open access). All of these fields are delimited by a pipe (`|`) character.
+สิ่งแรกที่เราต้องทำการการแก้ไฟล์ ACL รูปแบบการเขียนจะคล้ายกับ ACL ของ CVS โดยแต่ละบรรทัดจะขึ้นต้นด้วย `avail` หรือ `unavail` จากนั้นตามด้วยชื่อผู้ใช้คั่นด้วย comma-delimited และใส่ตัวสุดท้ายเป็น path ที่อนุญาติหรือไม่อนุญาติให้แก้ไข (ถ้าเป็นช่องว่าง หมายถึง open access) จานั้นปิดหัวท้ายของผู้ใช้ด้วย `|` ยกเว้นบรรทัดที่เราต้องการให้ open access
 
-In this case, you have a couple of administrators, some documentation writers with access to the `doc` directory, and one developer who only has access to the `lib` and `tests` directories, and your ACL file looks like this:
+ในกรณีของเรา จะมีผู้ใช้บางคนเป็น administrator บางคนเป็นคนเขียนเอกสารจะเข้าถึงได้เฉพาะ directory `doc` และมีหนึ่งคนที่เข้าถึง directory `lib` และ `tests` ซึ่งทำให้ ACL ของเราเป็นดังนี้
 
 	avail|nickh,pjhyett,defunkt,tpw
 	avail|usinclair,cdickens,ebronte|doc
 	avail|schacon|lib
 	avail|schacon|tests
 
-You begin by reading this data into a structure that you can use. In this case, to keep the example simple, you'll only enforce the `avail` directives. Here is a method that gives you an associative array where the key is the user name and the value is an array of paths to which the user has write access:
+เราเริ่มต้นด้วยการอ่านข้อมูลเข้ามาเป็นรูปแบบที่เราใช้งานได้ก่อน ในกรณีนี้เราจะมีแค่ `avail` เท่านั้น ในตัวอย่างต่อไปนี้เราจะรวบรวมเป็น associative array โดยให้ key เป็นชื่อของ user และมี value เป็น array ของ path ที่ผู้ใช้คนนั้นสามารถแก้ไขได้
 
 	def get_acl_access_data(acl_file)
 	  # read in ACL data
@@ -641,7 +641,7 @@ You begin by reading this data into a structure that you can use. In this case, 
 	  access
 	end
 
-On the ACL file you looked at earlier, this `get_acl_access_data` method returns a data structure that looks like this:
+ผลลัพท์ที่ได้จากการอ่านไฟล์ ACL ด้วยคำสั่ง `get_acl_access_data` จะได้เป็นข้อมูลรูปแบบดังนี้
 
 	{"defunkt"=>[nil],
 	 "tpw"=>[nil],
@@ -652,16 +652,16 @@ On the ACL file you looked at earlier, this `get_acl_access_data` method returns
 	 "usinclair"=>["doc"],
 	 "ebronte"=>["doc"]}
 
-Now that you have the permissions sorted out, you need to determine what paths the commits being pushed have modified, so you can make sure the user who's pushing has access to all of them.
+เอาล่ะ ตอนนี้เราได้สิทธิในการเข้าถึงของผู้ใช้แต่ละคนแล้ว ต่อไปเราต้องดูว่า paths ของ commit ที่ push เข้ามานั้น เป็นไปตามสิทธิของผู้ใช้ ตามเงื่อนไขที่เราวางเอาไว้หรือเปล่า
 
-You can pretty easily see what files have been modified in a single commit with the `--name-only` option to the `git log` command (mentioned briefly in Chapter 2):
+เราสามารถทำได้ง่ายๆ โดยดูไฟล์ที่ถูกแก้ไขใน commit แต่ละตัวด้วย option `--name-only` ในคำสั่ง `git log` (ซึ่งได้พูดไว้คร่าวๆ ในบทที่ 2) 
 
 	$ git log -1 --name-only --pretty=format:'' 9f585d
 
 	README
 	lib/test.rb
 
-If you use the ACL structure returned from the `get_acl_access_data` method and check it against the listed files in each of the commits, you can determine whether the user has access to push all of their commits:
+ถ้าเราใช้ ACL structure ที่ได้รับจาก `get_acl_access_data` แล้วเอามาเทียบกับรายชื่อของไฟล์ใน commit นั้นๆ เราจะสามารถบอกได้ว่าผู้ใช้แก้ไขไฟล์ตามสิทธิ์ของตนเองหรือไม่
 
 	# only allows certain users to modify certain subdirectories in a project
 	def check_directory_perms
@@ -690,9 +690,9 @@ If you use the ACL structure returned from the `get_acl_access_data` method and 
 
 	check_directory_perms
 
-Most of that should be easy to follow. You get a list of new commits being pushed to your server with `git rev-list`. Then, for each of those, you find which files are modified and make sure the user who's pushing has access to all the paths being modified. One Rubyism that may not be clear is `path.index(access_path) == 0`, which is true if path begins with `access_path` ‚Äî this ensures that `access_path` is not just in one of the allowed paths, but an allowed path begins with each accessed path. 
+Code ส่วนใหญ่สามารถอ่านตามได้ง่าย เราสามารถแสดงรายการ commit ที่ถูกส่งมาให้ server ด้วยคำสั่ง `git rev-list` จากนั้นก็ไล่ดูไปที่ละอัน เราจะเห็นว่าไฟล์ไหนบ้างที่ถูกแก้ไข จากนั้นก็ตรวจสอบให้แน่ใจว่าใครเป็นคน push ขึ้นมา แล้วดูว่าเค้ามีสิทธิ์หรือไม่ ใครที่เป็นนักพัฒฯา Ruิัby อาจจะงงๆ กับคำสั่ง `path.index(access_path) == 0` ซึ่งจะ return true ถ้า path เริ่มต้นด้วย `access_path` นี่จะทำให้แน่ใจว่า `access_path` ไม่ได้มีแค่ตัวเดียวที่ตรง แต่ต้องตรงทุก path
 
-Now your users can't push any commits with badly formed messages or with modified files outside of their designated paths.
+ตอนนี้ผู้ใช้ก็ไม่สามารถ push commit ที่ไม่ตรงกับรูปแบบที่เรากำหนดไว้ได้ และไม่สามารถแก้ไขที่อยุ่นอกสิทธิ์ที่เราออกแบบไว้ได้ด้วย
 
 #### Enforcing Fast-Forward-Only Pushes ####
 
