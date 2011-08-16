@@ -129,7 +129,7 @@ Figure 3-10. A short and simple commit history.
 Insert 18333fig0311.png 
 Figure 3-11. Creating a new branch pointer.
 
-คุณทำงานไปบน web site ของคุณและ commit ไปนิดหน่อย ซึ่งระหว่างนั้นก็เป็นการผลัก branch `iss53` ไปข้างหน้า เพราะคุณ checkedout มันออกมา (แปลว่า HEAD ของคุณชี้ไปหามัน ดังรูป Figure 3-12):
+คุณทำงานไปบน web site ของคุณและ commit ไปนิดหน่อย ซึ่งระหว่างนั้นก็เป็นการผลัก branch `iss53` ไปข้างหน้า เพราะคุณ checkout มันออกมา (แปลว่า HEAD ของคุณชี้ไปหามัน ดังรูป Figure 3-12):
 
 	$ vim index.html
 	$ git commit -a -m 'added a new footer [issue 53]'
