@@ -270,7 +270,7 @@ resolution (การซ่อม) อันนี้เอามาจากท
 
 ถ้า merge tool ที่ถูกเลือกขึ้นมาโดย default นั้นไม่โดนใจ (Git เลือก `opendiff` ให้ผมในกรณีนี้เพราะผม run command บน Mac) คุณก็ดูว่า supported tools ที่ list อยู่ข้างบนหลังจากคำว่า “merge tool candidates” แล้วพิมพ์ชื่อ tool ที่อยากใช้ลงไป ใน Chapter 7 เราจะมาถกกันว่าคุณจะเปลี่ยน default value เหล่านี้ใน environment คุณได้ยังไง
 
-หลังจากปิด merge tool ไป Git ก็จะถามคุณว่า merge สำเร็จมัย? ถ้าคุณตอบไปว่าชิววว มันก็จะ stages file นั้นเพื่อระบุว่ามันถูก resolved แล้วให้คุณ
+หลังจากปิด merge tool ไป Git ก็จะถามคุณว่า merge สำเร็จมั้ย? ถ้าคุณตอบไปว่าชิววว มันก็จะ stages file นั้นเพื่อระบุว่ามันถูก resolved แล้วให้คุณ
 
 ลอง run `git status` อีกทีเพื่อเช็คดูว่าไม่เหลือ conflicts ให้ resolve แล้วนะ
 
