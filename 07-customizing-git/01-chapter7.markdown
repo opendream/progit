@@ -696,9 +696,9 @@ Code ส่วนใหญ่สามารถอ่านตามได้ง
 
 #### Enforcing Fast-Forward-Only Pushes ####
 
-The only thing left is to enforce fast-forward-only pushes. In Git versions 1.6 or newer, you can set the `receive.denyDeletes` and `receive.denyNonFastForwards` settings. But enforcing this with a hook will work in older versions of Git, and you can modify it to do so only for certain users or whatever else you come up with later.
+ตอนนี้ก็เหลือแค่บังคับให้ fast-forward-only เท่านั้นที่ push เข้ามาได้ สำหรับ Git ตั้งแต่ version 1.6 ขึ้นไป เราจะสามารถใช้ `recive.denyDeletes` และ `receive.denyNonFastForwards` ใน setting ได้ แต่ในตัวอย่างนี้จะเอาไว้ใช้กับ Git version เก่าๆ ได้ หรือไม่เราก็สามารถดัดแปลงไปใช้อย่างอื่นได้อีกในอนาคต 
 
-The logic for checking this is to see if any commits are reachable from the older revision that aren't reachable from the newer one. If there are none, then it was a fast-forward push; otherwise, you deny it:
+เทคนิคในการตรวจสอบคือให้เราหาว่ามีซัก commit ที่เชื่อมไปยัง revision เก่าได้หรือไม่ ถ้าไม่มีก็แสดงว่าเป็น fast-forward push ถ้าไ่ม่ใช้ก็จะยกเลิก
 
 	# enforces fast-forward only pushes 
 	def check_fast_forward
@@ -712,7 +712,7 @@ The logic for checking this is to see if any commits are reachable from the olde
 
 	check_fast_forward
 
-Everything is set up. If you run `chmod u+x .git/hooks/update`, which is the file you into which you should have put all this code, and then try to push a non-fast-forwarded reference, you get something like this:
+ทีนี้ทุกอย่างก็ครบแล้ว ถ้าเราทดลองสั่ง `chmod u+x .git/hooks/update` ซึ่งเป็น file ที่ code ทั้งหมดของเราใส่เอาไว้ จากนั้นก็ทดลอง push ืcode ที่เป็น non-fast-forwarded เข้าไป เราจะได้ค่าดังนี้กลับมา
 
 	$ git push -f origin master
 	Counting objects: 5, done.
@@ -729,36 +729,36 @@ Everything is set up. If you run `chmod u+x .git/hooks/update`, which is the fil
 	 ! [remote rejected] master -> master (hook declined)
 	error: failed to push some refs to 'git@gitserver:project.git'
 
-There are a couple of interesting things here. First, you see this where the hook starts running.
+เรามาลองดูค่าที่ส่งกลับมาโดยเริ่มจะวินาทีที่ hook เริ่มทำงาน
 
 	Enforcing Policies... 
 	(refs/heads/master) (fb8c72) (c56860)
 
-Notice that you printed that out to stdout at the very beginning of your update script. It's important to note that anything your script prints to stdout will be transferred to the client.
+จะเห็นว่าเราทำการแสดงค่าออกมาทาง stdout ตามที่เราสั่งไว้ ดังนั้นต้องจำไว้ว่า อะไรก็ตามที่เราสั่งเขียนออกทาง stdout จะถูกส่งต่อไปยังเครื่อง client
 
-The next thing you'll notice is the error message.
+ต่อไปคือ error message
 
 	[POLICY] Cannot push a non fast-forward reference
 	error: hooks/update exited with error code 1
 	error: hook declined to update refs/heads/master
 
-The first line was printed out by you, the other two were Git telling you that the update script exited non-zero and that is what is declining your push. Lastly, you have this:
+บรรทัดแรกเราเป็นคนเขียนขึ้นมาเอง แต่สองบรรทัดต่อมา Git เป็นคนเขียน ว่า update script ได้ถูกยกเลิกพราะจบด้วย non-zero และ push ของผู้ใช้ก็ถูกยกเลิกไปด้วย โดยแสดงเป็น error ดังนี้
 
 	To git@gitserver:project.git
 	 ! [remote rejected] master -> master (hook declined)
 	error: failed to push some refs to 'git@gitserver:project.git'
 
-You'll see a remote rejected message for each reference that your hook declined, and it tells you that it was declined specifically because of a hook failure.
+เราจะเห็นจาก rejected message ว่าแต่ละ reference ที่ส่งเข้าไปใน hook นั้นถูกยกเลิกเพราะเหตุผลอะไร
 
-Furthermore, if the ref marker isn't there in any of your commits, you'll see the error message you're printing out for that.
+นอกจากนี้ ถ้า ref market ที่เรากำหนดให้ใส่ใน commit ดันไม่อยู๋ใน commit เราจะได้รับ message ดังนี้
 
 	[POLICY] Your message is not formatted correctly
 
-Or if someone tries to edit a file they don't have access to and push a commit containing it, they will see something similar. For instance, if a documentation author tries to push a commit modifying something in the `lib` directory, they see
+หรือถ้าผู้ใช้พยายามจะเข้าไปแก้ไขไฟล์ที่ตัวเองไม่มีสิทธิ์แก้ แล้วสั่ง push ขึ้นมาก็จะได้รับ error ดังนี้
 
 	[POLICY] You do not have access to push to lib/test.rb
 
-That's all. From now on, as long as that `update` script is there and executable, your repository will never be rewound and will never have a commit message without your pattern in it, and your users will be sandboxed.
+ครบแล้วครับ ตราบเท่าที่ `update` ของเรายังทำงานอยู่ repository ของเราจะไม่เคย reword และไม่เคยรับ commit ที่ไม่ถูกต้องตาม pattart และผู้ใช้ก็จะปลอดภัย
 
 ### Client-Side Hooks ###
 
