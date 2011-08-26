@@ -696,9 +696,9 @@ Code ส่วนใหญ่สามารถอ่านตามได้ง
 
 #### Enforcing Fast-Forward-Only Pushes ####
 
-The only thing left is to enforce fast-forward-only pushes. In Git versions 1.6 or newer, you can set the `receive.denyDeletes` and `receive.denyNonFastForwards` settings. But enforcing this with a hook will work in older versions of Git, and you can modify it to do so only for certain users or whatever else you come up with later.
+ตอนนี้ก็เหลือแค่บังคับให้ fast-forward-only เท่านั้นที่ push เข้ามาได้ สำหรับ Git ตั้งแต่ version 1.6 ขึ้นไป เราจะสามารถใช้ `recive.denyDeletes` และ `receive.denyNonFastForwards` ใน setting ได้ แต่ในตัวอย่างนี้จะเอาไว้ใช้กับ Git version เก่าๆ ได้ หรือไม่เราก็สามารถดัดแปลงไปใช้อย่างอื่นได้อีกในอนาคต 
 
-The logic for checking this is to see if any commits are reachable from the older revision that aren't reachable from the newer one. If there are none, then it was a fast-forward push; otherwise, you deny it:
+เทคนิคในการตรวจสอบคือให้เราหาว่ามีซัก commit ที่เชื่อมไปยัง revision เก่าได้หรือไม่ ถ้าไม่มีก็แสดงว่าเป็น fast-forward push ถ้าไ่ม่ใช้ก็จะยกเลิก
 
 	# enforces fast-forward only pushes 
 	def check_fast_forward
@@ -712,7 +712,7 @@ The logic for checking this is to see if any commits are reachable from the olde
 
 	check_fast_forward
 
-Everything is set up. If you run `chmod u+x .git/hooks/update`, which is the file you into which you should have put all this code, and then try to push a non-fast-forwarded reference, you get something like this:
+ทีนี้ทุกอย่างก็ครบแล้ว ถ้าเราทดลองสั่ง `chmod u+x .git/hooks/update` ซึ่งเป็น file ที่ code ทั้งหมดของเราใส่เอาไว้ จากนั้นก็ทดลอง push ืcode ที่เป็น non-fast-forwarded เข้าไป เราจะได้ค่าดังนี้กลับมา
 
 	$ git push -f origin master
 	Counting objects: 5, done.
@@ -729,44 +729,44 @@ Everything is set up. If you run `chmod u+x .git/hooks/update`, which is the fil
 	 ! [remote rejected] master -> master (hook declined)
 	error: failed to push some refs to 'git@gitserver:project.git'
 
-There are a couple of interesting things here. First, you see this where the hook starts running.
+เรามาลองดูค่าที่ส่งกลับมาโดยเริ่มจะวินาทีที่ hook เริ่มทำงาน
 
 	Enforcing Policies... 
 	(refs/heads/master) (fb8c72) (c56860)
 
-Notice that you printed that out to stdout at the very beginning of your update script. It's important to note that anything your script prints to stdout will be transferred to the client.
+จะเห็นว่าเราทำการแสดงค่าออกมาทาง stdout ตามที่เราสั่งไว้ ดังนั้นต้องจำไว้ว่า อะไรก็ตามที่เราสั่งเขียนออกทาง stdout จะถูกส่งต่อไปยังเครื่อง client
 
-The next thing you'll notice is the error message.
+ต่อไปคือ error message
 
 	[POLICY] Cannot push a non fast-forward reference
 	error: hooks/update exited with error code 1
 	error: hook declined to update refs/heads/master
 
-The first line was printed out by you, the other two were Git telling you that the update script exited non-zero and that is what is declining your push. Lastly, you have this:
+บรรทัดแรกเราเป็นคนเขียนขึ้นมาเอง แต่สองบรรทัดต่อมา Git เป็นคนเขียน ว่า update script ได้ถูกยกเลิกพราะจบด้วย non-zero และ push ของผู้ใช้ก็ถูกยกเลิกไปด้วย โดยแสดงเป็น error ดังนี้
 
 	To git@gitserver:project.git
 	 ! [remote rejected] master -> master (hook declined)
 	error: failed to push some refs to 'git@gitserver:project.git'
 
-You'll see a remote rejected message for each reference that your hook declined, and it tells you that it was declined specifically because of a hook failure.
+เราจะเห็นจาก rejected message ว่าแต่ละ reference ที่ส่งเข้าไปใน hook นั้นถูกยกเลิกเพราะเหตุผลอะไร
 
-Furthermore, if the ref marker isn't there in any of your commits, you'll see the error message you're printing out for that.
+นอกจากนี้ ถ้า ref market ที่เรากำหนดให้ใส่ใน commit ดันไม่อยู๋ใน commit เราจะได้รับ message ดังนี้
 
 	[POLICY] Your message is not formatted correctly
 
-Or if someone tries to edit a file they don't have access to and push a commit containing it, they will see something similar. For instance, if a documentation author tries to push a commit modifying something in the `lib` directory, they see
+หรือถ้าผู้ใช้พยายามจะเข้าไปแก้ไขไฟล์ที่ตัวเองไม่มีสิทธิ์แก้ แล้วสั่ง push ขึ้นมาก็จะได้รับ error ดังนี้
 
 	[POLICY] You do not have access to push to lib/test.rb
 
-That's all. From now on, as long as that `update` script is there and executable, your repository will never be rewound and will never have a commit message without your pattern in it, and your users will be sandboxed.
+ครบแล้วครับ ตราบเท่าที่ `update` ของเรายังทำงานอยู่ repository ของเราจะไม่เคย reword และไม่เคยรับ commit ที่ไม่ถูกต้องตาม pattart และผู้ใช้ก็จะปลอดภัย
 
 ### Client-Side Hooks ###
 
-The downside to this approach is the whining that will inevitably result when your users' commit pushes are rejected. Having their carefully crafted work rejected at the last minute can be extremely frustrating and confusing; and furthermore, they will have to edit their history to correct it, which isn't always for the faint of heart.
+สิ่งที่เลวร้ายมากสำหรับนักพัฒนาใน workflow ของเราคือ เวลาที่เค้า commit เข้ามาแล้วโดน reject หลังจากนั้นต้องใช้เวลานานมากเพื่อแก้ไขประวัติของการ commit ให้ถูกต้อง 
 
-The answer to this dilemma is to provide some client-side hooks that users can use to notify them when they're doing something that the server is likely to reject. That way, they can correct any problems before committing and before those issues become more difficult to fix. Because hooks aren't transferred with a clone of a project, you must distribute these scripts some other way and then have your users copy them to their `.git/hooks` directory and make them executable. You can distribute these hooks within the project or in a separate project, but there is no way to set them up automatically.
+วิธีที่จะป้องกันความเลวร้ายอันนี้คือ การสร้าง client-side ้hook ให้กับนักพัฒนา ซึ่งจะจำลองตัวเองเหมือน server แล้วเตือนผู้ใช้ว่า commit ที่เขียนเข้ามาถูกต้องตามเงื่อนไขหรือไม่ ตัวนี้จะช่วยบอกนักพัฒนาตัวแต่ตอนที่ commit ว่ามีอะไรผิดพลาดบ้างแทนที่จะรอให้ผ่านไปหลาย commit ซึ่งตอนนั้นก็แก้ยากแล้ว แต่อย่างหนึ่งที่ทำไม่ได้คือเราไม่สามารถผูก client-side ้hook ไว้กับ project ได้ เราต้องให้ผู้ใช้ download ไปเองหรือไม่ก็ทำ repository สำหรับเก็บแยกไว้ต่างหาก
 
-To begin, you should check your commit message just before each commit is recorded, so you know the server won't reject your changes due to badly formatted commit messages. To do this, you can add the `commit-msg` hook. If you have it read the message from the file passed as the first argument and compare that to the pattern, you can force Git to abort the commit if there is no match:
+เราจะเริ่มต้นด้วยการตรวจสอบ commit message ทุกอันก่อนที่จะถูก push ขึ้นไปบน server โดยเขียน script ไว้ใน hook `commit-msg` จากนั้นอ่านทีละ message แล้วเปรียบเทียบกับ pattern ด้วยวิธีการเดียวกับ server ถ้าเกิดว่าไม่ตรงก็ให้ Git ทำการยกเลิก commit นั้นเลย
 
 	#!/usr/bin/env ruby
 	message_file = ARGV[0]
@@ -779,18 +779,18 @@ To begin, you should check your commit message just before each commit is record
 	  exit 1
 	end
 
-If that script is in place (in `.git/hooks/commit-msg`) and executable, and you commit with a message that isn't properly formatted, you see this:
+ถ้าเราเอา script ไว้ถูกที่ (ใน `.git/hooks/commit-msg`) และทำให้มัน excutable แล้ว เมื่อเรา commit message ที่ไม่ตรงตามรูปแบบที่วางเอาไว้ เราจะได้รับข้อความดังนี้
 
 	$ git commit -am 'test'
 	[POLICY] Your message is not formatted correctly
 
-No commit was completed in that instance. However, if your message contains the proper pattern, Git allows you to commit:
+แต่ถ้า commit message ของเราเขียนมาอย่างถูกต้อง Git ก็จะให้ commit นั้นผ่านเข้าไปได้ และแสดงข้อความดังนี้
 
 	$ git commit -am 'test [ref: 132]'
 	[master e05c914] test [ref: 132]
 	 1 files changed, 1 insertions(+), 0 deletions(-)
 
-Next, you want to make sure you aren't modifying files that are outside your ACL scope. If your project's `.git` directory contains a copy of the ACL file you used previously, then the following `pre-commit` script will enforce those constraints for you:
+ต่อไปคือเราต้องการแน่ใจว่าไฟล์ที่ถูกแก้ไขนั้น ผู้แก้มีสิทธิในการแก้ไขตามที่ ACL กำหนดไว้ ถ้าโปรแกรมของเรามีไฟล์ ACL อยู่ใน `.git` เรียบร้อยแล้ว เราก็เขียนแก้ `pre-commit` ได้เลย 
 
 	#!/usr/bin/env ruby
 
@@ -819,29 +819,31 @@ Next, you want to make sure you aren't modifying files that are outside your ACL
 
 	check_directory_perms
 
-This is roughly the same script as the server-side part, but with two important differences. First, the ACL file is in a different place, because this script runs from your working directory, not from your Git directory. You have to change the path to the ACL file from this
+script ชุดนี้จะหน้าตาเหมือนของ server-side script แต่มีสองส่วนที่แตกต่างกัน อันแรกคือไฟล์ ACL จะอยู่คนละที่กัน เพราะ script จะทำงานที่ working directory ไม่ได้ดูที่ Git directory ดังนั้นเราต้องเปลี่ยนที่อยู่ของไฟล์ ACL จาก
 
 	access = get_acl_access_data('acl')
 
-to this:
+ไปเป็น
 
 	access = get_acl_access_data('.git/acl')
 
-The other important difference is the way you get a listing of the files that have been changed. Because the server-side method looks at the log of commits, and, at this point, the commit hasn't been recorded yet, you must get your file listing from the staging area instead. Instead of
+ความแตกต่างอย่างที่สองคือ วิธีการดึง list ของไฟล์ที่ถูกแก้ไข ในฝั่ง server เราจะใช้วิธีดู log ของการ commit แต่ถในกรณีของฝั่ง client ตัว commit จะยังไม่ได้ถูกบันทึกลงไป ดังนั้นเราจะต้องดึง list ของไฟล์จาก ที่ผู้ใช้ใส่เข้ามาโดยแทนที่บรรทัดต่อไปนี้
 
 	files_modified = `git log -1 --name-only --pretty=format:'' #{ref}`
 
-you have to use
+ด้วยบรรทัดนี้
 
 	files_modified = `git diff-index --cached --name-only HEAD`
 
-But those are the only two differences ‚Äî otherwise, the script works the same way. One caveat is that it expects you to be running locally as the same user you push as to the remote machine. If that is different, you must set the `$user` variable manually.
+จะมีส่วนที่แตกต่างกันแค่สองส่วนนี้เท่านั้น นอกนั้น client กับ server จะเหมือนกัน มีอีกเล็กน้อยที่ต้องระวังคือผมคาดว่าเราจะใช้ user ที่ผั่ง client กับ server เป็นคนเดียวกัน แต่ถ้าไม่ใช่เราอาจจะต้องกำหนดค่า `$user` ขึ้นมาเอง
 
-The last thing you have to do is check that you're not trying to push non-fast-forwarded references, but that is a bit less common. To get a reference that isn't a fast-forward, you either have to rebase past a commit you've already pushed up or try pushing a different local branch up to the same remote branch.
+อย่างสุดท้ายที่เราต้องดูคือ เราต้องตรวจสอบว่านักพัฒนาไม่ได้ push non-fast-forward เข้ามา ซึ่งเราไม่สามารถใช้ท่าธรรมดาได้ วิธีที่จะรู้ว่า reference นั้นไม่ใช่ fast-forward เราจะต้อง rebase commit ที่ถูก pus้h ขึ้นไแแล้ว หรือไม่ก็ทดลอง push local branch อื่นๆ ขึ้นไปที่ remote branch เดียวกัน
+
+เพราะเราต้องพึ่ง server ในการบอกว่า push นั้นเป็น non-fast-forward หรือไม่ โดยให้ตัว hook ที่ฝั่ง server ทำหน้าที่ตรวจสอบให้ ่เดี๋ยวเราจะทดลองสั่ง rebase commit ที่เราเคย push ขึ้นไปแล้ว เพื่อทดสอบ hook ของเรา
 
 Because the server will tell you that you can't push a non-fast-forward anyway, and the hook prevents forced pushes, the only accidental thing you can try to catch is rebasing commits that have already been pushed.
 
-Here is an example pre-rebase script that checks for that. It gets a list of all the commits you're about to rewrite and checks whether they exist in any of your remote references. If it sees one that is reachable from one of your remote references, it aborts the rebase:
+ต่อไปนี้เป็นตัวอย่างของการทำ pre-rebase script สำหรับการตรวจสอบกรณีนี้ ตัวอย่างจะดึงรายการ commit ที่เราตอ้งการแก้ไข และตรวจสอบว่าแต่ละตัวมีการ push ขึ้น remote ไปบ้างแล้วหรือไม่ ถ้ามีตัวใดตัวหนึ่งที่มีอยู่แล้วเราจะทำการยกเลิกการ rebase ทันที
 
 	#!/usr/bin/env ruby
 
@@ -865,14 +867,16 @@ Here is an example pre-rebase script that checks for that. It gets a list of all
 	  end
 	end
 
-This script uses a syntax that wasn't covered in the Revision Selection section of Chapter 6. You get a list of commits that have already been pushed up by running this:
+ใน script จะมีคำสั่งที่ไม่มีใน Revision Selection ้ของบทที่ 6 คือเราสามารถดึง list ของ commit ที่ถูก pust ขึ้นไปแล้วได้โดยการสั่ง
 
 	git rev-list ^#{sha}^@ refs/remotes/#{remote_ref}
 
-The `SHA^@` syntax resolves to all the parents of that commit. You're looking for any commit that is reachable from the last commit on the remote and that isn't reachable from any parent of any of the SHAs you're trying to push up ‚Äî meaning it's a fast-forward.
+ค่า `SHA^@` เป็นตัวแทน parents ทุกตัวของแต่ละ commit เราพยายามมองหาว่าแต่ละ commit ที่เชื่อมโยงกับ commit สุดท้ายบน server และดูว่ามันเชื่อมโยงไปยัง parent ของ SHA ตัวใดตัวหนึ่งที่เราพยายามจะ push หรือไม่ ถ้ามีก็แสดงว่าเป็น fast-forward
 
-The main drawback to this approach is that it can be very slow and is often unnecessary ‚Äî if you don't try to force the push with `-f`, the server will warn you and not accept the push. However, it's an interesting exercise and can in theory help you avoid a rebase that you might later have to go back and fix.
+ปัญหาของวิธีการนี้คือมันช้ามาก และดูเหมือนไม่ค่อยมีประโยชน์ เพราะถ้าเราไม่ได้พยายามจะ force push ด้วย `-f` แล้ว ทุกครั้งที่เรา พยายามจะ push ตัว server ก็จะเตือนเราเองและทางแก้ก็ไม่ยาก แต่อย่างไรก็ตามตัวอย่างนี้ก็น่าสนใจ และน่าจะสามารถช่วยให้เราแก้ปํญหาการ rebase ผิดแล้วต้องย้อนกลับมาแก้ทีหลัง
 
 ## Summary ##
 
-You've covered most of the major ways that you can customize your Git client and server to best fit your workflow and projects. You've learned about all sorts of configuration settings, file-based attributes, and event hooks, and you've built an example policy-enforcing server. You should now be able to make Git fit nearly any workflow you can dream up.
+ถึงต้อนนี้เราได้เรียนรู้เทคนิคส่วนใหญ่ในการปรับแต่ Git แล้วทั้งฝั่ง client และ server เพื่อให้ Git ทำงานได้ตรงกับ workflow ของโครงการ 
+ทั้งการปรับแต่งจาก configuration setting, file-base attributes, hooks และ ได้ทดลองทำ policy-enforceing ที่ฝั่ง server หลังจากนี้
+เราจะสามารถสร้าง Git ในฝันของเราได้แล้ว
